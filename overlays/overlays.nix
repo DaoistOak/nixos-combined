@@ -10,6 +10,7 @@ in {
 
   # Overlays for NixOS systems
   nixos = [
+    overlays.additions
     overlays.nur
   ];
 
