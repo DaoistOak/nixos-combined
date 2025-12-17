@@ -80,9 +80,6 @@
             enable = true;
             package = inputs.hyprland.packages."x86_64-linux".hyprland;
             portalPackage = inputs.hyprland.packages."x86_64-linux".xdg-desktop-portal-hyprland;
-            plugins = [
-              inputs.Hyprspace.packages.x86_64-linux.Hyprspace
-            ];
           };
         }
       ];
