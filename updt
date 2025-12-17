@@ -1,0 +1,236 @@
+#!/usr/bin/env bash
+
+# Updt: Comprehensive NixOS & Home-Manager Update Script
+# Updates flake inputs, rebuilds both system and user configurations
+
+set -e  # Exit on any error
+
+# Configuration
+FLAKE_PATH="$HOME/.config/nixos"
+NIXOS_HOST="Overlord"
+HOME_USER="zeph"
+SUCCESS_SOUND="/run/current-system/sw/share/sounds/freedesktop/stereo/complete.oga"
+ERROR_SOUND="/run/current-system/sw/share/sounds/freedesktop/stereo/dialog-error.oga"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Logging functions
+log_info() {
+    echo -e "${BLUE}ℹ${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}✅${NC} $1"
+}
+
+log_warning() {
+    echo -e "${YELLOW}⚠${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}❌${NC} $1"
+}
+
+# Notification function
+notify() {
+    local title="$1"
+    local message="$2"
+    local urgency="${3:-normal}"
+
+    if command -v notify-send &> /dev/null; then
+        notify-send -u "$urgency" "$title" "$message"
+    fi
+}
+
+# Sound function
+play_sound() {
+    local sound_file="$1"
+    if [[ -f "$sound_file" ]] && command -v pw-play &> /dev/null; then
+        pw-play "$sound_file" 2>/dev/null || true
+    fi
+}
+
+# Check if we're in the right directory
+check_directory() {
+    if [[ ! -d "$FLAKE_PATH" ]]; then
+        log_error "Flake directory not found: $FLAKE_PATH"
+        exit 1
+    fi
+
+    cd "$FLAKE_PATH" || {
+        log_error "Cannot cd into $FLAKE_PATH"
+        exit 1
+    }
+}
+
+# Check for uncommitted changes
+check_git_status() {
+    if [[ -n $(git status --porcelain) ]]; then
+        log_warning "Uncommitted changes detected"
+        echo "📄 Opening LazyGit to review changes..."
+        sleep 2
+
+        if command -v lazygit &> /dev/null; then
+            lazygit
+        else
+            git status
+            echo "Press Enter to continue or Ctrl+C to abort..."
+            read -r
+        fi
+    fi
+}
+
+# Update flake inputs
+update_flake_inputs() {
+    log_info "Updating flake inputs..."
+    if nix flake update; then
+        log_success "Flake inputs updated"
+    else
+        log_error "Failed to update flake inputs"
+        return 1
+    fi
+}
+
+# Build NixOS system
+build_nixos() {
+    log_info "Building NixOS system ($NIXOS_HOST)..."
+
+    if sudo nixos-rebuild build --flake "$FLAKE_PATH#$NIXOS_HOST"; then
+        log_success "NixOS build successful"
+        return 0
+    else
+        log_error "NixOS build failed"
+        return 1
+    fi
+}
+
+# Build home-manager configuration
+build_home_manager() {
+    log_info "Building home-manager configuration ($HOME_USER)..."
+
+    if home-manager build --flake "$FLAKE_PATH#$HOME_USER"; then
+        log_success "Home-manager build successful"
+        return 0
+    else
+        log_error "Home-manager build failed"
+        return 1
+    fi
+}
+
+# Switch to new NixOS system
+switch_nixos() {
+    log_info "Switching to new NixOS system..."
+
+    if sudo nixos-rebuild switch --flake "$FLAKE_PATH#$NIXOS_HOST"; then
+        log_success "NixOS switch successful"
+        return 0
+    else
+        log_error "NixOS switch failed"
+        return 1
+    fi
+}
+
+# Switch to new home-manager configuration
+switch_home_manager() {
+    log_info "Switching to new home-manager configuration..."
+
+    if home-manager switch --flake "$FLAKE_PATH#$HOME_USER"; then
+        log_success "Home-manager switch successful"
+        return 0
+    else
+        log_error "Home-manager switch failed"
+        return 1
+    fi
+}
+
+# Commit changes
+commit_changes() {
+    log_info "Committing changes to git..."
+
+    # Check if there are actually changes to commit
+    if [[ -z $(git diff --cached --name-only) ]] && [[ -z $(git diff --name-only) ]]; then
+        log_info "No changes to commit"
+        return 0
+    fi
+
+    git add -A
+
+    # Create a meaningful commit message
+    local commit_msg="Update: $(date '+%Y-%m-%d %H:%M:%S')"
+    local changed_files=$(git diff --cached --name-only | wc -l)
+    commit_msg="$commit_msg ($changed_files files changed)"
+
+    if git commit -m "$commit_msg"; then
+        log_success "Changes committed: $commit_msg"
+    else
+        log_warning "Failed to commit changes"
+    fi
+}
+
+# Main update function
+main() {
+    echo "🚀 Starting comprehensive NixOS & Home-Manager update..."
+    echo "=================================================="
+
+    # Pre-flight checks
+    check_directory
+    check_git_status
+
+    # Update phase
+    update_flake_inputs
+
+    # Build phase (dry run)
+    echo
+    log_info "Build Phase (Testing configurations)..."
+    echo "---------------------------------------"
+
+    if ! build_nixos; then
+        notify "❌ Build Failed" "NixOS build failed. Check terminal for details." "critical"
+        play_sound "$ERROR_SOUND"
+        exit 1
+    fi
+
+    if ! build_home_manager; then
+        notify "❌ Build Failed" "Home-manager build failed. Check terminal for details." "critical"
+        play_sound "$ERROR_SOUND"
+        exit 1
+    fi
+
+    # Switch phase (actual application)
+    echo
+    log_info "Switch Phase (Applying configurations)..."
+    echo "------------------------------------------"
+
+    if ! switch_nixos; then
+        notify "❌ Switch Failed" "NixOS switch failed. System may be in inconsistent state." "critical"
+        play_sound "$ERROR_SOUND"
+        exit 1
+    fi
+
+    if ! switch_home_manager; then
+        notify "❌ Switch Failed" "Home-manager switch failed. User configuration may be inconsistent." "critical"
+        play_sound "$ERROR_SOUND"
+        exit 1
+    fi
+
+    # Post-update tasks
+    echo
+    log_info "Post-update tasks..."
+    commit_changes
+
+    # Success notification
+    echo
+    log_success "🎉 Update completed successfully!"
+    log_success "Both NixOS system and home-manager configurations updated"
+
+    notify "✅ Update Complete" "NixOS and Home-Manager updated successfully!"
+    play_sound "$SUCCESS_SOUND"
+}
+
+# Run main function
+main "$@"
