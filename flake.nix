@@ -32,6 +32,10 @@
       url = "github:hyprwm/hyprland-plugins";
       inputs.hyprland.follows = "hyprland";
     };
+    Hyprspace = {
+      url = "github:KZDKM/Hyprspace";
+      inputs.hyprland.follows = "hyprland";
+    };
     caelestia-shell = {
       url = "github:caelestia-dots/shell";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -76,6 +80,9 @@
             enable = true;
             package = inputs.hyprland.packages."x86_64-linux".hyprland;
             portalPackage = inputs.hyprland.packages."x86_64-linux".xdg-desktop-portal-hyprland;
+            plugins = [
+              inputs.Hyprspace.packages.x86_64-linux.Hyprspace
+            ];
           };
         }
       ];
