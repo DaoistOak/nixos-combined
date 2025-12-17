@@ -26,16 +26,18 @@ in
 
 
    # Theming
-   gtk = {
-    theme = {
-      name = "catppuccin-macchiato-mauve-standard";
-      package = pkgs.catppuccin-gtk.override {
-        accents = [ "mauve" ];
-        variant = "macchiato";
-      };
-    };
-      iconTheme.name = "Papirus-Dark";
-  };
+    gtk = {
+     theme = {
+       name = "catppuccin-macchiato-mauve-standard";
+       package = pkgs.catppuccin-gtk.override {
+         accents = [ "mauve" ];
+         variant = "macchiato";
+       };
+     };
+       iconTheme.name = "Papirus-Dark";
+   };
+
+   xdg.configFile."gtk-4.0/gtk.css".force = true;
 
   home.sessionVariables = {
     EDITOR = "nvim";

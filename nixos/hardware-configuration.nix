@@ -50,9 +50,9 @@ boot = {
       # CachyOS kernel for performance (use linuxPackages_cachyos if built correctly)
       # kernelPackages = pkgs.linuxPackages_latest;
       # Alternatives:
-      kernelPackages = pkgs.linuxPackages_zen;
+      # kernelPackages = pkgs.linuxPackages_zen;
       # kernelPackages = pkgs.linuxPackages_lqx;
-      # kernelPackages = pkgs.linuxPackages_cachyos;
+      kernelPackages = pkgs.linuxPackages_cachyos;
 
       # --- Bootloader ---
       loader = {
