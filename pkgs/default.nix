@@ -110,8 +110,6 @@
     git
     gnirehtet
     gnumake
-    gnumake42
-    home-manager
     jre
     kbd
     killall
