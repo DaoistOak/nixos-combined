@@ -42,7 +42,10 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, chaotic, nur, ... }@inputs: {
+  outputs = { self, nixpkgs, home-manager, chaotic, nur, ... }@inputs:
+    let
+      overlays = import ./overlays/overlays.nix { inherit inputs; };
+    in {
     nixosConfigurations."Overlord" = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = {
@@ -50,7 +53,7 @@
       };
       modules = [
         {
-          nixpkgs.overlays = [ nur.overlays.default ];
+          nixpkgs.overlays = overlays.nixos;
         }
         ./nixos/configuration.nix
         home-manager.nixosModules.default
@@ -59,7 +62,10 @@
     };
 
     homeConfigurations."zeph" = home-manager.lib.homeManagerConfiguration {
-      pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      pkgs = import nixpkgs {
+        system = "x86_64-linux";
+        overlays = overlays.home-manager;
+      };
       extraSpecialArgs = { inherit inputs; };
       modules = [
         ./home-manager/home.nix
