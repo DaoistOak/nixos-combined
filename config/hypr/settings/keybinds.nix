@@ -112,7 +112,7 @@
         "$mod, X, exec, noctalia-shell ipc call sessionMenu toggle"
         "$mod, D, exec, noctalia-shell ipc call wallpaper toggle"
         "$mod ALT, S, exec, hyprpanel t settings-dialog"
-        "$mod, Q, exec, hyprpanel t dashboardmenu"
+        "$mod, Q, overview:toggle"
         "$mod, M, exec, hyprpanel t mediamenu"
         "$mod, N, exec, hyprpanel t networkmenu"
 
