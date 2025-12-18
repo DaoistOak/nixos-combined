@@ -65,4 +65,14 @@
   # /run/current-system/sw/share/consolefonts/ter-u16n.psfu.gz
   console.font = "/run/current-system/sw/share/consolefonts/ter-u18n.psf.gz";
 
+  # Stylix theming
+  stylix = {
+    enable = true;
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-macchiato.yaml";
+  };
+
+  environment.systemPackages = with pkgs; [
+    base16-schemes
+  ];
+
 }

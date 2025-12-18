@@ -28,6 +28,10 @@
     catppuccin = {
       url = "github:catppuccin/nix";
     };
+    stylix = {
+      url = "github:nix-community/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     hyprland = {
       url = "github:hyprwm/Hyprland/f88deb928a0f7dc02f427473f8c29e8f2bed14a3";
       # Pin to a specific commit to reduce rebuilds - update weekly

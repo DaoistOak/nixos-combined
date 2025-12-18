@@ -1,6 +1,5 @@
 { config, lib, pkgs, ... }: {
 xdg.configFile."hypr/hyprlock.conf".text = ''
-  source = $HOME/.config/hypr/themes/colors
   $font=JetBrains Mono
 
 # GENERAL
@@ -35,7 +34,7 @@ background {
 label {
     monitor =
     text = cmd[update:1000] echo "<b><big> $(date +"%H") </big></b>"
-    color = $accent
+    color = rgb(cad3f5)
     font_size = 112
     font_family = $font 
     shadow_passes = 3
@@ -50,7 +49,7 @@ label {
 label {
     monitor =
     text = cmd[update:1000] echo "<b><big> $(date +"%M") </big></b>"
-    color = $accent
+    color = rgb(cad3f5)
     font_size = 112
     font_family = $font 
     shadow_passes = 3
@@ -65,7 +64,7 @@ label {
 label {
     monitor =
     text = cmd[update:18000000] echo "<b><big> "$(date +'%A')" </big></b>"
-    color = $overlay1
+    color = rgb(8087a2)
     font_size = 22
     font_family = $font 
 
@@ -84,9 +83,9 @@ input-field {
     dots_center = true
     dots_rouding = -1
     rounding = 14
-    outer_color = $accent
-    inner_color = $surface0
-    font_color = $text
+    outer_color = rgb(cad3f5)
+    inner_color = rgb(363a4f)
+    font_color = rgb(cad3f5)
     fade_on_empty = true
     placeholder_text = <i>Password...</i> 
     position = 0, 120
@@ -97,7 +96,7 @@ input-field {
 label {
     monitor =
     text = cmd[update:18000000] echo "<b>Feels like<big> $(curl -s 'wttr.in?format=%t' | tr -d '+') </big></b>"
-    color = $overlay0
+    color = rgb(6e738d)
     font_size = 18
     font_family = $font 
 

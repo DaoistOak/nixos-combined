@@ -17,25 +17,22 @@ in
   home.stateVersion = "24.11";
   home.packages = with pkgs; [
     spotify
+    base16-schemes
   ] ++ user-packages;
 
-  programs.noctalia-shell = {
-    enable = true;
-  };
-
-
-
-   # Theming
-    gtk = {
-     theme = {
-       name = "catppuccin-macchiato-mauve-standard";
-       package = pkgs.catppuccin-gtk.override {
-         accents = [ "mauve" ];
-         variant = "macchiato";
-       };
-     };
-       iconTheme.name = "Papirus-Dark";
+   programs.noctalia-shell = {
+     enable = true;
    };
+
+   # Stylix theming
+   stylix = {
+     enable = true;
+     base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-macchiato.yaml";
+   };
+
+
+
+    # Theming handled by Stylix
 
    xdg.configFile."gtk-4.0/gtk.css".force = true;
 
