@@ -7,7 +7,9 @@
 - **Update dependencies**: `nix flake update`
 - **Test system build (no switch)**: `sudo nixos-rebuild build --flake .#Overlord`
 - **Test home-manager build (no switch)**: `home-manager build --flake .#zeph`
+- **Format code**: `nixfmt .` (format all Nix files)
 - **Syntax check**: `nix-instantiate --eval flake.nix` (basic syntax validation)
+- **Dry run system**: `sudo nixos-rebuild dry-run --flake .#Overlord` (check for changes)
 
 ## Code Style Guidelines
 - **Language**: Nix (functional, declarative, dynamically typed)
@@ -19,5 +21,8 @@
 - **Modularity**: Separate concerns into logical modules/files
 - **Comments**: Minimal, only for complex configurations
 - **Error handling**: Leverage Nix's evaluation errors; use assertions for validation
-- **Formatting**: Follow nixpkgs style, use `nixfmt` for consistency</content>
+- **Formatting**: Follow nixpkgs style, use `nixfmt` for consistency
+- **Types**: No static typing; use descriptive names and runtime checks
+- **Naming**: Functions in camelCase, modules in kebab-case
+- **Security**: Never expose secrets; use `config.age.secrets` for sensitive data</content>
 <parameter name="filePath">/home/zeph/.config/nixos/AGENTS.md

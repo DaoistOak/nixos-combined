@@ -9,6 +9,9 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+    };
     zen-browser = {
       url = "github:youwen5/zen-browser-flake";
     };
@@ -26,7 +29,9 @@
       url = "github:catppuccin/nix";
     };
     hyprland = {
-      url = "github:hyprwm/Hyprland/";
+      url = "github:hyprwm/Hyprland/f88deb928a0f7dc02f427473f8c29e8f2bed14a3";
+      # Pin to a specific commit to reduce rebuilds - update weekly
+      # Last updated: 2025-12-18
     };
     hyprland-plugins = {
       url = "github:hyprwm/hyprland-plugins";
@@ -46,43 +51,12 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, chaotic, nur, ... }@inputs:
-    let
-      overlays = import ./overlays/overlays.nix { inherit inputs; };
-    in {
-    nixosConfigurations."Overlord" = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      specialArgs = {
-        inherit inputs;
-      };
-      modules = [
-        {
-          nixpkgs.overlays = overlays.nixos;
-        }
-        ./nixos/configuration.nix
-        home-manager.nixosModules.default
-        chaotic.nixosModules.default
+  outputs = inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [ "x86_64-linux" ];
+      imports = [
+        ./nixos
+        ./home
       ];
     };
-
-    homeConfigurations."zeph" = home-manager.lib.homeManagerConfiguration {
-      pkgs = import nixpkgs {
-        system = "x86_64-linux";
-        overlays = overlays.home-manager;
-      };
-      extraSpecialArgs = { inherit inputs; };
-      modules = [
-        ./home-manager/home.nix
-        inputs.catppuccin.homeModules.catppuccin
-        inputs.caelestia-shell.homeManagerModules.default
-        {
-          wayland.windowManager.hyprland = {
-            enable = true;
-            package = inputs.hyprland.packages."x86_64-linux".hyprland;
-            portalPackage = inputs.hyprland.packages."x86_64-linux".xdg-desktop-portal-hyprland;
-          };
-        }
-      ];
-    };
-  };
 }
