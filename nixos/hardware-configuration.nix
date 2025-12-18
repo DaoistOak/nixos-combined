@@ -40,12 +40,10 @@ boot = {
         "rd.systemd.show_status=auto"
       ];
 
-      # --- Plymouth (Boot Splash) ---
-      plymouth = {
-        enable = true;
-        theme = "seal_2";
-        themePackages = [ pkgs.adi1090x-plymouth-themes ];
-      };
+       # --- Plymouth (Boot Splash) ---
+       plymouth = {
+         enable = true;
+       };
       # --- Kernel Packages ---
       # CachyOS kernel for performance (use linuxPackages_cachyos if built correctly)
       # kernelPackages = pkgs.linuxPackages_latest;
