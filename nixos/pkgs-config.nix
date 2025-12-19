@@ -26,7 +26,7 @@ in
     ];
   };
 
-  chaotic = {
+   chaotic = {
     mesa-git.enable = true;
     nyx = {
       cache.enable = true;
@@ -34,4 +34,7 @@ in
       nixPath.enable = true;
     };
   };
+
+  programs.steam.enable = true;
+  programs.hyprland.enable = true;
 }

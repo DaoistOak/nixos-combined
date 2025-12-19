@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 let
   user-packages = (import ../pkgs/default.nix { inherit pkgs inputs; }).user-packages;
@@ -9,6 +9,7 @@ in
   imports = [
     ../config/hypr/hyprland.nix
     inputs.noctalia.homeModules.default
+    ./themes/theme.nix
   ];
   home.username = "zeph";
   home.homeDirectory = "/home/zeph";
@@ -17,34 +18,33 @@ in
   home.stateVersion = "24.11";
   home.packages = with pkgs; [
     spotify
-    base16-schemes
   ] ++ user-packages;
 
-   programs.noctalia-shell = {
-     enable = true;
-   };
-
-   # Stylix theming
-   stylix = {
-     enable = true;
-     base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-macchiato.yaml";
-   };
+    programs.noctalia-shell = {
+      enable = true;
+    };
 
 
 
-    # Theming handled by Stylix
 
-   xdg.configFile."gtk-4.0/gtk.css".force = true;
 
-  home.sessionVariables = {
-    EDITOR = "nvim";
-    QT_QPA_PLATFORMTHEME = "kvantum";
-    QT_STYLE_OVERRIDE   = "kvantum";
-  };
+   home.sessionVariables = {
+      EDITOR = "nvim";
+      QT_QPA_PLATFORMTHEME = lib.mkForce "kvantum";
+      QT_STYLE_OVERRIDE   = lib.mkForce "kvantum";
+      FLAKE_DIR = "/home/zeph/.config/nixos";
+    };
 
   programs.home-manager.enable = true;
   nixpkgs.config.allowUnfree = true;
   systemd.user.startServices = true;
+
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
+  };
 
   programs.caelestia = {
     enable = true;
@@ -66,5 +66,8 @@ in
       };
     };
   };
+
+
+
   # Include the keyboard LED control module
 }

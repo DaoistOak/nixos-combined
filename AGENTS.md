@@ -3,26 +3,23 @@
 ## Build/Test Commands
 - **Full system build**: `sudo nixos-rebuild switch --flake .#Overlord`
 - **Home-manager build**: `home-manager switch --flake .#zeph`
+- **Quick rebuild (nh)**: `nh os switch .#Overlord` / `nh home switch .#zeph`
 - **Flake validation**: `nix flake check`
 - **Update dependencies**: `nix flake update`
-- **Test system build (no switch)**: `sudo nixos-rebuild build --flake .#Overlord`
-- **Test home-manager build (no switch)**: `home-manager build --flake .#zeph`
-- **Format code**: `nixfmt .` (format all Nix files)
-- **Syntax check**: `nix-instantiate --eval flake.nix` (basic syntax validation)
-- **Dry run system**: `sudo nixos-rebuild dry-run --flake .#Overlord` (check for changes)
+- **Test builds (no switch)**: `nh os build .#Overlord` / `nh home build .#zeph`
+- **Format code**: `nixfmt .`
+- **Syntax check**: `nix-instantiate --eval flake.nix`
 
 ## Code Style Guidelines
 - **Language**: Nix (functional, declarative, dynamically typed)
-- **File naming**: kebab-case (e.g., `configuration.nix`, `home-manager/`)
+- **File naming**: kebab-case (e.g., `configuration.nix`)
 - **Attribute naming**: camelCase (e.g., `homeDirectory`, `stateVersion`)
-- **Structure**: Use attribute sets `{ key = value; }` with 2-space indentation
-- **Imports**: List in arrays `[ ./file.nix ./other.nix ]`
-- **Local variables**: Use `let ... in` blocks for complex expressions
+- **Structure**: Attribute sets `{ key = value; }` with 2-space indentation
+- **Imports**: Arrays `[ ./file.nix ./other.nix ]`
+- **Local variables**: `let ... in` blocks for complex expressions
 - **Modularity**: Separate concerns into logical modules/files
 - **Comments**: Minimal, only for complex configurations
-- **Error handling**: Leverage Nix's evaluation errors; use assertions for validation
-- **Formatting**: Follow nixpkgs style, use `nixfmt` for consistency
-- **Types**: No static typing; use descriptive names and runtime checks
-- **Naming**: Functions in camelCase, modules in kebab-case
-- **Security**: Never expose secrets; use `config.age.secrets` for sensitive data</content>
+- **Error handling**: Use assertions; leverage Nix evaluation errors
+- **Formatting**: Follow nixpkgs style with `nixfmt`
+- **Security**: Never expose secrets; use `config.age.secrets`</content>
 <parameter name="filePath">/home/zeph/.config/nixos/AGENTS.md
