@@ -86,17 +86,6 @@
       package32 = pkgs.pkgsi686Linux.mesa;
       enable = true;
       enable32Bit = true;
-      extraPackages = with pkgs; [
-        mesa
-        mesa-demos
-        vulkan-loader # ensures Vulkan runtime is installed
-        vulkan-validation-layers
-      ];
-      extraPackages32 = with pkgs; [
-        pkgsi686Linux.vulkan-loader
-        pkgsi686Linux.mesa
-        driversi686Linux.mesa-demos
-      ];
     };
   };
 
