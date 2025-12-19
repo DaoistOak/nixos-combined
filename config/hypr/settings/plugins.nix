@@ -9,6 +9,7 @@
   wayland.windowManager.hyprland = {
     plugins = [
       pkgs.hyprlandPlugins.hyprgrass # inputs.Hyprspace.packages.${pkgs.system}.Hyprspace
+      pkgs.hyprlandPlugins.hyprscrolling
     ];
 
     settings = {
@@ -41,6 +42,7 @@
             ", longpress:2, movewindow"
             ", longpress:3, resizewindow"
           ];
+
         };
       };
     };
