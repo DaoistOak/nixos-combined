@@ -1,4 +1,4 @@
-{pkgs, inputs, ...}:
+{ pkgs, inputs, ... }:
 
 let
   system-packages = (import ../pkgs/default.nix { inherit pkgs inputs; }).system-packages;
@@ -26,7 +26,7 @@ in
     ];
   };
 
-   chaotic = {
+  chaotic = {
     mesa-git.enable = true;
     nyx = {
       cache.enable = true;

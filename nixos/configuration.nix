@@ -2,18 +2,22 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      ./pkgs-config.nix
-      ./services.nix
-      ./users.nix
-      ./gui.nix
-    ];
-
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+    ./pkgs-config.nix
+    ./services.nix
+    ./users.nix
+    ./gui.nix
+  ];
 
   # System settings
   system = {
@@ -32,7 +36,10 @@
     };
     settings = {
       auto-optimise-store = true;
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
     };
   };
 
@@ -52,7 +59,7 @@
   # Virtualization
   virtualisation = {
     docker.enable = true;
-    waydroid.enable=true;
+    waydroid.enable = true;
     libvirtd = {
       enable = true;
       extraConfig = ''

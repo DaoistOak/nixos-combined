@@ -1,4 +1,3 @@
-
 { config, pkgs, ... }:
 
 let
@@ -13,11 +12,10 @@ let
     killall hyprlock
     hyprlock &
   '';
-in {
+in
+{
   home.file.".config/hypr/scripts/hyprlock.sh" = {
-    text       = hyprlockScript;
+    text = hyprlockScript;
     executable = true;
   };
 }
-
-

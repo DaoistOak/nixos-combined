@@ -1,4 +1,9 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 let
   catppuccin-sddm-custom = pkgs.catppuccin-sddm.override {
@@ -12,8 +17,7 @@ let
 in
 {
   # Enable X11
-  services.xserver.enable=true;
-
+  services.xserver.enable = true;
 
   # Enable SDDM
   services.displayManager.sddm = {
@@ -22,12 +26,12 @@ in
     theme = "catppuccin-macchiato-mauve";
   };
   # Enable KDE Plasma 6
-  services.desktopManager.plasma6= {
+  services.desktopManager.plasma6 = {
     enable = true;
     # Now nest your KWin tweaks here—this is the correct path
   };
-# --- KWallet 6 auto-unlock at login ---------------------------
-  security.pam.services.sddm.enableKwallet = true;     # still works
+  # --- KWallet 6 auto-unlock at login ---------------------------
+  security.pam.services.sddm.enableKwallet = true; # still works
   # --- Ensure kwalletd6 is running -------------------------------
   systemd.user.services.kwalletd6 = {
     description = "KWallet 6 Daemon";
@@ -40,13 +44,11 @@ in
   # 🎧 Blueman (Bluetooth GUI) — disabled as requested
   services.blueman.enable = false;
 
-
-
   xdg.portal = {
     enable = true;
-    xdgOpenUsePortal = true;  # Use portal for file pickers too
-    configPackages = [ pkgs.kdePackages.xdg-desktop-portal-kde ];  # Or -kde for Plasma
-#     extraPortals = [  pkgs.kdePackages.xdg-desktop-portal-kde ];
+    xdgOpenUsePortal = true; # Use portal for file pickers too
+    configPackages = [ pkgs.kdePackages.xdg-desktop-portal-kde ]; # Or -kde for Plasma
+    #     extraPortals = [  pkgs.kdePackages.xdg-desktop-portal-kde ];
 
   };
   # PipeWire (Audio)
@@ -58,7 +60,7 @@ in
     jack.enable = false;
     wireplumber.enable = true;
   };
-  services.pulseaudio.enable=false;
+  services.pulseaudio.enable = false;
   # Enable real-time scheduling for better audio performance
   security.rtkit.enable = true;
 

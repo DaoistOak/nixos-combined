@@ -2,7 +2,7 @@
 
 {
   wayland.windowManager.hyprland = {
-  settings = {
+    settings = {
       input = {
         kb_file = "";
         kb_layout = "us";
@@ -26,6 +26,6 @@
       #   workspace_swipe = "yes";
       #   workspace_swipe_fingers = 3;
       # };
-  };
+    };
   };
 }

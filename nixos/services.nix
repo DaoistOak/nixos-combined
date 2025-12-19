@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   powerManagement.powertop.enable = true;
@@ -26,8 +31,14 @@
     auto-cpufreq = {
       enable = true;
       settings = {
-        battery = { governor = "powersave"; turbo = "never"; };
-        charger = { governor = "performance"; turbo = "auto"; };
+        battery = {
+          governor = "powersave";
+          turbo = "never";
+        };
+        charger = {
+          governor = "performance";
+          turbo = "auto";
+        };
       };
     };
 
@@ -51,11 +62,10 @@
     # 🔌 Power Profiles (disabled)
     power-profiles-daemon.enable = false;
 
-
     # 🖨️ Printing (CUPS)
     printing.enable = true;
 
-    resolved.enable=true;
+    resolved.enable = true;
 
     # 🗝️ TLP tuning
     tlp = {
@@ -80,8 +90,11 @@
     '';
 
     # 🎛️ Other services...
-#    xserver.videoDrivers = [ "amdgpu" ];
-    xserver.xkb = { layout = "us"; variant = ""; };
+    #    xserver.videoDrivers = [ "amdgpu" ];
+    xserver.xkb = {
+      layout = "us";
+      variant = "";
+    };
   };
 
   systemd.services.NetworkManager-wait-online.enable = true;
