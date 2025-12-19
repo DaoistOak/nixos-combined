@@ -15,6 +15,7 @@
     code-cursor
     firefox
     gamescope
+    heroic
     genymotion
     kdePackages.bluedevil
     kdePackages.bluez-qt
