@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, lib, ... }:
 
 {
   wayland.windowManager.hyprland = {
@@ -10,7 +10,7 @@
         animate_manual_resizes = true;
         animate_mouse_windowdragging = true;
         enable_swallow = true;
-        disable_hyprland_logo = false;
+        disable_hyprland_logo = lib.mkForce false;
         disable_splash_rendering = false;
       };
     };

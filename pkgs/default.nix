@@ -196,7 +196,11 @@
     spice
     spice-gtk
     spice-vdagent
-    speechd
-    terminus_font
-  ];
-}
+     speechd
+     terminus_font
+      nh
+      nix-output-monitor
+      nixfmt
+      nvd
+   ];
+ }

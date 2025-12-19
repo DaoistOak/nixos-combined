@@ -13,7 +13,7 @@ in
 {
   # Enable X11
   services.xserver.enable=true;
-  programs.xwayland.enable = true;
+
 
   # Enable SDDM
   services.displayManager.sddm = {
@@ -40,8 +40,8 @@ in
   # 🎧 Blueman (Bluetooth GUI) — disabled as requested
   services.blueman.enable = false;
 
-  programs.steam.enable = true;
-  programs.hyprland.enable = true;
+
+
   xdg.portal = {
     enable = true;
     xdgOpenUsePortal = true;  # Use portal for file pickers too

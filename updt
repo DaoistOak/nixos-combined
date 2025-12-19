@@ -100,7 +100,7 @@ update_flake_inputs() {
 build_nixos() {
     log_info "Building NixOS system ($NIXOS_HOST)..."
 
-    if sudo nixos-rebuild build --flake "$FLAKE_PATH#$NIXOS_HOST"; then
+    if nh os build .#nixosConfigurations."$NIXOS_HOST"; then
         log_success "NixOS build successful"
         return 0
     else
@@ -113,7 +113,7 @@ build_nixos() {
 build_home_manager() {
     log_info "Building home-manager configuration ($HOME_USER)..."
 
-    if home-manager build --flake "$FLAKE_PATH#$HOME_USER"; then
+    if home-manager build --flake .#"$HOME_USER"; then
         log_success "Home-manager build successful"
         return 0
     else
@@ -126,7 +126,7 @@ build_home_manager() {
 switch_nixos() {
     log_info "Switching to new NixOS system..."
 
-    if sudo nixos-rebuild switch --flake "$FLAKE_PATH#$NIXOS_HOST"; then
+    if nh os switch .#nixosConfigurations."$NIXOS_HOST"; then
         log_success "NixOS switch successful"
         return 0
     else
@@ -139,7 +139,7 @@ switch_nixos() {
 switch_home_manager() {
     log_info "Switching to new home-manager configuration..."
 
-    if home-manager switch --flake "$FLAKE_PATH#$HOME_USER"; then
+    if home-manager switch -b backup --flake .#"$HOME_USER"; then
         log_success "Home-manager switch successful"
         return 0
     else
@@ -176,6 +176,10 @@ commit_changes() {
 main() {
     echo "🚀 Starting comprehensive NixOS & Home-Manager update..."
     echo "=================================================="
+
+    # Ask for sudo password upfront
+    log_info "Requesting sudo access..."
+    sudo -v
 
     # Pre-flight checks
     check_directory

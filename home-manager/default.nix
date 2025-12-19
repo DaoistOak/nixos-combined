@@ -8,10 +8,9 @@
     };
     extraSpecialArgs = { inherit inputs; };
     modules = [
-      ../home-manager/home.nix
+      ./home.nix
       inputs.catppuccin.homeModules.catppuccin
       inputs.caelestia-shell.homeManagerModules.default
-      inputs.catppuccin.homeModules.catppuccin
       inputs.stylix.homeManagerModules.stylix
       {
         wayland.windowManager.hyprland = {

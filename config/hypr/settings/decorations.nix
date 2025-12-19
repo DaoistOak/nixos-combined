@@ -4,13 +4,11 @@
   wayland.windowManager.hyprland = {
     settings = {
       # General settings
-      general = {
-        "gaps_in" = 3;
-        "gaps_out" = 4;
-        "border_size" = 2;
-        "col.active_border" = "$accent";
-        "col.inactive_border" = "$base";
-      };
+       general = {
+         "gaps_in" = 3;
+         "gaps_out" = 4;
+         "border_size" = 2;
+       };
 
       # Decoration settings
       decoration = {
@@ -34,9 +32,6 @@
           "offset" = "4, 4";
           "render_power" = 1;
           "ignore_window" = true;
-          "color" = "$crust";
-          # col.shadow = "$accent";
-          # col.shadow_inactive = "$base";
         };
       };
     };
