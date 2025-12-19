@@ -1,4 +1,10 @@
-{ config, lib, pkgs, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 
 let
   user-packages = (import ../pkgs/default.nix { inherit pkgs inputs; }).user-packages;
@@ -16,24 +22,23 @@ in
   gtk.enable = true;
   qt.enable = true;
   home.stateVersion = "24.11";
-  home.packages = with pkgs; [
-    spotify
-  ] ++ user-packages;
+  home.packages =
+    with pkgs;
+    [
+      spotify
+    ]
+    ++ user-packages;
 
-    programs.noctalia-shell = {
-      enable = true;
-    };
+  programs.noctalia-shell = {
+    enable = true;
+  };
 
-
-
-
-
-   home.sessionVariables = {
-      EDITOR = "nvim";
-      QT_QPA_PLATFORMTHEME = lib.mkForce "kvantum";
-      QT_STYLE_OVERRIDE   = lib.mkForce "kvantum";
-      FLAKE_DIR = "/home/zeph/.config/nixos";
-    };
+  home.sessionVariables = {
+    EDITOR = "nvim";
+    QT_QPA_PLATFORMTHEME = lib.mkForce "kvantum";
+    QT_STYLE_OVERRIDE = lib.mkForce "kvantum";
+    FLAKE_DIR = "/home/zeph/.config/nixos";
+  };
 
   programs.home-manager.enable = true;
   nixpkgs.config.allowUnfree = true;
@@ -51,7 +56,7 @@ in
     systemd = {
       enable = false; # if you prefer starting from your compositor
       target = "graphical-session.target";
-      environment = [];
+      environment = [ ];
     };
     settings = {
       bar.status = {
@@ -66,8 +71,6 @@ in
       };
     };
   };
-
-
 
   # Include the keyboard LED control module
 }

@@ -1,16 +1,22 @@
-
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   wayland.windowManager.hyprland = {
-    plugins = [ pkgs.hyprlandPlugins.hyprgrass # inputs.Hyprspace.packages.${pkgs.system}.Hyprspace
+    plugins = [
+      pkgs.hyprlandPlugins.hyprgrass # inputs.Hyprspace.packages.${pkgs.system}.Hyprspace
     ];
 
-          settings = {
-            plugin = {
-              hyprgrass = { };
-              touch_gestures = {
-                sensitivity = 1.0;          workspace_swipe_fingers = 3;
+    settings = {
+      plugin = {
+        hyprgrass = { };
+        touch_gestures = {
+          sensitivity = 1.0;
+          workspace_swipe_fingers = 3;
           workspace_swipe_edge = "d";
           long_press_delay = 400;
           resize_on_border_long_press = true;
@@ -40,4 +46,3 @@
     };
   };
 }
-

@@ -1,8 +1,9 @@
 # Overlay configuration for different systems
-{inputs, ...}:
+{ inputs, ... }:
 let
   overlays = import ./default.nix { inherit inputs; };
-in {
+in
+{
   # Default overlays to apply to all systems
   default = [
     overlays.nur

@@ -1,4 +1,10 @@
-{ config, lib, pkgs, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   flake.homeConfigurations."zeph" = inputs.home-manager.lib.homeManagerConfiguration {

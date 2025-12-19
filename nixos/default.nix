@@ -1,4 +1,10 @@
-{ config, lib, pkgs, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   flake.nixosConfigurations."Overlord" = inputs.nixpkgs.lib.nixosSystem {

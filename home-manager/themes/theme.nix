@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   stylix = {
@@ -27,6 +32,7 @@
     targets.hyprland.enable = true;
     targets.gtk.enable = true;
     targets.qt.enable = true;
+    targets.kde.enable = false;
   };
   home.packages = with pkgs; [
     base16-schemes

@@ -6,7 +6,20 @@
     shell = pkgs.zsh;
     isNormalUser = true;
     description = "SD";
-    extraGroups = [ "networkmanager" "wheel" "audio" "libvirtd" "kvm" "qemu-libvirtd" "nixos" "dialout" "video" "render" "seat" "docker"];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "audio"
+      "libvirtd"
+      "kvm"
+      "qemu-libvirtd"
+      "nixos"
+      "dialout"
+      "video"
+      "render"
+      "seat"
+      "docker"
+    ];
   };
 
   # User-specific environment variables
@@ -22,7 +35,6 @@
   };
   # Enable Zsh
   programs.zsh.enable = true;
-  programs.direnv.enableZshIntegration=true;
-
+  programs.direnv.enableZshIntegration = true;
 
 }

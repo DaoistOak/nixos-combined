@@ -1,6 +1,7 @@
 # Custom packages, that can be defined similarly to ones from nixpkgs
 # You can build them using 'nix build .#example'
-{ pkgs, inputs, ... }: {
+{ pkgs, inputs, ... }:
+{
   # example = pkgs.callPackage ./example { };
   user-packages = with pkgs; [
     # GUI Applications
@@ -196,11 +197,11 @@
     spice
     spice-gtk
     spice-vdagent
-     speechd
-     terminus_font
-      nh
-      nix-output-monitor
-      nixfmt
-      nvd
-   ];
- }
+    speechd
+    terminus_font
+    nh
+    nix-output-monitor
+    nixfmt
+    nvd
+  ];
+}
