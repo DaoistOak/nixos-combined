@@ -20,6 +20,7 @@
       inputs.home-manager.nixosModules.default
       inputs.chaotic.nixosModules.default
       inputs.stylix.nixosModules.stylix
+      inputs.nixos-hardware.nixosModules.lenovo-ideapad-slim-5
     ];
   };
 }
