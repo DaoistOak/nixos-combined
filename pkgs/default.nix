@@ -76,6 +76,7 @@
     direnv
     mangohud
     hyprpanel
+    hyprpolkitagent
     libgtop
     bluez
     bluez-tools
