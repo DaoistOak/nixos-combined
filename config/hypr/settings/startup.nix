@@ -38,7 +38,7 @@
       "avizo-service"
 
       # Polkit authentication agent
-      "hyprpolkitagent"
+      "systemctl --user start hyprpolkitagent"
 
       # Idle and power management
       "hypridle"
