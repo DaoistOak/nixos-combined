@@ -24,6 +24,7 @@
     kdePackages.kate
     kdePackages.kpmcore
     kdePackages.kwallet-pam
+    kdePackages.okular
     kdePackages.plasma-nm
     kdePackages.plasma-pa
     kdePackages.plymouth-kcm
@@ -54,6 +55,7 @@
     webcord-vencord
     winboat
     wineWowPackages.full
+    wpsoffice
     inputs.zen-browser.packages."x86_64-linux".default
     adwaita-icon-theme
     zellij
