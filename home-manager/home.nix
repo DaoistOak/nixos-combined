@@ -31,7 +31,6 @@ in
 
   programs.noctalia-shell = {
     enable = true;
-    colors.mPrimary = lib.mkForce config.lib.stylix.colors.withHashtag.base0E;
   };
 
   home.sessionVariables = {
