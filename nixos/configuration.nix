@@ -19,6 +19,12 @@
     ./gui.nix
   ];
 
+  # Hibernation settings
+  boot = {
+    resumeDevice = "/dev/disk/by-uuid/c90cb3d2-feba-424e-a25b-146d24f9bd0d";
+    kernelParams = [ "resume=UUID=c90cb3d2-feba-424e-a25b-146d24f9bd0d" ];
+  };
+
   # System settings
   system = {
     autoUpgrade = {
