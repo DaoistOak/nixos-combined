@@ -33,6 +33,8 @@
     targets.gtk.enable = true;
     targets.qt.enable = true;
     targets.kde.enable = false;
+    targets.noctalia-shell.enable = true;
+    targets.hyprland.colors.override = { "col.active_border" = "#c6a0f6"; };
   };
   home.packages = with pkgs; [
     base16-schemes
