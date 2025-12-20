@@ -38,7 +38,7 @@
       "avizo-service"
 
       # Polkit authentication agent
-      "/run/wrappers/bin/polkit-agent-helper-1"
+      "hyprpolkitagent"
 
       # Idle and power management
       "hypridle"
