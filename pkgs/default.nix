@@ -88,6 +88,7 @@
     grim
     hypridle
     hyprlandPlugins.hyprgrass
+    hyprlandPlugins.hyprscrolling
     inputs.caelestia-shell.packages.${pkgs.system}.with-cli
 
     # TUI Applications
