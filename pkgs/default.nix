@@ -76,7 +76,6 @@
     direnv
     mangohud
     hyprpanel
-    hyprpolkitagent
     libgtop
     bluez
     bluez-tools
@@ -86,6 +85,7 @@
     hyprlock
     hyprprop
     hyprnome
+    hyprpolkitagent
     hyprpolkitagent
     hyprsunset
     grim
