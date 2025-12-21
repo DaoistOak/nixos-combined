@@ -19,7 +19,7 @@
           column_width = 0.5;
           fullscreen_on_one_column = true;
         };
-      
+
         touch_gestures = {
           sensitivity = 1.0;
           workspace_swipe_fingers = 3;

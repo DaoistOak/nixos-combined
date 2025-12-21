@@ -34,7 +34,9 @@
     targets.qt.enable = true;
     targets.kde.enable = false;
     targets.noctalia-shell.enable = false;
-    targets.hyprland.colors.override = { "col.active_border" = "#c6a0f6"; };
+    targets.hyprland.colors.override = {
+      "col.active_border" = "#c6a0f6";
+    };
   };
   home.packages = with pkgs; [
     base16-schemes
