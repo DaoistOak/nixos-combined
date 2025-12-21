@@ -42,7 +42,7 @@
     SCIHOME = "$XDG_STATE_HOME/scilab";
     WAKATIME_HOME = "$XDG_CONFIG_HOME/wakatime";
     WINEPREFIX = "$XDG_DATA_HOME/wine";
-    XAUTHORITY = "$XDG_RUNTIME_DIR/Xauthority";
+    # XAUTHORITY = "$XDG_RUNTIME_DIR/Xauthority";
     NIX_LD_LIBRARY_PATH = "$(nix eval --raw nixpkgs#glibc.outPath)/lib";
     XCOMPOSECACHE = "$XDG_CACHE_HOME/X11/xcompose";
     PYTHONSTARTUP = "/home/zeph/python/pythonrc";
