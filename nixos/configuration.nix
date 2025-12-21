@@ -19,21 +19,21 @@
     ./gui.nix
   ];
 
-   # Hibernation settings
-   boot = {
-     resumeDevice = "/dev/disk/by-uuid/c90cb3d2-feba-424e-a25b-146d24f9bd0d";
-     kernelParams = [ "resume=UUID=c90cb3d2-feba-424e-a25b-146d24f9bd0d" ];
-   };
+  # Hibernation settings
+  boot = {
+    resumeDevice = "/dev/disk/by-uuid/c90cb3d2-feba-424e-a25b-146d24f9bd0d";
+    kernelParams = [ "resume=UUID=c90cb3d2-feba-424e-a25b-146d24f9bd0d" ];
+  };
 
-   # Enable hibernation
-   services.logind = {
-     powerKey = "hibernate";
-     powerKeyLongPress = "poweroff";
-     lidSwitch = "suspend-then-hibernate";
-   };
-   systemd.sleep.extraConfig = ''
-     HibernateDelaySec=30m
-   '';
+  # Enable hibernation
+  services.logind = {
+    powerKey = "hibernate";
+    powerKeyLongPress = "poweroff";
+    lidSwitch = "suspend-then-hibernate";
+  };
+  systemd.sleep.extraConfig = ''
+    HibernateDelaySec=30m
+  '';
 
   # System settings
   system = {
