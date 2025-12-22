@@ -43,6 +43,7 @@
     popcorntime
     protonvpn-gui
     qbittorrent
+    qutebrowser
     syncthingtray
     terminus_font
     thunderbird
