@@ -208,6 +208,7 @@
     nh
     nix-output-monitor
     nixfmt
+    nixfmt-tree
     nvd
   ];
 }
