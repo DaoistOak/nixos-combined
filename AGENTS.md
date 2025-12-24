@@ -21,5 +21,6 @@
 - **Comments**: Minimal, only for complex configurations
 - **Error handling**: Use assertions; leverage Nix evaluation errors
 - **Formatting**: Follow nixpkgs style with `nixfmt`
-- **Security**: Never expose secrets; use `config.age.secrets`</content>
+- **Security**: Never expose secrets; use `config.age.secrets`
+- **Types**: No explicit typing; rely on runtime evaluation</content>
 <parameter name="filePath">/home/zeph/.config/nixos/AGENTS.md

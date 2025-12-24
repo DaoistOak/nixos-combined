@@ -142,6 +142,11 @@ switch_home_manager() {
 
     if home-manager switch -b backup --flake .#"$HOME_USER"; then
         log_success "Home-manager switch successful"
+        # Refresh KDE application cache for GUI launchers
+        if command -v kbuildsycoca6 &> /dev/null; then
+            log_info "Refreshing KDE application cache..."
+            kbuildsycoca6 --noincremental || log_warning "Failed to refresh KDE cache"
+        fi
         return 0
     else
         log_error "Home-manager switch failed"
