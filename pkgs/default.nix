@@ -146,7 +146,10 @@
     unzip
     upower
     util-linux
-    unityhub
+    (pkgs.writeShellScriptBin "unityhub" ''
+      export APPIMAGE=1
+      exec ${pkgs.unityhub}/bin/unityhub "$@"
+    '')
     vim
     vimPlugins.nvchad
     wget
