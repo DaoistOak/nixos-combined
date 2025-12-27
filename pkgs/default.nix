@@ -146,6 +146,7 @@
     unzip
     upower
     util-linux
+    unityhub
     vim
     vimPlugins.nvchad
     wget
@@ -209,6 +210,7 @@
     nix-output-monitor
     nixfmt
     nixfmt-tree
+    lohit-fonts.devanagari
     nvd
   ];
 }
