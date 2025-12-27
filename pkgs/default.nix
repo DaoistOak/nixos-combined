@@ -5,95 +5,55 @@
   # example = pkgs.callPackage ./example { };
   user-packages = with pkgs; [
     # GUI Applications
-    adi1090x-plymouth-themes
-    appimage-run
+    ags
     arduino-ide
+    avizo
     brave
-    catppuccin-cursors.macchiatoLight
-    catppuccin-kvantum
-    catppuccin-papirus-folders
-    code-cursor
+    copyq
     firefox
-    gamescope
-    heroic
     genymotion
+    heroic
+    hyprlock
+    hyprpanel
+    hyprpolkitagent
+    inputs.zen-browser.packages."x86_64-linux".default
     kdePackages.bluedevil
     kdePackages.bluez-qt
     kdePackages.dragon
     kdePackages.flatpak-kcm
     kdePackages.kate
     kdePackages.kpmcore
-    kdePackages.kwallet-pam
     kdePackages.okular
     kdePackages.plasma-nm
     kdePackages.plasma-pa
     kdePackages.plymouth-kcm
-    kdePackages.qtstyleplugin-kvantum
     kdePackages.sddm-kcm
     kdePackages.yakuake
     keepassxc
+    kicad-small
     kitty
     lact
     lutris
     networkmanagerapplet
     nexusmods-app
-    nur.repos.mikilio.ttf-ms-fonts
-    nur.repos.shadowrz.klassy-qt6
-    papirus-folders
+    pcmanfm
     popcorntime
     protonvpn-gui
     qbittorrent
     qutebrowser
+    rofi
     syncthingtray
-    terminus_font
     thunderbird
-    times-newer-roman
     ungoogled-chromium
     vesktop
     viber
     virt-manager
     vscodium
-    webcord-vencord
-    winboat
-    wineWowPackages.full
-    wpsoffice
-    inputs.zen-browser.packages."x86_64-linux".default
-    adwaita-icon-theme
-    zellij
-    hollywood
-    kicad-small
-    python3
-    python3Packages.pip
-    cairo
-    ags
     waybar
     waypaper
-    copyq
-    avizo
-    rofi
-    swww
-    networkmanager_dmenu
-    networkmanager
-    direnv
-    mangohud
-    hyprpanel
-    libgtop
-    bluez
-    bluez-tools
-    dart-sass
-    gvfs
-    pcmanfm
-    hyprlock
-    hyprprop
-    hyprnome
-    hyprpolkitagent
-    hyprpolkitagent
-    hyprsunset
-    grim
-    hypridle
-    hyprlandPlugins.hyprgrass
-    hyprlandPlugins.hyprscrolling
-    inputs.caelestia-shell.packages.${pkgs.system}.with-cli
+    webcord-vencord
+    winboat
+    wpsoffice
 
     # TUI Applications
     alsa-utils
@@ -106,6 +66,7 @@
     cargo
     cpufrequtils
     curl
+    direnv
     distrobox
     docker-compose
     eza
@@ -117,6 +78,9 @@
     git
     gnirehtet
     gnumake
+    grim
+    hollywood
+    inputs.caelestia-shell.packages.${pkgs.system}.with-cli
     jre
     kbd
     killall
@@ -126,17 +90,23 @@
     mesa-demos
     mpv
     neovim
+    networkmanager
+    networkmanager_dmenu
     ninja
     nodejs
     ntfs3g
+    octaveFull
     oh-my-zsh
     ollama
     opencode
     p7zip
     pciutils
+    picocom
     powertop
+    screen
     speechd
     steam-run
+    swww
     swayidle
     syncthing
     tgpt
@@ -151,11 +121,42 @@
     wget
     wl-clipboard
     xclip
+    zellij
     zoxide
     zsh
-    octaveFull
-    picocom
-    screen
+
+    # Dependencies
+    bluez
+    bluez-tools
+    cairo
+    dart-sass
+    gvfs
+    libgtop
+    mangohud
+    python3
+    python3Packages.pip
+    wineWowPackages.full
+
+    # Utilities
+    adwaita-icon-theme
+    adi1090x-plymouth-themes
+    appimage-run
+    catppuccin-cursors.macchiatoLight
+    catppuccin-kvantum
+    catppuccin-papirus-folders
+    code-cursor
+    gamescope
+    hypridle
+    hyprlandPlugins.hyprgrass
+    hyprlandPlugins.hyprscrolling
+    hyprnome
+    hyprprop
+    hyprsunset
+    nur.repos.mikilio.ttf-ms-fonts
+    nur.repos.shadowrz.klassy-qt6
+    papirus-folders
+    terminus_font
+    times-newer-roman
   ];
   system-packages = with pkgs; [
     # Libraries & Dependencies
