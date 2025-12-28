@@ -211,6 +211,9 @@
     nixfmt
     nixfmt-tree
     lohit-fonts.devanagari
+    nix-ld
+    stdenv.cc.cc.lib   
+    libglvnd
     nvd
   ];
 }
