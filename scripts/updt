@@ -206,10 +206,11 @@ main() {
     echo -e "2. ${YELLOW}Update Flake Only${NC}    - Update flake inputs only"
     echo -e "3. ${RED}Update System Only${NC}    - NixOS system only"
     echo -e "4. ${BLUE}Update Home-Manager Only${NC} - Home-manager only"
-    echo -e "5. ${GREEN}Git Push${NC}             - Push changes to remote"
-    echo -e "6. ${RED}Exit${NC}"
+     echo -e "5. ${GREEN}Git Push${NC}             - Push changes to remote"
+     echo -e "6. ${YELLOW}Update & Push${NC}         - Update all + push"
+     echo -e "7. ${RED}Exit${NC}"
     echo
-    read -p "Enter choice (1-6): " choice
+     read -p "Enter choice (1-7): " choice
     case $choice in
             1)
                 echo -e "${BOLD}${GREEN}🚀 Starting comprehensive NixOS & Home-Manager update...${NC}"
@@ -256,12 +257,12 @@ main() {
                     exit 1
                 fi
 
-                # Post-update tasks
-                echo
-                log_info "Post-update tasks..."
-                commit_changes
+                 # Post-update tasks
+                 log_info "Post-update tasks..."
+                 commit_changes
+                 push_changes
 
-                # Success notification
+                 # Success notification
                 echo
                 log_success "🎉 Update completed successfully!"
                 log_success "Both NixOS system and home-manager configurations updated"
@@ -304,13 +305,72 @@ main() {
                 fi
                 commit_changes
                 ;;
-            5)
-                push_changes
-                ;;
-            6)
-                exit 0
-                ;;
-            *) echo -e "${RED}Invalid option $choice${NC}";;
+             5)
+                 push_changes
+                 ;;
+             6)
+                 echo -e "${BOLD}${GREEN}🚀 Starting comprehensive NixOS & Home-Manager update + push...${NC}"
+                 echo -e "${GREEN}==================================================${NC}"
+
+                 # Ask for sudo password upfront
+                 log_info "Requesting sudo access..."
+                 sudo -v
+
+                 # Update phase
+                 update_flake_inputs
+
+                 # Build phase (dry run)
+                 echo
+                 log_info "Build Phase (Testing configurations)..."
+                 echo "---------------------------------------"
+
+                 if ! build_nixos; then
+                     notify "❌ Build Failed" "NixOS build failed. Check terminal for details." "critical"
+                     play_sound "$ERROR_SOUND"
+                     exit 1
+                 fi
+
+                 if ! build_home_manager; then
+                     notify "❌ Build Failed" "Home-manager build failed. Check terminal for details." "critical"
+                     play_sound "$ERROR_SOUND"
+                     exit 1
+                 fi
+
+                 # Switch phase (actual application)
+                 echo
+                 log_info "Switch Phase (Applying configurations)..."
+                 echo "------------------------------------------"
+
+                 if ! switch_nixos; then
+                     notify "❌ Switch Failed" "NixOS switch failed. System may be in inconsistent state." "critical"
+                     play_sound "$ERROR_SOUND"
+                     exit 1
+                 fi
+
+                 if ! switch_home_manager; then
+                     notify "❌ Switch Failed" "Home-manager switch failed. User configuration may be inconsistent." "critical"
+                     play_sound "$ERROR_SOUND"
+                     exit 1
+                 fi
+
+                 # Post-update tasks
+                 echo
+                 log_info "Post-update tasks..."
+                 commit_changes
+                 push_changes
+
+                 # Success notification
+                 echo
+                 log_success "🎉 Update completed successfully!"
+                 log_success "Both NixOS system and home-manager configurations updated and pushed"
+
+                 notify "✅ Update Complete" "NixOS and Home-Manager updated and pushed successfully!"
+                 play_sound "$SUCCESS_SOUND"
+                 ;;
+              7)
+                  exit 0
+                  ;;
+              *) echo -e "${RED}Invalid option $choice${NC}";;
         esac
 }
 
