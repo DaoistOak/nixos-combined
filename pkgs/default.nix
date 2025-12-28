@@ -48,7 +48,7 @@
     vesktop
     viber
     virt-manager
-    vscodium
+    vscode-fhs
     waybar
     waypaper
     webcord-vencord
@@ -144,7 +144,7 @@
     catppuccin-cursors.macchiatoLight
     catppuccin-kvantum
     catppuccin-papirus-folders
-    code-cursor
+    code-cursor-fhs
     gamescope
     hypridle
     hyprlandPlugins.hyprgrass
