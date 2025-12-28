@@ -47,6 +47,7 @@ in
   xdg.portal = {
     enable = true;
     xdgOpenUsePortal = true; # Use portal for file pickers too
+    config.common.default = [ "kde" ];
     configPackages = [ inputs.hyprland.packages.${pkgs.system}.xdg-desktop-portal-hyprland ]; # Use Hyprland portal for Hyprland
     extraPortals = [ pkgs.kdePackages.xdg-desktop-portal-kde ]; # Keep KDE portal as extra for Plasma
 
