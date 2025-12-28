@@ -34,9 +34,9 @@ A comprehensive, declarative NixOS and home-manager setup for seamless system an
 
 ## 🛠️ Commands
 
+- ***Update & rebuild all***: `./scripts/updt`
 - **Rebuild system**: `nh os switch .#Overlord`
 - **Rebuild home**: `nh home switch .#zeph`
-- **Update system**: `./scripts/updt`
 - **Format code**: `nixfmt .`
 - **Validate**: `nix flake check`
 
