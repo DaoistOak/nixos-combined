@@ -33,13 +33,13 @@ in
     enable = true;
   };
 
-   home.sessionVariables = {
-     EDITOR = "nvim";
-     BROWSER = "firefox";
-     QT_QPA_PLATFORMTHEME = lib.mkForce "kvantum";
-     QT_STYLE_OVERRIDE = lib.mkForce "kvantum";
-     FLAKE_DIR = "/home/zeph/.config/nixos";
-   };
+  home.sessionVariables = {
+    EDITOR = "nvim";
+    BROWSER = "firefox";
+    QT_QPA_PLATFORMTHEME = lib.mkForce "kvantum";
+    QT_STYLE_OVERRIDE = lib.mkForce "kvantum";
+    FLAKE_DIR = "/home/zeph/.config/nixos";
+  };
 
   programs.home-manager.enable = true;
   nixpkgs.config.allowUnfree = true;

@@ -160,6 +160,16 @@
   ];
   system-packages = with pkgs; [
     # Libraries & Dependencies
+    blender
+    catppuccin-sddm.override
+    {
+      flavor = "macchiato";
+      accent = "mauve";
+      font = "JetBrains Mono";
+      fontSize = "9";
+      background = "${./../nixos/sddm/wallpaper}";
+      loginBackground = true;
+    }
     fuse3
     automake
     cmake
@@ -212,7 +222,7 @@
     nixfmt-tree
     lohit-fonts.devanagari
     nix-ld
-    stdenv.cc.cc.lib   
+    stdenv.cc.cc.lib
     libglvnd
     nvd
   ];

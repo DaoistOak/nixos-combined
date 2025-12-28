@@ -5,16 +5,6 @@
   ...
 }:
 
-let
-  catppuccin-sddm-custom = pkgs.catppuccin-sddm.override {
-    flavor = "macchiato";
-    accent = "mauve";
-    font = "JetBrains Mono";
-    fontSize = "9";
-    background = "${./sddm/wallpaper}";
-    loginBackground = true;
-  };
-in
 {
   # Enable X11
   services.xserver.enable = true;
@@ -64,7 +54,4 @@ in
   services.pulseaudio.enable = false;
   # Enable real-time scheduling for better audio performance
   security.rtkit.enable = true;
-
-  # SDDM theme package
-  environment.systemPackages = [ catppuccin-sddm-custom ];
 }
