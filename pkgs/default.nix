@@ -8,6 +8,7 @@
     ags
     arduino-ide
     avizo
+    blender
     brave
     copyq
     firefox
