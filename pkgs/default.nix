@@ -106,7 +106,16 @@
     ninja
     nodejs
     ntfs3g
-    (octaveFull.withPackages (ps: with ps; [ signal ]))
+    (octaveFull.withPackages (ps: with ps; [
+      signal        # Signal processing (sawtooth, filter, etc.)
+      control       # Control systems
+      image         # Image processing
+      statistics    # Statistical functions
+      io            # File I/O operations
+      linear-algebra # Advanced linear algebra
+      struct        # Structured data
+      geometry      # Geometry functions
+    ]))
     oh-my-zsh
     ollama
     opencode
