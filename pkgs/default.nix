@@ -163,15 +163,14 @@
     times-newer-roman
 
     # Libraries & System Dependencies
-    catppuccin-sddm.override
-    {
+    (catppuccin-sddm.override {
       flavor = "macchiato";
       accent = "mauve";
       font = "JetBrains Mono";
       fontSize = "9";
       background = "${./../nixos/sddm/wallpaper}";
       loginBackground = true;
-    }
+    })
     fuse3
     automake
     cmake
