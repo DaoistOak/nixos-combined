@@ -97,7 +97,6 @@
     nodejs
     ntfs3g
     octaveFull
-    octavePackages.signal
     oh-my-zsh
     ollama
     opencode
