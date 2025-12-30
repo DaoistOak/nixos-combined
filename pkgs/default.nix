@@ -106,7 +106,8 @@
     ninja
     nodejs
     ntfs3g
-    (octave.withPackages (ps: with ps; [ signal ]))
+    octave
+    octavePackages.signal
     oh-my-zsh
     ollama
     opencode
