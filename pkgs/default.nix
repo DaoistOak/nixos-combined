@@ -4,6 +4,18 @@
 {
   # example = pkgs.callPackage ./example { };
   user-packages = with pkgs; [
+    # Flake-specific packages
+    inputs.zen-browser.packages."x86_64-linux".default
+    inputs.caelestia-shell.packages.${pkgs.system}.with-cli
+    hyprlandPlugins.hyprgrass
+    hyprlandPlugins.hyprscrolling
+    hyprnome
+    hyprprop
+    hyprsunset
+    nur.repos.mikilio.ttf-ms-fonts
+    nur.repos.shadowrz.klassy-qt6
+  ];
+  system-packages = with pkgs; [
     # GUI Applications
     ags
     arduino-ide
@@ -17,7 +29,6 @@
     hyprlock
     hyprpanel
     hyprpolkitagent
-    inputs.zen-browser.packages."x86_64-linux".default
     kdePackages.bluedevil
     kdePackages.bluez-qt
     kdePackages.dragon
@@ -81,7 +92,6 @@
     gnumake
     grim
     hollywood
-    inputs.caelestia-shell.packages.${pkgs.system}.with-cli
     jre
     kbd
     killall
@@ -148,20 +158,11 @@
     code-cursor-fhs
     gamescope
     hypridle
-    hyprlandPlugins.hyprgrass
-    hyprlandPlugins.hyprscrolling
-    hyprnome
-    hyprprop
-    hyprsunset
-    nur.repos.mikilio.ttf-ms-fonts
-    nur.repos.shadowrz.klassy-qt6
     papirus-folders
     terminus_font
     times-newer-roman
-  ];
-  system-packages = with pkgs; [
-    # Libraries & Dependencies
-    blender
+
+    # Libraries & System Dependencies
     catppuccin-sddm.override
     {
       flavor = "macchiato";
@@ -216,7 +217,6 @@
     spice-gtk
     spice-vdagent
     speechd
-    terminus_font
     nh
     nix-output-monitor
     nixfmt
