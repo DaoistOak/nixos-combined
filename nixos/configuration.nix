@@ -27,9 +27,11 @@
 
   # Enable hibernation
   services.logind = {
-    powerKey = "hibernate";
-    powerKeyLongPress = "poweroff";
-    lidSwitch = "suspend-then-hibernate";
+    settings.Login = {
+      HandlePowerKey = "hibernate";
+      HandlePowerKeyLongPress = "poweroff";
+      HandleLidSwitch = "suspend-then-hibernate";
+    };
   };
   systemd.sleep.extraConfig = ''
     HibernateDelaySec=30m
