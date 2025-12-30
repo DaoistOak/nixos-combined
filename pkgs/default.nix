@@ -5,7 +5,6 @@
   # example = pkgs.callPackage ./example { };
   user-packages = with pkgs; [
     # Flake-specific packages
-    inputs.zen-browser.packages."x86_64-linux".default
     inputs.caelestia-shell.packages.${pkgs.system}.with-cli
     hyprlandPlugins.hyprgrass
     hyprlandPlugins.hyprscrolling
@@ -22,6 +21,7 @@
     avizo
     blender
     brave
+    inputs.zen-browser.packages."x86_64-linux".default
     copyq
     firefox
     genymotion
