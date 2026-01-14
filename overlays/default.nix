@@ -12,11 +12,13 @@
   # This one contains whatever you want to overlay
   # You can change versions, add patches, set compilation flags, anything really.
   # https://nixos.wiki/wiki/Overlays
-  modifications = final: prev: {
-    # example = prev.example.overrideAttrs (oldAttrs: rec {
-    # ...
-    # });
-  };
+  # modifications = final: prev: {
+  #   webcord = prev.webcord.overrideAttrs (oldAttrs: {
+  #     makeCacheWritable = true;
+  #     npmDepsHash = null;
+  #     npmInstallFlags = [ "--legacy-peer-deps" ];
+  #   });
+  # };
 
   # NUR (Nix User Repository) overlay
   nur = inputs.nur.overlays.default;

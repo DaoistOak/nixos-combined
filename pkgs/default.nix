@@ -6,12 +6,12 @@
   user-packages = with pkgs; [
     # Flake-specific packages
     inputs.caelestia-shell.packages.${pkgs.system}.with-cli
-    hyprlandPlugins.hyprgrass
+    # hyprlandPlugins.hyprgrass
     hyprlandPlugins.hyprscrolling
     hyprnome
     hyprprop
     hyprsunset
-    nur.repos.mikilio.ttf-ms-fonts
+    # nur.repos.mikilio.ttf-ms-fonts
     nur.repos.shadowrz.klassy-qt6
   ];
   system-packages = with pkgs; [
@@ -54,6 +54,7 @@
     qbittorrent
     qutebrowser
     rofi
+    rpi-imager
     syncthingtray
     thunderbird
     ungoogled-chromium
@@ -63,7 +64,7 @@
     vscode-fhs
     waybar
     waypaper
-    webcord-vencord
+    # webcord-vencord
     winboat
     wpsoffice
 
