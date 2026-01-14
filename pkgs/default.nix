@@ -54,7 +54,9 @@
     qbittorrent
     qutebrowser
     rofi
-    rpi-imager
+    (pkgs.rpi-imager.overrideAttrs (oldAttrs: {
+      buildInputs = oldAttrs.buildInputs ++ [ pkgs.qt6.qtquickcontrols2 ];
+    }))
     syncthingtray
     thunderbird
     ungoogled-chromium
@@ -107,16 +109,18 @@
     ninja
     nodejs
     ntfs3g
-    (octaveFull.withPackages (ps: with ps; [
-      signal        # Signal processing (sawtooth, filter, etc.)
-      control       # Control systems
-      image         # Image processing
-      statistics    # Statistical functions
-      io            # File I/O operations
-      linear-algebra # Advanced linear algebra
-      struct        # Structured data
-      geometry      # Geometry functions
-    ]))
+    (octaveFull.withPackages (
+      ps: with ps; [
+        signal # Signal processing (sawtooth, filter, etc.)
+        control # Control systems
+        image # Image processing
+        statistics # Statistical functions
+        io # File I/O operations
+        linear-algebra # Advanced linear algebra
+        struct # Structured data
+        geometry # Geometry functions
+      ]
+    ))
     oh-my-zsh
     ollama
     opencode
