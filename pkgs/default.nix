@@ -7,7 +7,7 @@
     # Flake-specific packages
     inputs.caelestia-shell.packages.${pkgs.system}.with-cli
     # hyprlandPlugins.hyprgrass
-    hyprlandPlugins.hyprscrolling
+    # hyprlandPlugins.hyprscrolling
     hyprnome
     hyprprop
     hyprsunset
