@@ -55,7 +55,7 @@
     qutebrowser
     rofi
     (pkgs.rpi-imager.overrideAttrs (oldAttrs: {
-      buildInputs = oldAttrs.buildInputs ++ [ pkgs.qt6.full ];
+      buildInputs = oldAttrs.buildInputs ++ [ pkgs.qt6.qt5compat ];
     }))
     syncthingtray
     thunderbird
