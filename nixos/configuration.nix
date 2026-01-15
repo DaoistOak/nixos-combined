@@ -86,6 +86,7 @@
     };
   };
   programs.xwayland.enable = true;
+  programs.nix-ld.enable = true;
   # Console settings
   # /run/current-system/sw/share/consolefonts/ter-u16n.psfu.gz
   console.font = "/run/current-system/sw/share/consolefonts/ter-u18n.psf.gz";
