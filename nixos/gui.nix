@@ -43,7 +43,10 @@
       "kde"
     ];
     configPackages = [ inputs.hyprland.packages.${pkgs.system}.xdg-desktop-portal-hyprland ]; # Use Hyprland portal for Hyprland
-    extraPortals = [ pkgs.kdePackages.xdg-desktop-portal-kde ]; # Keep KDE portal as extra for Plasma
+    extraPortals = [
+      pkgs.xdg-desktop-portal
+      pkgs.kdePackages.xdg-desktop-portal-kde
+    ]; # Keep KDE portal as extra for Plasma
 
   };
   # PipeWire (Audio)
