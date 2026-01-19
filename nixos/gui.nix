@@ -38,7 +38,10 @@
     enable = true;
     xdgOpenUsePortal = false; # Disable for opening links to avoid issues
     config.common.default = [ "kde" ];
-    config.hyprland.default = [ "hyprland" ];
+    config.hyprland.default = [
+      "hyprland"
+      "kde"
+    ];
     configPackages = [ inputs.hyprland.packages.${pkgs.system}.xdg-desktop-portal-hyprland ]; # Use Hyprland portal for Hyprland
     extraPortals = [ pkgs.kdePackages.xdg-desktop-portal-kde ]; # Keep KDE portal as extra for Plasma
 
