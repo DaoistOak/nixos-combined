@@ -84,9 +84,10 @@
       };
     };
 
-    # 🧩 Custom udev rule
+    # 🧩 Custom udev rules
     udev.extraRules = ''
       SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="ec:91:61:47:2d:13", NAME="wlan0"
+      ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1ea7", ATTR{idProduct}=="0066", ATTR{power/control}="on"
     '';
 
     # 🎛️ Other services...
