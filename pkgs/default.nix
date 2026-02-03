@@ -92,6 +92,7 @@
     gnirehtet
     gnumake
     grim
+    grimblast
     hollywood
     jre
     kbd
