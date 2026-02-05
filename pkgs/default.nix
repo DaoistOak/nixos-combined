@@ -95,6 +95,7 @@
     grimblast
     hollywood
     jre
+    openjfx
     kbd
     killall
     lazydocker
