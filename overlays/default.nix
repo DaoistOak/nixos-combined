@@ -23,6 +23,4 @@
   # NUR (Nix User Repository) overlay
   nur = inputs.nur.overlays.default;
 
-  # Chaotic NYX overlay (if needed)
-  chaotic = inputs.chaotic.overlays.default;
 }

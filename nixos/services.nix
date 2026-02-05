@@ -49,9 +49,9 @@
     fwupd.enable = true;
 
     # 🖥️ Lact (AMD GPU tuning)
-    lact = {
-      enable = true;
-    };
+    # lact = {
+    #   enable = true;
+    # };
 
     # ✔️ Ollama Service
     ollama = {
@@ -69,7 +69,7 @@
 
     # 🗝️ TLP tuning
     tlp = {
-      enable = true;
+      enable = false;
       settings = {
         CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
         CPU_SCALING_GOVERNOR_ON_AC = "performance";

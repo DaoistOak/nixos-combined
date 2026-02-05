@@ -10,7 +10,7 @@
     hyprprop
     hyprsunset
     # nur.repos.mikilio.ttf-ms-fonts
-    nur.repos.shadowrz.klassy-qt6
+    klassy
   ];
   system-packages = with pkgs; [
     # GUI Applications
@@ -42,10 +42,9 @@
     keepassxc
     kicad-small
     kitty
-    lact
+    # lact
     lutris
     networkmanagerapplet
-    nexusmods-app
     pcmanfm
     popcorntime
     protonvpn-gui
@@ -55,7 +54,6 @@
     (pkgs.rpi-imager.overrideAttrs (oldAttrs: {
       buildInputs = oldAttrs.buildInputs ++ [ pkgs.qt6.qt5compat ];
     }))
-    syncthingtray
     thunderbird
     ungoogled-chromium
     vesktop

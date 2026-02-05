@@ -38,6 +38,8 @@
   '';
 
   # System settings
+  powerManagement.cpuFreqGovernor = "schedutil";
+
   system = {
     autoUpgrade = {
       enable = true;
