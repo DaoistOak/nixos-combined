@@ -18,13 +18,10 @@
     zen-browser = {
       url = "github:youwen5/zen-browser-flake";
     };
-    chaotic = {
-      url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
-    };
-
     nur = {
       url = "github:nix-community/NUR";
     };
+
     spicetify-nix = {
       url = "github:Gerg-L/spicetify-nix";
     };

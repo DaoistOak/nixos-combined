@@ -18,7 +18,9 @@
       }
       ../nixos/configuration.nix
       inputs.home-manager.nixosModules.default
-      inputs.chaotic.nixosModules.default
+      {
+        home-manager.extraSpecialArgs = { inherit inputs; };
+      }
       inputs.stylix.nixosModules.stylix
       inputs.nixos-hardware.nixosModules.lenovo-ideapad-slim-5
     ];

@@ -46,6 +46,10 @@
       "splash"
       "loglevel=3"
       "rd.systemd.show_status=auto"
+      "amd_pstate=active"
+      "amdgpu.gpu_recovery=1"
+      "amdgpu.runpm=1"
+      "amdgpu.dpm=1"
     ];
 
     # --- Plymouth (Boot Splash) ---
@@ -53,12 +57,10 @@
       enable = true;
     };
     # --- Kernel Packages ---
-    # CachyOS kernel for performance (use linuxPackages_cachyos if built correctly)
+    # Kernel packages
     # kernelPackages = pkgs.linuxPackages_latest;
-    # Alternatives:
-    # kernelPackages = pkgs.linuxPackages_zen;
+    kernelPackages = pkgs.linuxPackages_zen;
     # kernelPackages = pkgs.linuxPackages_lqx;
-    kernelPackages = pkgs.linuxPackages_cachyos;
 
     # --- Bootloader ---
     loader = {
