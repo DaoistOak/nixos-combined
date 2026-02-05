@@ -80,6 +80,7 @@
     direnv
     distrobox
     docker-compose
+    podman
     eza
     ffmpeg
     fish

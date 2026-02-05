@@ -19,6 +19,7 @@
       "render"
       "seat"
       "docker"
+      "tty"
     ];
   };
 

@@ -22,6 +22,7 @@ in
   gtk.enable = true;
   qt.enable = true;
   home.stateVersion = "24.11";
+  xdg.configFile."hypr/hyprlock.conf".force = true;
   home.packages =
     with pkgs;
     [
