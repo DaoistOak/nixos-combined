@@ -39,6 +39,7 @@
     kdePackages.plymouth-kcm
     kdePackages.sddm-kcm
     kdePackages.yakuake
+    kdePackages.kde-cli-tools
     keepassxc
     kicad-small
     kitty
