@@ -37,7 +37,7 @@
   xdg.portal = {
     enable = true;
     xdgOpenUsePortal = false;
-    config.common.default = [ "kde" ];
+    config.common.default = [ "gtk" ];
     config.hyprland.default = [
       "hyprland"
       "kde"
@@ -45,6 +45,7 @@
     configPackages = [ inputs.hyprland.packages.${pkgs.system}.xdg-desktop-portal-hyprland ]; # Use Hyprland portal for Hyprland
     extraPortals = [
       pkgs.xdg-desktop-portal
+      pkgs.xdg-desktop-portal-gtk
       pkgs.kdePackages.xdg-desktop-portal-kde
     ]; # Keep KDE portal as extra for Plasma
 
