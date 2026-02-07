@@ -36,7 +36,7 @@
 
   xdg.portal = {
     enable = true;
-    xdgOpenUsePortal = true;
+    xdgOpenUsePortal = false;
     config.common.default = [ "kde" ];
     config.hyprland.default = [
       "hyprland"
