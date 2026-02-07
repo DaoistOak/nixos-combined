@@ -36,7 +36,7 @@
 
   xdg.portal = {
     enable = true;
-    xdgOpenUsePortal = false; # Disable for opening links to avoid issues
+    xdgOpenUsePortal = true;
     config.common.default = [ "kde" ];
     config.hyprland.default = [
       "hyprland"
