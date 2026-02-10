@@ -9,7 +9,7 @@
   stylix = {
     enable = true;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-macchiato.yaml";
-    image = ./transparent_1920x1280.png ;
+    image = ./stylix-bg.png;
     cursor = {
       package = pkgs.catppuccin-cursors.macchiatoLight;
       name = "Catppuccin-Macchiato-Light-Cursors";
