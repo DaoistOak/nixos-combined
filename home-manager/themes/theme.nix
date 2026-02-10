@@ -9,8 +9,6 @@
   stylix = {
     enable = true;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-macchiato.yaml";
-    image = ./wallpaper;
-    imageScalingMode = "fit";
     cursor = {
       package = pkgs.catppuccin-cursors.macchiatoLight;
       name = "Catppuccin-Macchiato-Light-Cursors";

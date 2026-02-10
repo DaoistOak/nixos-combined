@@ -13,6 +13,9 @@
         disable_hyprland_logo = lib.mkForce false;
         disable_splash_rendering = false;
       };
+
+      preload = [ "/home/zeph/.config/nixos/home-manager/themes/wallpaper" ];
+      wallpaper = [ ",/home/zeph/.config/nixos/home-manager/themes/wallpaper" ];
     };
   };
 }
