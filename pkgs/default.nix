@@ -161,10 +161,19 @@
     mangohud
     python3
     python3Packages.pip
+    python311Packages.opencv4
     qt6.qtbase
     qt6.qtwayland
-    xorg.libxcb
-    python3Packages.opencv4
+    libxcb
+    xorg.libX11
+    xorg.libXcursor
+    xorg.libXrandr
+    xorg.libXinerama
+    xorg.libXi
+    gtk3
+    gdk-pixbuf
+    libjpeg
+    libpng
     wineWowPackages.full
 
     # Utilities
