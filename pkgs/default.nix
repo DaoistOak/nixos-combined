@@ -159,8 +159,7 @@
     gvfs
     libgtop
     mangohud
-    python3
-    python3Packages.pip
+    python3Packages.pyqt5
     wineWowPackages.full
 
     # Utilities
