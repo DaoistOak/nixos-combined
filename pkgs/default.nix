@@ -171,7 +171,7 @@
         pyserial
       ]
     ))
-    qt6.qtbase
+    qt5.qtbase
     qt6.qtwayland
     libxcb
     xorg.libX11
