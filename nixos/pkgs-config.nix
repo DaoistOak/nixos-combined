@@ -12,14 +12,7 @@ in
     };
   };
 
-  environment.systemPackages =
-    system-packages
-    ++ (with pkgs; [
-      qt6.qtbase
-      qt6.qtwayland
-      xorg.libxcb
-      python3Packages.opencv4
-    ]);
+  environment.systemPackages = system-packages;
 
   services.flatpak.enable = true;
   users.extraGroups.docker.members = [ "zeph" ];

@@ -162,6 +162,10 @@
     python3
     python3Packages.pip
     python3Packages.pyqt5
+    qt6.qtbase
+    qt6.qtwayland
+    xorg.libxcb
+    python3Packages.opencv4
     wineWowPackages.full
 
     # Utilities
