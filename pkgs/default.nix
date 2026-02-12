@@ -161,7 +161,6 @@
     mangohud
     python3
     python3Packages.pip
-    python3Packages.pyqt5
     qt6.qtbase
     qt6.qtwayland
     xorg.libxcb
