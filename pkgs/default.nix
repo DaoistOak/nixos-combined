@@ -174,6 +174,11 @@
     gdk-pixbuf
     libjpeg
     libpng
+    gstreamer
+    gst-plugins-base
+    gst-plugins-good
+    gst-plugins-bad
+    gst-plugins-ugly
     wineWowPackages.full
 
     # Utilities
