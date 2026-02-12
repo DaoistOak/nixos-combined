@@ -78,6 +78,7 @@
     cargo
     cpufrequtils
     curl
+    jq
     direnv
     distrobox
     docker-compose
@@ -162,10 +163,19 @@
     python3
     python3Packages.pip
     python311Packages.opencv4
+    (pkgs.python311.withPackages (
+      ps: with ps; [
+        opencv4
+        pyserial
+      ]
+    ))
     qt6.qtbase
     qt6.qtwayland
     libxcb
     xorg.libX11
+    xorg.libXext
+    xorg.libXau
+    xorg.libXdmcp
     xorg.libXcursor
     xorg.libXrandr
     xorg.libXinerama
@@ -224,6 +234,7 @@
     eglexternalplatform
     egl-wayland
     libGL
+    libGLU
     libva
     libvdpau
     libvdpau-va-gl
@@ -240,6 +251,7 @@
     vulkan-hdr-layer-kwin6
     zlib
     arduino-cli
+    dbus
     dnsmasq
     flatpak
     fprintd
