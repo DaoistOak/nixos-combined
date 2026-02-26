@@ -23,7 +23,6 @@ in
   qt.enable = true;
   home.stateVersion = "24.11";
   xdg.configFile."hypr/hyprlock.conf".force = true;
-  home.backupFileExtension = "backup";
   home.packages =
     with pkgs;
     [
