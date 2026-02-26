@@ -33,7 +33,7 @@
     targets.hyprland.enable = true;
     targets.gtk.enable = true;
     targets.qt.enable = true;
-    targets.kde.enable = false;
+    targets.kde.enable = true;
     targets.noctalia-shell.enable = false;
     targets.hyprland.colors.override = {
       "col.active_border" = "#c6a0f6";
