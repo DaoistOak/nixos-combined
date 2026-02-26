@@ -40,6 +40,7 @@
     kdePackages.sddm-kcm
     kdePackages.yakuake
     kdePackages.kde-cli-tools
+    kdePackages.plasma-desktop
     keepassxc
     kicad-small
     kitty
