@@ -39,7 +39,7 @@
     targets.kde.decorations = "org.kde.klassy";
     targets.kde.decorationTheme = "klassy";
     targets.kde.applicationStyle = "kvantum-dark";
-    targets.kde.widgetStyle = "utterly-round-solid";
+    targets.kde.widgetStyle = "utterly-round-dark";
     targets.noctalia-shell.enable = false;
     targets.hyprland.colors.override = {
       "col.active_border" = "#c6a0f6";
