@@ -42,6 +42,7 @@
     kdePackages.kde-cli-tools
     kdePackages.plasma-desktop
     kdePackages.plasma-workspace
+    kdePackages.plasma5support
     kdePackages.kwin
     kdePackages.libplasma
     keepassxc
