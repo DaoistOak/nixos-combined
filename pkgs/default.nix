@@ -41,6 +41,7 @@
     kdePackages.yakuake
     kdePackages.kde-cli-tools
     kdePackages.plasma-desktop
+    kdePackages.plasma-workspace
     keepassxc
     kicad-small
     kitty
