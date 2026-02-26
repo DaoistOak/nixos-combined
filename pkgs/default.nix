@@ -161,16 +161,14 @@
     libgtop
     mangohud
     python3
-    python3Packages.pip
-    python310
-    python310Packages.pip
-    python311Packages.opencv4
-    (pkgs.python311.withPackages (
-      ps: with ps; [
-        opencv4
-        pyserial
-      ]
-    ))
+    # python3Packages.pip
+    # python311Packages.opencv4
+    # (pkgs.python311.withPackages (
+      # ps: with ps; [
+        # opencv4
+        # pyserial
+      # ]
+    # ))
     qt5.qtbase
     qt6.qtwayland
     libxcb
