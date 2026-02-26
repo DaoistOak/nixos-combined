@@ -16,10 +16,29 @@
     # Disable Python 3.11 docs to avoid sphinx build issues
     python311 = prev.python311.override { doc = false; };
 
-    # Allow sphinx 9.1.0 with Python 3.11 (if needed)
-    python311Packages.sphinx = prev.python311Packages.sphinx.overridePythonAttrs (oldAttrs: {
-      disabled = false;
-    });
+    python311Packages = prev.python311Packages.override {
+      overrides = self: super: {
+        sphinx = super.sphinx.overridePythonAttrs (oldAttrs: {
+          disabled = false;
+        });
+        picosvg = super.picosvg.overridePythonAttrs (oldAttrs: {
+          doCheck = false;
+        });
+      };
+    };
+
+    # Same for python313 if present
+    python313 = prev.python313.override { doc = false; };
+    python313Packages = prev.python313Packages.override {
+      overrides = self: super: {
+        sphinx = super.sphinx.overridePythonAttrs (oldAttrs: {
+          disabled = false;
+        });
+        picosvg = super.picosvg.overridePythonAttrs (oldAttrs: {
+          doCheck = false;
+        });
+      };
+    };
   };
 
   # NUR (Nix User Repository) overlay

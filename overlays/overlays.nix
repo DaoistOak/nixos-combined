@@ -18,6 +18,7 @@ in
   # Overlays for home-manager configurations
   home-manager = [
     overlays.additions
+    overlays.modifications
     overlays.nur
   ];
 }
