@@ -36,7 +36,8 @@
     targets.qt.enable = true;
     targets.kde.enable = true;
     targets.kde.useWallpaper = false;
-    targets.kde.decorations = "klassy";
+    targets.kde.decorations = "org.kde.klassy";
+    targets.kde.decorationTheme = "klassy";
     targets.kde.applicationStyle = "kvantum-dark";
     targets.kde.widgetStyle = "utterly-round-solid";
     targets.noctalia-shell.enable = false;
