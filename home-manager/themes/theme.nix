@@ -36,6 +36,9 @@
     targets.qt.enable = true;
     targets.kde.enable = true;
     targets.kde.useWallpaper = false;
+    targets.kde.decorations = "Klassy";
+    targets.kde.applicationStyle = "kvantum-dark";
+    targets.kde.widgetStyle = "Utterly-Round-Solid";
     targets.noctalia-shell.enable = false;
     targets.hyprland.colors.override = {
       "col.active_border" = "#c6a0f6";
