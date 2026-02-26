@@ -59,7 +59,7 @@
       systems = [ "x86_64-linux" ];
       imports = [
         ./nixos
-        ./home-manager
+        ./home-manager/default.nix
       ];
     };
 }
