@@ -18,13 +18,13 @@
       inputs.catppuccin.homeModules.catppuccin
       inputs.caelestia-shell.homeManagerModules.default
       inputs.stylix.homeModules.stylix
-      {
-        wayland.windowManager.hyprland = {
-          enable = true;
-          package = inputs.hyprland.packages."x86_64-linux".hyprland;
-          portalPackage = inputs.hyprland.packages."x86_64-linux".xdg-desktop-portal-hyprland;
-        };
-      }
+      # {
+      #   wayland.windowManager.hyprland = {
+      #     enable = true;
+      #     package = inputs.hyprland.packages."x86_64-linux".hyprland;
+      #     portalPackage = inputs.hyprland.packages."x86_64-linux".xdg-desktop-portal-hyprland;
+      #   };
+      # }
     ];
   };
 }
