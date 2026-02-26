@@ -31,9 +31,11 @@
       };
     };
     targets.hyprland.enable = true;
+    targets.hyprland.image.enable = false;
     targets.gtk.enable = true;
     targets.qt.enable = true;
     targets.kde.enable = true;
+    targets.kde.useWallpaper = false;
     targets.noctalia-shell.enable = false;
     targets.hyprland.colors.override = {
       "col.active_border" = "#c6a0f6";
