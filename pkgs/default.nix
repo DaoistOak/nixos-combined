@@ -42,6 +42,8 @@
     kdePackages.kde-cli-tools
     kdePackages.plasma-desktop
     kdePackages.plasma-workspace
+    kdePackages.kwin
+    kdePackages.libplasma
     keepassxc
     kicad-small
     kitty
