@@ -44,6 +44,7 @@
     kdePackages.plasma-workspace
     kdePackages.plasma5support
     kdePackages.kwin
+    kdePackages.kglobalaccel
     kdePackages.libplasma
     keepassxc
     kicad-small
