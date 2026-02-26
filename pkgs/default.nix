@@ -160,7 +160,7 @@
     gvfs
     libgtop
     mangohud
-    python3Full
+    python3
     # python3Packages.pip
     # python311Packages.opencv4
     # (pkgs.python311.withPackages (
