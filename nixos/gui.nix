@@ -15,6 +15,8 @@
     wayland.enable = true;
     theme = "catppuccin-macchiato-mauve";
   };
+  # Enable Niri Window Window Manager
+  programs.niri.enable=true;
   # Enable KDE Plasma 6
   services.desktopManager.plasma6 = {
     enable = true;
