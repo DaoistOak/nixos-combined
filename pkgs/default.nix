@@ -227,6 +227,7 @@
     gdb
     binutils
     bintools
+    patchelf
     coreutils-full
     dxvk
     glibc
