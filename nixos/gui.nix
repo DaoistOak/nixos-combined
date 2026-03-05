@@ -44,7 +44,7 @@
       "hyprland"
       "kde"
     ];
-    configPackages = [ inputs.hyprland.packages.${pkgs.system}.xdg-desktop-portal-hyprland ]; # Use Hyprland portal for Hyprland
+    configPackages = [ pkgs.kdePackages.xdg-desktop-portal-kde ]; # Use KDE portal as main
     extraPortals = [
       pkgs.xdg-desktop-portal
       pkgs.xdg-desktop-portal-gtk
