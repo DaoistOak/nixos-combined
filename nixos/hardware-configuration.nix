@@ -59,7 +59,7 @@
     # --- Kernel Packages ---
     # Kernel packages
     # kernelPackages = pkgs.linuxPackages_latest;
-    kernelPackages = pkgs.linuxPackages_zen;
+    kernelPackages = pkgs.linuxPackages;
     # kernelPackages = pkgs.linuxPackages_lqx;
 
     # --- Bootloader ---
