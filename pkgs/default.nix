@@ -1,8 +1,8 @@
 # Custom packages, that can be defined similarly to ones from nixpkgs
 # You can build them using 'nix build .#example'
 { pkgs, inputs, ... }:
-{
-  # example = pkgs.callPackage ./example { };
+
+let
   user-packages = with pkgs; [
     # Flake-specific packages
     inputs.caelestia-shell.packages.${pkgs.system}.with-cli
@@ -12,6 +12,7 @@
     # nur.repos.mikilio.ttf-ms-fonts
     klassy
   ];
+
   system-packages = with pkgs; [
     # GUI Applications
     ags
@@ -278,4 +279,8 @@
     libglvnd
     nvd
   ];
+in
+{
+  user-packages = user-packages;
+  system-packages = system-packages;
 }
