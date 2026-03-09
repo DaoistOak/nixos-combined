@@ -102,7 +102,6 @@
       "$mod, G, exec, steam"
 
       # Other applications
-      "# 1.Nocatalia Shell"
       "$mod ALT, D, exec, noctalia-shell ipc call controlCenter toggle"
       "$mod ALT, N, exec,  noctalia-shell ipc call notifications toggleHistory"
       "$mod, SUPER_L, exec, noctalia-shell ipc call launcher toggle"
