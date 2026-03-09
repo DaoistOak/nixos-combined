@@ -26,7 +26,7 @@
     gesture = $gestureFingers, down, dispatcher, exec, caelestia toggle specialws
 
     # 1. KEYBIND CHEATSHEET
-    bind = $mod $upr, K, exec, nocatalia-shell ipc call plugin:keybind-cheatsheet toggle #"Show Keybinds"
+    bind = $mod $upr, K, exec, noctalia-shell ipc call plugin:keybind-cheatsheet toggle #"Show Keybinds"
 
     # 2. WORKSPACE NAVIGATION
     bind = $mod, mouse_down, workspace, e-1 #"Previous workspace (scroll down)"
