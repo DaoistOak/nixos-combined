@@ -100,7 +100,7 @@
     bind = $mod, X, exec, noctalia-shell ipc call sessionMenu toggle #"Session menu"
     bind = $mod, D, exec, noctalia-shell ipc call wallpaper toggle #"Wallpaper selector"
     bind = $mod, S, exec, noctalia-shell ipc call plugin:clipper toggle #"Clipboard manager"
-    bind = $mod SHIFT, S, exec, noctalia-shell ipc call settings open #"Settings dialog"
+    bind = $mod ALT, S, exec, noctalia-shell ipc call settings open #"Settings dialog"
     bind = $mod, Q, exec,  #"Dashboard menu"
     bind = $mod, M, exec, noctalia-shell ipc call media toggle #"Media menu"
     bind = $mod, N, exec, noctalia-shell ipc call wifi toggle #"Network menu"
