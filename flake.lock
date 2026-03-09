@@ -346,6 +346,31 @@
         "type": "github"
       }
     },
+    "hyprgrass": {
+      "inputs": {
+        "hyprland": [
+          "hyprland"
+        ],
+        "nixpkgs": [
+          "hyprgrass",
+          "hyprland",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1772640005,
+        "narHash": "sha256-XI9j4gXRMeMR+dycRMZ1QwbVK5xYoXDBbihFeGapv04=",
+        "owner": "horriblename",
+        "repo": "hyprgrass",
+        "rev": "b1762ae8c3f3a6b49704106aa1f90236c8fdb368",
+        "type": "github"
+      },
+      "original": {
+        "owner": "horriblename",
+        "repo": "hyprgrass",
+        "type": "github"
+      }
+    },
     "hyprland": {
       "inputs": {
         "aquamarine": "aquamarine",
@@ -363,11 +388,11 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1773054659,
-        "narHash": "sha256-0B7oWd6vfp2gWYzZxCZocVKlzlHul8KrJLapPra6x2o=",
+        "lastModified": 1773074870,
+        "narHash": "sha256-8jfx41CqZHxCm2fdjVpvk25hvXyjjxgaOWFALZyzzSI=",
         "owner": "hyprwm",
         "repo": "Hyprland",
-        "rev": "5cf53f581b8b383fe7b1bf9bb9e28c72394e2e16",
+        "rev": "e172a26b5b6ee9d38107fa648f7b3a9acaca2e54",
         "type": "github"
       },
       "original": {
@@ -809,11 +834,11 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1773073983,
-        "narHash": "sha256-EQxAjdOWOvkYpZbcr1uZgdnSPtoToLc+BOxVyBLWHAM=",
+        "lastModified": 1773076617,
+        "narHash": "sha256-++oDfjnXKfFEp/ZAsXN3ogVQ5pZe/FHXr13R1w+eR3c=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "a8c44edd0d13580eca45428ad87f92bbbb1e864b",
+        "rev": "21be324dc9e3191b608fb572c8fcdcdddc28188c",
         "type": "github"
       },
       "original": {
@@ -875,6 +900,7 @@
         "catppuccin": "catppuccin",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
+        "hyprgrass": "hyprgrass",
         "hyprland": "hyprland",
         "hyprland-plugins": "hyprland-plugins",
         "nixos-hardware": "nixos-hardware",
