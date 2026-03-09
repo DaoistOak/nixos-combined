@@ -23,6 +23,10 @@ in
   qt.enable = true;
   home.stateVersion = "24.11";
   xdg.configFile."gtk-3.0/gtk.css".force = true;
+  xdg.configFile."flameshot/flameshot.ini".text = ''
+    [General]
+    useGrimAdapter=true
+  '';
   xdg.configFile."hypr/hyprlock.conf".force = true;
   home.packages =
     with pkgs;
