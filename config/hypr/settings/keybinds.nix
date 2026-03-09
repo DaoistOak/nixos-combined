@@ -69,7 +69,7 @@
     bind = , XF86AudioPrev, exec, playerctl previous #"Previous track"
 
     # 8. SCREENSHOT AND TOOLS
-    bind = , Print, exec, ~/bin/screenshot #"Take screenshot"
+    bind = $mod ,S, exec, flameshot gui #"Take screenshot"
     bind = $mod ALT, P, exec, ~/bin/colorpicker #"Color picker"
 
     # 9. APPLICATION LAUNCHERS
