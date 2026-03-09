@@ -33,9 +33,9 @@
       HandleLidSwitch = "suspend-then-hibernate";
     };
   };
-  systemd.sleep.extraConfig = ''
-    HibernateDelaySec=30m
-  '';
+  systemd.sleep.settings.Sleep = {
+    HibernateDelaySec = "30m";
+  };
 
   # System settings
   powerManagement.cpuFreqGovernor = "schedutil";
@@ -86,6 +86,14 @@
       extraConfig = ''
         virtiofsd_path = "${pkgs.qemu}/bin/virtiofsd"
       '';
+      secrets = [
+        {
+          uuid = "12345678-1234-1234-1234-123456789012";
+          type = "passphrase";
+          usage = "volume";
+          content = "dummy";
+        }
+      ];
     };
   };
   programs.xwayland.enable = true;

@@ -16,7 +16,6 @@
     modules = [
       ./home.nix
       inputs.catppuccin.homeModules.catppuccin
-      inputs.caelestia-shell.homeManagerModules.default
       inputs.stylix.homeModules.stylix
       # {
       #   wayland.windowManager.hyprland = {
