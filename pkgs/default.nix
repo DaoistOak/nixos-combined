@@ -10,6 +10,7 @@ let
     hyprprop
     hyprsunset
     hyprshot
+    flameshot
     # nur.repos.mikilio.ttf-ms-fonts
     klassy
   ];
