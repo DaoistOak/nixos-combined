@@ -9,6 +9,7 @@ let
     hyprnome
     hyprprop
     hyprsunset
+    hyprshot
     # nur.repos.mikilio.ttf-ms-fonts
     klassy
   ];

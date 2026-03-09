@@ -146,7 +146,7 @@ switch_nixos() {
 switch_home_manager() {
     log_info "Switching to new home-manager configuration..."
 
-    if home-manager switch -b backup --flake .#"$HOME_USER"; then
+    if home-manager switch --flake .#"$HOME_USER"; then
         log_success "Home-manager switch successful"
         # Refresh KDE application cache for GUI launchers
         if command -v kbuildsycoca6 &> /dev/null; then
