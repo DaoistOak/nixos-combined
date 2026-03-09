@@ -12,6 +12,7 @@ let
     hyprshot
     flameshot
     cliphist
+    gpu-screen-recorder
     # nur.repos.mikilio.ttf-ms-fonts
     klassy
   ];
