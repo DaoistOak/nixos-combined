@@ -8,7 +8,8 @@
 {
   wayland.windowManager.hyprland = {
     plugins = [
-      inputs.hyprland-plugins.packages.${pkgs.system}.hyprgrass
+      inputs.hyprgrass.packages.${pkgs.system}.hyprgrass
+      # inputs.hyprland-plugins.packages.${pkgs.system}.hyprgrass
       # pkgs.hyprlandPlugins.hyprscrolling
     ];
 
