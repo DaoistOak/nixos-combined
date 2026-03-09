@@ -1,139 +1,138 @@
 { config, pkgs, ... }:
 {
-  wayland.windowManager.hyprland.settings = {
-    "$mod" = "SUPER";
-    "$upr" = "SHIFT";
-    "$workspaceSwipeFingers" = "3";
-    "$gestureFingers" = "3";
+  wayland.windowManager.hyprland.extraConfig = ''
+    $mod = SUPER
+    $upr = SHIFT
+    $workspaceSwipeFingers = 3
+    $gestureFingers = 3
 
-    bindm = [
-      "SUPER, mouse:272, movewindow"
-      "SUPER, mouse:273, resizewindow"
-    ];
+    bindm = SUPER, mouse:272, movewindow
+    bindm = SUPER, mouse:273, resizewindow
 
     # --------------------
     # Gestures configuration
     # --------------------
-    gestures = {
-      workspace_swipe_distance = 700;
-      workspace_swipe_cancel_ratio = 0.15;
-      workspace_swipe_min_speed_to_force = 5;
-      workspace_swipe_direction_lock = true;
-      workspace_swipe_direction_lock_threshold = 10;
-      workspace_swipe_create_new = true;
-    };
+    gestures {
+      workspace_swipe_distance = 700
+      workspace_swipe_cancel_ratio = 0.15
+      workspace_swipe_min_speed_to_force = 5
+      workspace_swipe_direction_lock = true
+      workspace_swipe_direction_lock_threshold = 10
+      workspace_swipe_create_new = true
+    }
 
-    gesture = [
-      "$workspaceSwipeFingers, horizontal, workspace"
-      "$gestureFingers, up, special, special"
-      "$gestureFingers, down, dispatcher, exec, caelestia toggle specialws"
-    ];
-
-    bind = [
-      # Show Keybinds
-      "$mod $upr, K, exec, nocatalia-shell ipc call plugin:keybind-cheatsheet toggle"
-
-      # Scroll through workspaces with super+scroll wheel
-      "$mod, mouse_down, workspace, e-1"
-      "$mod, mouse_up, workspace, e+1"
-
-      # Basic actions
-      "$mod, C, killactive"
-      "$mod $upr, C, exec, hyprctl kill"
-      "$mod $upr, F, fullscreen"
-      "$mod CONTROL, F, togglefloating"
-      "$mod $upr, P, pseudo"
-
-      # Change focus with super+arrows
-      "$mod, left, movefocus, l"
-      "$mod, right, movefocus, r"
-      "$mod, up, movefocus, u"
-      "$mod, down, movefocus, d"
-
-      # Change window orientation with supershift+arrows
-      "$mod $upr, left, movewindow, l"
-      "$mod $upr, right, movewindow, r"
-      "$mod $upr, up, movewindow, u"
-      "$mod $upr, down, movewindow, d"
-
-      # Change active window size with superctrl+arrows
-      "$mod CONTROL, left, resizeactive, -50 0"
-      "$mod CONTROL, right, resizeactive, 50 0"
-      "$mod CONTROL, up, resizeactive, 0 -50"
-      "$mod CONTROL, down, resizeactive, 0 50"
-
-      # Media and volume controls
-      ", XF86PowerOff, exec, hyprpanel t powermenu"
-      ", XF86AudioRaiseVolume, exec, volumectl -du up"
-      ", XF86AudioLowerVolume, exec, volumectl -du down"
-      ", XF86AudioMute, exec, volumectl -d toggle-mute"
-      ", XF86AudioMicMute, exec, volumectl -m toggle-mute"
-      ", XF86MonBrightnessUp, exec, lightctl -d up"
-      ", XF86MonBrightnessDown, exec, lightctl -d down"
-      ", XF86AudioNext, exec, playerctl next"
-      ", XF86AudioPlay, exec, playerctl play-pause"
-      ", XF86AudioPrev, exec, playerctl previous"
-
-      # Screenshot
-      ", Print, exec, ~/bin/screenshot"
-
-      # Colorpicker
-      "$mod ALT, P, exec, ~/bin/colorpicker"
-
-      # Clipboard
-      "$mod, V, exec, copyq menu"
-
-      # Launch programs
-      "$mod, RETURN, exec, kitty tmux"
-      "$mod, F, exec, pcmanfm"
-      "$mod, H, exec, kitty htop"
-      "$mod ALT, H, exec, kitty btop"
-      "$mod ALT, RETURN, exec, alacritty"
-      "$mod, W, exec, zen"
-      "$mod CONTROL, W, exec, firefox -P minimalfox"
-      "$mod ALT, W, exec, qutebrowser"
-      "$mod $upr, W, exec, firefox --private-window"
-      "$mod, E, exec, cursor"
-      "$mod ALT, E, exec, featherpad"
-      "$mod ALT, F, exec, pcmanfm"
-      "$mod ALT, M, exec, cantata"
-      "$mod, Z, exec, zathura"
-      "$mod, P, exec, keepassxc"
-      "$mod, G, exec, steam"
-
-      # Other applications
-      "$mod ALT, D, exec, noctalia-shell ipc call controlCenter toggle"
-      "$mod ALT, N, exec,  noctalia-shell ipc call notifications toggleHistory"
-      "$mod, SUPER_L, exec, noctalia-shell ipc call launcher toggle"
-      "$mod, B, exec, noctalia-shell ipc call bluetooth toggle"
-      "$mod, Period, exec, noctalia-shell ipc call laucher emoji"
-      "$mod, X, exec, noctalia-shell ipc call sessionMenu toggle"
-      "$mod, D, exec, noctalia-shell ipc call wallpaper toggle"
-      "$mod, S, exec, noctalia-shell ipc call plugin:clipper toggle"
-      "$mod ALT, S, exec, noctalia-shell ipc call settings toggle"
-      "$mod, Q, exec, "
-      "$mod, M, exec, nocatalia-shell ipc call media toggle"
-      "$mod, N, exec, noctalia-shell ipc call wifi toggle"
-
-      # Passthrough
-      "$mod $upr, Escape, submap, passthru"
-      "$mod, Escape, submap, reset"
-
-      # Special workspace bindings
-      "$mod $upr, S, movetoworkspace, special"
-      "$mod, SPACE, togglespecialworkspace, special"
-    ]
-    ++ (builtins.concatLists (
+    gesture = $workspaceSwipeFingers, horizontal, workspace
+    gesture = $gestureFingers, up, special, special
+    gesture = $gestureFingers, down, dispatcher, exec, caelestia toggle specialws
+  ''
+  + (builtins.concatStringsSep "\n" [
+    ""
+    "# Show Keybinds"
+    "bind = $mod $upr, K, exec, nocatalia-shell ipc call plugin:keybind-cheatsheet toggle"
+    ""
+    "# Scroll through workspaces with super+scroll wheel"
+    "bind = $mod, mouse_down, workspace, e-1"
+    "bind = $mod, mouse_up, workspace, e+1"
+    ""
+    "# 1.Basic actions"
+    "bind = $mod, C, killactive"
+    "bind = $mod $upr, C, exec, hyprctl kill"
+    "bind = $mod $upr, F, fullscreen"
+    "bind = $mod CONTROL, F, togglefloating"
+    "bind = $mod $upr, P, pseudo"
+    ""
+    "# 2.Change focus with super+arrows"
+    "bind = $mod, left, movefocus, l"
+    "bind = $mod, right, movefocus, r"
+    "bind = $mod, up, movefocus, u"
+    "bind = $mod, down, movefocus, d"
+    ""
+    "# Change window orientation with supershift+arrows"
+    "bind = $mod $upr, left, movewindow, l"
+    "bind = $mod $upr, right, movewindow, r"
+    "bind = $mod $upr, up, movewindow, u"
+    "bind = $mod $upr, down, movewindow, d"
+    ""
+    "# Change active window size with superctrl+arrows"
+    "bind = $mod CONTROL, left, resizeactive, -50 0"
+    "bind = $mod CONTROL, right, resizeactive, 50 0"
+    "bind = $mod CONTROL, up, resizeactive, 0 -50"
+    "bind = $mod CONTROL, down, resizeactive, 0 50"
+    ""
+    "# Media and volume controls"
+    "bind = , XF86PowerOff, exec, hyprpanel t powermenu"
+    "bind = , XF86AudioRaiseVolume, exec, volumectl -du up"
+    "bind = , XF86AudioLowerVolume, exec, volumectl -du down"
+    "bind = , XF86AudioMute, exec, volumectl -d toggle-mute"
+    "bind = , XF86AudioMicMute, exec, volumectl -m toggle-mute"
+    "bind = , XF86MonBrightnessUp, exec, lightctl -d up"
+    "bind = , XF86MonBrightnessDown, exec, lightctl -d down"
+    "bind = , XF86AudioNext, exec, playerctl next"
+    "bind = , XF86AudioPlay, exec, playerctl play-pause"
+    "bind = , XF86AudioPrev, exec, playerctl previous"
+    ""
+    "# Screenshot"
+    "bind = , Print, exec, ~/bin/screenshot"
+    ""
+    "# Colorpicker"
+    "bind = $mod ALT, P, exec, ~/bin/colorpicker"
+    ""
+    "# Clipboard"
+    "bind = $mod, V, exec, copyq menu"
+    ""
+    "# Launch programs"
+    "bind = $mod, RETURN, exec, kitty tmux"
+    "bind = $mod, F, exec, pcmanfm"
+    "bind = $mod, H, exec, kitty htop"
+    "bind = $mod ALT, H, exec, kitty btop"
+    "bind = $mod ALT, RETURN, exec, alacritty"
+    "bind = $mod, W, exec, zen"
+    "bind = $mod CONTROL, W, exec, firefox -P minimalfox"
+    "bind = $mod ALT, W, exec, qutebrowser"
+    "bind = $mod $upr, W, exec, firefox --private-window"
+    "bind = $mod, E, exec, cursor"
+    "bind = $mod ALT, E, exec, featherpad"
+    "bind = $mod ALT, F, exec, pcmanfm"
+    "bind = $mod ALT, M, exec, cantata"
+    "bind = $mod, Z, exec, zathura"
+    "bind = $mod, P, exec, keepassxc"
+    "bind = $mod, G, exec, steam"
+    ""
+    "# Other applications"
+    "bind = $mod ALT, D, exec, noctalia-shell ipc call controlCenter toggle"
+    "bind = $mod ALT, N, exec,  noctalia-shell ipc call notifications toggleHistory"
+    "bind = $mod, SUPER_L, exec, noctalia-shell ipc call launcher toggle"
+    "bind = $mod, B, exec, hyprpanel t bluetoothmenu"
+    "bind = $mod, Period, exec, plasma-emojier"
+    "bind = $mod, X, exec, noctalia-shell ipc call sessionMenu toggle"
+    "bind = $mod, D, exec, noctalia-shell ipc call wallpaper toggle"
+    "bind = $mod, S, exec, noctalia-shell ipc call plugin:clipper toggle"
+    "bind = $mod ALT, S, exec, hyprpanel t settings-dialog"
+    "bind = $mod, Q, exec, hyprpanel t dashboardmenu"
+    "bind = $mod, M, exec, hyprpanel t mediamenu"
+    "bind = $mod, N, exec, hyprpanel t networkmenu"
+    ""
+    "# Passthrough"
+    "bind = $mod $upr, Escape, submap, passthru"
+    "bind = $mod, Escape, submap, reset"
+    ""
+    "# Special workspace bindings"
+    "bind = $mod $upr, S, movetoworkspace, special"
+    "bind = $mod, SPACE, togglespecialworkspace, special"
+  ])
+  + "\n"
+  + (builtins.concatStringsSep "\n" (
+    builtins.concatLists (
       builtins.genList (
         i:
         let
           ws = i + 1;
         in
         [
-          "$mod, code:1${toString i}, workspace, ${toString ws}"
-          "$mod $upr, code:1${toString i}, movetoworkspace, ${toString ws}"
+          "bind = $mod, code:1${toString i}, workspace, ${toString ws}"
+          "bind = $mod $upr, code:1${toString i}, movetoworkspace, ${toString ws}"
         ]
       ) 9
-    ));
-  };
+    )
+  ));
 }
