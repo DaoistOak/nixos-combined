@@ -63,7 +63,18 @@
       systems = [ "x86_64-linux" ];
       imports = [
         ./nixos
-        ./home-manager/default.nix
       ];
+      flake.homeConfigurations."zeph" = inputs.home-manager.lib.homeManagerConfiguration {
+        pkgs = import inputs.nixpkgs {
+          system = "x86_64-linux";
+          overlays = (import ./overlays/overlays.nix { inherit inputs; }).home-manager;
+        };
+        extraSpecialArgs = { inherit inputs; };
+        modules = [
+          ./home-manager/home.nix
+          inputs.catppuccin.homeModules.catppuccin
+          inputs.stylix.homeModules.stylix
+        ];
+      };
     };
 }
