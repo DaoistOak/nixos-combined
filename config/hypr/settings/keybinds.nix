@@ -71,7 +71,6 @@
     # 8. SCREENSHOT AND TOOLS
     bind = , Print, exec, ~/bin/screenshot #"Take screenshot"
     bind = $mod ALT, P, exec, ~/bin/colorpicker #"Color picker"
-    bind = $mod, V, exec, copyq menu #"Clipboard menu"
 
     # 9. APPLICATION LAUNCHERS
     bind = $mod, RETURN, exec, kitty tmux #"Terminal (Kitty + Tmux)"
@@ -99,7 +98,7 @@
     bind = $mod, Period, exec, noctalia-shell ipc call launcher emoji #"Emoji picker"
     bind = $mod, X, exec, noctalia-shell ipc call sessionMenu toggle #"Session menu"
     bind = $mod, D, exec, noctalia-shell ipc call wallpaper toggle #"Wallpaper selector"
-    bind = $mod, S, exec, noctalia-shell ipc call plugin:clipper toggle #"Clipboard manager"
+    bind = $mod, V, exec, noctalia-shell ipc call plugin:clipper toggle #"Clipboard manager"
     bind = $mod ALT, S, exec, noctalia-shell ipc call settings open #"Settings dialog"
     bind = $mod, Q, exec,  #"Dashboard menu"
     bind = $mod, M, exec, noctalia-shell ipc call media toggle #"Media menu"
