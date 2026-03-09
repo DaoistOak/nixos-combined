@@ -11,6 +11,7 @@ let
     hyprsunset
     hyprshot
     flameshot
+    cliphist
     # nur.repos.mikilio.ttf-ms-fonts
     klassy
   ];
