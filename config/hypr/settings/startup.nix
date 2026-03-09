@@ -44,7 +44,7 @@
       "hypridle"
 
       # Application autostarts
-      "copyq"
+      # "copyq"
       "syncthingtray"
       "keepassxc"
 
