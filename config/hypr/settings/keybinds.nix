@@ -2,6 +2,7 @@
 {
   wayland.windowManager.hyprland.settings = {
     "$mod" = "SUPER";
+    "$upr" = "SHIFT";
     "$workspaceSwipeFingers" = "3";
     "$gestureFingers" = "3";
 
@@ -30,7 +31,7 @@
 
     bind = [
       # Show Keybinds
-      "$mod, K, exec, kitty nvim $XDG_CONFIG_HOME/hypr/conf/keybinds/keybinds.conf"
+      "$mod $upr, K, exec, nocatalia-shell ipc call plugin:keybind-cheatsheet toggle"
 
       # Scroll through workspaces with super+scroll wheel
       "$mod, mouse_down, workspace, e-1"
@@ -38,10 +39,10 @@
 
       # Basic actions
       "$mod, C, killactive"
-      "$mod SHIFT, C, exec, hyprctl kill"
-      "$mod SHIFT, F, fullscreen"
+      "$mod $upr, C, exec, hyprctl kill"
+      "$mod $upr, F, fullscreen"
       "$mod CONTROL, F, togglefloating"
-      "$mod SHIFT, P, pseudo"
+      "$mod $upr, P, pseudo"
 
       # Change focus with super+arrows
       "$mod, left, movefocus, l"
@@ -50,10 +51,10 @@
       "$mod, down, movefocus, d"
 
       # Change window orientation with supershift+arrows
-      "$mod SHIFT, left, movewindow, l"
-      "$mod SHIFT, right, movewindow, r"
-      "$mod SHIFT, up, movewindow, u"
-      "$mod SHIFT, down, movewindow, d"
+      "$mod $upr, left, movewindow, l"
+      "$mod $upr, right, movewindow, r"
+      "$mod $upr, up, movewindow, u"
+      "$mod $upr, down, movewindow, d"
 
       # Change active window size with superctrl+arrows
       "$mod CONTROL, left, resizeactive, -50 0"
@@ -91,7 +92,7 @@
       "$mod, W, exec, zen"
       "$mod CONTROL, W, exec, firefox -P minimalfox"
       "$mod ALT, W, exec, qutebrowser"
-      "$mod SHIFT, W, exec, firefox --private-window"
+      "$mod $upr, W, exec, firefox --private-window"
       "$mod, E, exec, cursor"
       "$mod ALT, E, exec, featherpad"
       "$mod ALT, F, exec, pcmanfm"
@@ -101,25 +102,26 @@
       "$mod, G, exec, steam"
 
       # Other applications
+      "# 1.Nocatalia Shell"
       "$mod ALT, D, exec, noctalia-shell ipc call controlCenter toggle"
-
       "$mod ALT, N, exec,  noctalia-shell ipc call notifications toggleHistory"
       "$mod, SUPER_L, exec, noctalia-shell ipc call launcher toggle"
-      "$mod, B, exec, hyprpanel t bluetoothmenu"
-      "$mod, Period, exec, plasma-emojier"
+      "$mod, B, exec, noctalia-shell ipc call bluetooth toggle"
+      "$mod, Period, exec, noctalia-shell ipc call laucher emoji"
       "$mod, X, exec, noctalia-shell ipc call sessionMenu toggle"
       "$mod, D, exec, noctalia-shell ipc call wallpaper toggle"
-      "$mod ALT, S, exec, hyprpanel t settings-dialog"
-      "$mod, Q, exec, hyprpanel t dashboardmenu"
-      "$mod, M, exec, hyprpanel t mediamenu"
-      "$mod, N, exec, hyprpanel t networkmenu"
+      "$mod, S, exec, noctalia-shell ipc call plugin:clipper toggle"
+      "$mod ALT, S, exec, noctalia-shell ipc call settings toggle"
+      "$mod, Q, exec, "
+      "$mod, M, exec, nocatalia-shell ipc call media toggle"
+      "$mod, N, exec, noctalia-shell ipc call wifi toggle"
 
       # Passthrough
-      "$mod SHIFT, Escape, submap, passthru"
+      "$mod $upr, Escape, submap, passthru"
       "$mod, Escape, submap, reset"
 
       # Special workspace bindings
-      "$mod SHIFT, S, movetoworkspace, special"
+      "$mod $upr, S, movetoworkspace, special"
       "$mod, SPACE, togglespecialworkspace, special"
     ]
     ++ (builtins.concatLists (
@@ -130,7 +132,7 @@
         in
         [
           "$mod, code:1${toString i}, workspace, ${toString ws}"
-          "$mod SHIFT, code:1${toString i}, movetoworkspace, ${toString ws}"
+          "$mod $upr, code:1${toString i}, movetoworkspace, ${toString ws}"
         ]
       ) 9
     ));

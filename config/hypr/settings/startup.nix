@@ -45,6 +45,8 @@
 
       # Application autostarts
       # "copyq"
+      "cliphist"
+      "wl-clipboard"
       "syncthingtray"
       "keepassxc"
 
