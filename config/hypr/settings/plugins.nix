@@ -8,14 +8,12 @@
 {
   wayland.windowManager.hyprland = {
     plugins = [
-      inputs.hyprgrass.packages.${pkgs.system}.hyprgrass
       # inputs.hyprland-plugins.packages.${pkgs.system}.hyprgrass
       # pkgs.hyprlandPlugins.hyprscrolling
     ];
 
     settings = {
       plugin = {
-        hyprgrass = { };
         hyprscrolling = {
           column_width = 0.5;
           fullscreen_on_one_column = true;
@@ -58,15 +56,15 @@
           };
 
           # hyprgrass bindings
-          "hyprgrass-bind" = [
-            ", swipe:3:r, workspace, +1"
-            ", swipe:3:l, workspace, -1"
-            ", tap:3, exec, kitty"
-          ];
+          # "hyprgrass-bind" = [
+          #   ", swipe:3:r, workspace, +1"
+          #   ", swipe:3:l, workspace, -1"
+          #   ", tap:3, exec, kitty"
+          # ];
 
-          "hyprgrass-bindm" = [
-            ", longpress:2, movewindow"
-          ];
+          # "hyprgrass-bindm" = [
+          #   ", longpress:2, movewindow"
+          # ];
 
         };
       };
