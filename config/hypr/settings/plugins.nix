@@ -8,25 +8,48 @@
 {
   wayland.windowManager.hyprland = {
     plugins = [
-      # pkgs.hyprlandPlugins.hyprgrass # inputs.Hyprspace.packages.${pkgs.system}.Hyprspace
+      inputs.hyprland-plugins.packages.${pkgs.system}.hyprgrass
       # pkgs.hyprlandPlugins.hyprscrolling
     ];
 
     settings = {
       plugin = {
-        # hyprgrass = { };
+        hyprgrass = { };
         hyprscrolling = {
           column_width = 0.5;
           fullscreen_on_one_column = true;
         };
 
         touch_gestures = {
-          sensitivity = 1.0;
+          # The default sensitivity is probably too low on tablet screens,
+          # I recommend turning it up to 4.0
+          sensitivity = 4.0;
+
+          # must be >= 3
           workspace_swipe_fingers = 3;
+
+          # switching workspaces by swiping from an edge, this is separate from workspace_swipe_fingers
+          # and can be used at the same time
+          # possible values: l, r, u, or d
+          # to disable it set it to anything else
           workspace_swipe_edge = "d";
+
+          # in milliseconds
           long_press_delay = 400;
+
+          # resize windows by long-pressing on window borders and gaps.
+          # If general:resize_on_border is enabled, general:extend_border_grab_area is
+          # used for floating windows
           resize_on_border_long_press = true;
+
+          # in pixels, the distance from the edge that is considered an edge
           edge_margin = 10;
+
+          # emulates touchpad swipes when swiping in a direction that does not trigger
+          # workspace swipe. ONLY triggers when finger count is equal to
+          # workspace_swipe_fingers.
+          #
+          # might be removed in the future in favor of event hooks
           emulate_touchpad_swipe = false;
 
           experimental = {
@@ -34,19 +57,15 @@
           };
 
           # hyprgrass bindings
-          # "hyprgrass-bind" = [
-          #   ", edge:r:l, workspace, +1"
-          #   ", edge:d:u, exec, firefox"
-          #   ", edge:l:d, exec, pactl set-sink-volume @DEFAULT_SINK@ -4%"
-          #   ", swipe:4:d, killactive"
-          #   ", swipe:3:ld, exec, foot"
-          #   ", tap:3, exec, foot"
-          # ];
+          "hyprgrass-bind" = [
+            ", swipe:3:r, workspace, +1"
+            ", swipe:3:l, workspace, -1"
+            ", tap:3, exec, kitty"
+          ];
 
-          # "hyprgrass-bindm" = [
-          #   ", longpress:2, movewindow"
-          #   ", longpress:3, resizewindow"
-          # ];
+          "hyprgrass-bindm" = [
+            ", longpress:2, movewindow"
+          ];
 
         };
       };
