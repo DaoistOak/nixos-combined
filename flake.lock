@@ -1236,11 +1236,11 @@
         "noctalia-qs": "noctalia-qs"
       },
       "locked": {
-        "lastModified": 1773079403,
-        "narHash": "sha256-5TMaujV6LwmSdnOO5IHfe6H2ZOoXcY7Dt6oIYzjYq40=",
+        "lastModified": 1773080291,
+        "narHash": "sha256-3rJzXUYZOvAP7HvO9Atqm4/vyj96uus7iXNOk1yuvjI=",
         "owner": "noctalia-dev",
         "repo": "noctalia-shell",
-        "rev": "e8e5d87fc58321f16d4c2a734a710b4727ee70ef",
+        "rev": "8be7a34b46d0cd9c615ac39db4efcc4529c67802",
         "type": "github"
       },
       "original": {
