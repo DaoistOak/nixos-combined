@@ -25,6 +25,7 @@ let
     firefox
     genymotion
     heroic
+    goverlay
     hyprlock
     hyprpanel
     hyprpolkitagent
