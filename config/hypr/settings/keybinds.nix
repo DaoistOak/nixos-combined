@@ -88,7 +88,7 @@
     bind = $mod ALT, M, exec, cantata #"Music player"
     bind = $mod, Z, exec, zathura #"PDF viewer"
     bind = $mod, P, exec, keepassxc #"Password manager"
-    bind = $mod, G, exec, steam #"Game launcher"
+    bind = $mod, G, exec, lutris #"Game launcher"
 
     # 10. SYSTEM CONTROLS
     bind = $mod ALT, D, exec, noctalia-shell ipc call controlCenter toggle #"Control center"
