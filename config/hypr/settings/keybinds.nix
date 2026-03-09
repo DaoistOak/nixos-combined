@@ -120,7 +120,7 @@
 
       # Special workspace bindings
       "$mod SHIFT, S, movetoworkspace, special"
-      "$mod, SPACE, togglespecialworkspace, scratchpad"
+      "$mod, SPACE, togglespecialworkspace, special"
     ]
     ++ (builtins.concatLists (
       builtins.genList (

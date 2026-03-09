@@ -22,6 +22,8 @@ in
   gtk.enable = true;
   qt.enable = true;
   home.stateVersion = "24.11";
+  xdg.configFile."gtk-3.0/gtk.css".force = true;
+  home.file.".gtkrc-2.0".force = true;
   xdg.configFile."hypr/hyprlock.conf".force = true;
   home.packages =
     with pkgs;
