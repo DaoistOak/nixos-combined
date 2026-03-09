@@ -45,8 +45,7 @@
 
       # Application autostarts
       # "copyq"
-      "cliphist"
-      "wl-clipboard"
+      "wl-paste --watch cliphist store"
       "syncthingtray"
       "keepassxc"
 

@@ -78,6 +78,7 @@ let
     # webcord-vencord
     winboat
     wpsoffice
+    zathura
 
     # TUI Applications
     alsa-utils
