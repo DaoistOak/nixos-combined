@@ -28,7 +28,7 @@
   + (builtins.concatStringsSep "\n" [
     ""
     "# Show Keybinds"
-    "bind = $mod $upr, K, exec, nocatalia-shell ipc call plugin:keybind-cheatsheet toggle"
+    "bind = $mod $upr, K, exec, noctalia-shell ipc call plugin:keybind-cheatsheet toggle"
     ""
     "# Scroll through workspaces with super+scroll wheel"
     "bind = $mod, mouse_down, workspace, e-1"
