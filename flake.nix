@@ -67,7 +67,6 @@
       flake.homeConfigurations."zeph" = inputs.home-manager.lib.homeManagerConfiguration {
         pkgs = import inputs.nixpkgs {
           system = "x86_64-linux";
-          overlays = (import ./overlays/overlays.nix { inherit inputs; }).home-manager;
         };
         extraSpecialArgs = { inherit inputs; };
         modules = [
