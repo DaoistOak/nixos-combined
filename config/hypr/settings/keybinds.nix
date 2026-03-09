@@ -2,7 +2,6 @@
 {
   wayland.windowManager.hyprland.extraConfig = ''
     $mod = SUPER
-    $upr = SHIFT
     $workspaceSwipeFingers = 3
     $gestureFingers = 3
 
@@ -26,7 +25,7 @@
     gesture = $gestureFingers, down, dispatcher, exec, caelestia toggle specialws
 
     # 1. KEYBIND CHEATSHEET
-    bind = $mod $upr, K, exec, noctalia-shell ipc call plugin:keybind-cheatsheet toggle #"Show Keybinds"
+    bind = $mod SHIFT, K, exec, noctalia-shell ipc call plugin:keybind-cheatsheet toggle #"Show Keybinds"
 
     # 2. WORKSPACE NAVIGATION
     bind = $mod, mouse_down, workspace, e-1 #"Previous workspace (scroll down)"
@@ -34,10 +33,10 @@
 
     # 3. WINDOW MANAGEMENT
     bind = $mod, C, killactive #"Close active window"
-    bind = $mod $upr, C, exec, hyprctl kill #"Force kill active window"
-    bind = $mod $upr, F, fullscreen #"Toggle fullscreen"
+    bind = $mod SHIFT, C, exec, hyprctl kill #"Force kill active window"
+    bind = $mod SHIFT, F, fullscreen #"Toggle fullscreen"
     bind = $mod CONTROL, F, togglefloating #"Toggle floating"
-    bind = $mod $upr, P, pseudo #"Toggle pseudo mode"
+    bind = $mod SHIFT, P, pseudo #"Toggle pseudo mode"
 
     # 4. FOCUS NAVIGATION
     bind = $mod, left, movefocus, l #"Focus left"
@@ -46,10 +45,10 @@
     bind = $mod, down, movefocus, d #"Focus down"
 
     # 5. WINDOW MOVEMENT
-    bind = $mod $upr, left, movewindow, l #"Move window left"
-    bind = $mod $upr, right, movewindow, r #"Move window right"
-    bind = $mod $upr, up, movewindow, u #"Move window up"
-    bind = $mod $upr, down, movewindow, d #"Move window down"
+    bind = $mod SHIFT, left, movewindow, l #"Move window left"
+    bind = $mod SHIFT, right, movewindow, r #"Move window right"
+    bind = $mod SHIFT, up, movewindow, u #"Move window up"
+    bind = $mod SHIFT, down, movewindow, d #"Move window down"
 
     # 6. WINDOW RESIZING
     bind = $mod CONTROL, left, resizeactive, -50 0 #"Shrink width left"
@@ -83,7 +82,7 @@
     bind = $mod, W, exec, zen #"Web browser (Zen)"
     bind = $mod CONTROL, W, exec, firefox -P minimalfox #"Web browser (Firefox Minimal)"
     bind = $mod ALT, W, exec, qutebrowser #"Web browser (Qutebrowser)"
-    bind = $mod $upr, W, exec, firefox --private-window #"Private browser"
+    bind = $mod SHIFT, W, exec, firefox --private-window #"Private browser"
     bind = $mod, E, exec, cursor #"Text editor (Cursor)"
     bind = $mod ALT, E, exec, featherpad #"Text editor (Featherpad)"
     bind = $mod ALT, F, exec, pcmanfm #"File manager (alt)"
@@ -107,11 +106,11 @@
     bind = $mod, N, exec, hyprpanel t networkmenu #"Network menu"
 
     # 11. SUBMAPS
-    bind = $mod $upr, Escape, submap, passthru #"Enter passthrough mode"
+    bind = $mod SHIFT, Escape, submap, passthru #"Enter passthrough mode"
     bind = $mod, Escape, submap, reset #"Reset submap"
 
     # 12. SPECIAL WORKSPACE
-    bind = $mod $upr, S, movetoworkspace, special #"Move to special workspace"
+    bind = $mod SHIFT, S, movetoworkspace, special #"Move to special workspace"
     bind = $mod, SPACE, togglespecialworkspace, special #"Toggle special workspace"
   ''
   + "\n"
@@ -124,7 +123,7 @@
         in
         [
           "bind = $mod, code:1${toString i}, workspace, ${toString ws} #\"Workspace ${toString ws}\""
-          "bind = $mod $upr, code:1${toString i}, movetoworkspace, ${toString ws} #\"Move to workspace ${toString ws}\""
+          "bind = $mod SHIFT, code:1${toString i}, movetoworkspace, ${toString ws} #\"Move to workspace ${toString ws}\""
         ]
       ) 9
     )
