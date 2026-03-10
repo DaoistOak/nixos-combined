@@ -129,6 +129,7 @@ let
     pciutils
     picocom
     powertop
+    ryzenadj
     screen
     speechd
     steam-run

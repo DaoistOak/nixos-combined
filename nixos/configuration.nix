@@ -23,6 +23,7 @@
   boot = {
     resumeDevice = "/dev/disk/by-uuid/c90cb3d2-feba-424e-a25b-146d24f9bd0d";
     kernelParams = [ "resume=UUID=c90cb3d2-feba-424e-a25b-146d24f9bd0d" ];
+    kernelModules = [ "ryzen_smu" ];
   };
 
   # Enable hibernation
@@ -86,16 +87,10 @@
       extraConfig = ''
         virtiofsd_path = "${pkgs.qemu}/bin/virtiofsd"
       '';
-      secrets = [
-        {
-          uuid = "12345678-1234-1234-1234-123456789012";
-          type = "passphrase";
-          usage = "volume";
-          content = "dummy";
-        }
-      ];
     };
   };
+  systemd.services.virt-secret-init-encryption.enable = false;
+  systemd.services."drkonqi-coredump-processor@".enable = false;
   programs.xwayland.enable = true;
   programs.nix-ld.enable = true;
   # Console settings
