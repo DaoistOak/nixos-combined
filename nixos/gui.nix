@@ -38,22 +38,15 @@
 
   xdg.portal = {
     enable = true;
-    xdgOpenUsePortal = false;
+    xdgOpenUsePortal = true;
     config.common.default = [ "gtk" ];
-    config.hyprland.default = [
-      "hyprland"
-      "kde"
-    ];
-    config.kde.default = [
-      "kde"
-    ];
-    configPackages = [ pkgs.kdePackages.xdg-desktop-portal-kde ]; # Use KDE portal as main
-    extraPortals = [
+    config.hyprland.default = [ "hyprland" ];
+    config.kde.default = [ "kde" ];
+    configPackages = [
       pkgs.xdg-desktop-portal
       pkgs.xdg-desktop-portal-gtk
       pkgs.kdePackages.xdg-desktop-portal-kde
-    ]; # Keep KDE portal as extra for Plasma
-
+    ];
   };
   # PipeWire (Audio)
   services.pipewire = {
