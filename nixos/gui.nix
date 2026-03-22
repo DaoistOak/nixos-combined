@@ -36,6 +36,20 @@
   # 🎧 Blueman (Bluetooth GUI) — disabled as requested
   services.blueman.enable = false;
 
+  # Ensure KDE portal service is properly linked and started
+  systemd.user.services.plasma-xdg-desktop-portal-kde = {
+    description = "Portal service (KDE implementation)";
+    partOf = [ "graphical-session.target" ];
+    wantedBy = [ "xdg-desktop-portal.service" ];
+    before = [ "xdg-desktop-portal.service" ];
+    serviceConfig = {
+      Type = "dbus";
+      BusName = "org.freedesktop.impl.portal.desktop.kde";
+      ExecStart = "${pkgs.kdePackages.xdg-desktop-portal-kde}/libexec/xdg-desktop-portal-kde";
+      Restart = "on-failure";
+    };
+  };
+
   xdg.portal = {
     enable = true;
     xdgOpenUsePortal = true;
