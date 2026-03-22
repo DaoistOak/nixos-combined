@@ -44,7 +44,7 @@
       "hyprland"
       "kde"
     ];
-    config.plasma6.default = [
+    config.kde.default = [
       "kde"
     ];
     configPackages = [ pkgs.kdePackages.xdg-desktop-portal-kde ]; # Use KDE portal as main
