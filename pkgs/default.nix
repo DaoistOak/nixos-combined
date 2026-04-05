@@ -51,6 +51,7 @@ let
     kdePackages.kwin
     kdePackages.kglobalaccel
     kdePackages.libplasma
+    kdePackages.kdeconnect-kde
     keepassxc
     kicad-small
     kitty
