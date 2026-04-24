@@ -57,6 +57,7 @@ let
     kitty
     # lact
     lutris
+    qalculate-qt
     networkmanagerapplet
     pcmanfm
     popcorntime
