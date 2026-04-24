@@ -47,6 +47,10 @@ in
     FLAKE_DIR = "/home/zeph/.config/nixos";
   };
 
+  xdg.configFile.".gtkrc-2.0" = {
+    force = true;
+    text = "# Default GTK RC-2.0 Configuration\n";
+  };
   programs.home-manager.enable = true;
   nixpkgs.config.allowUnfree = true;
   systemd.user.startServices = true;
