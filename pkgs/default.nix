@@ -56,7 +56,6 @@ let
     kicad-small
     kitty
     # lact
-    lutris
     qalculate-qt
     networkmanagerapplet
     pcmanfm
