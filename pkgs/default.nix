@@ -115,6 +115,7 @@ let
     lazydocker
     lazygit
     lm_sensors
+    lutris-unwrapped
     mesa-demos
     mpv
     neovim
