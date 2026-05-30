@@ -183,6 +183,7 @@ let
     xorg.libXrandr
     xorg.libXinerama
     xorg.libXi
+    gdalMinimal
     gtk3
     gdk-pixbuf
     libjpeg
