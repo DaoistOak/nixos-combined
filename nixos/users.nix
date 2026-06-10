@@ -52,7 +52,6 @@
     NPM_CONFIG_CACHE = "$XDG_CACHE_HOME/npm";
     NPM_CONFIG_TMP = "$XDG_RUNTIME_DIR/npm";
     PSQL_HISTORY = "$XDG_STATE_HOME/psql_history";
-    SCIHOME = "$XDG_STATE_HOME/scilab";
     WAKATIME_HOME = "$XDG_CONFIG_HOME/wakatime";
     WINEPREFIX = "$XDG_DATA_HOME/wine";
     # XAUTHORITY = "$XDG_RUNTIME_DIR/Xauthority";
