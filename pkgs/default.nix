@@ -139,7 +139,6 @@ let
     swww
     swayidle
     syncthing
-    scilab-bin
     tgpt
     thermald
     tlp
