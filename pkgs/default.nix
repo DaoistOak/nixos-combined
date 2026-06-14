@@ -135,6 +135,7 @@ let
     ryzenadj
     screen
     speechd
+    spotube
     steam-run
     swww
     swayidle
