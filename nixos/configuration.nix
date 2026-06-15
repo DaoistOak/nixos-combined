@@ -104,7 +104,6 @@
       '';
     };
   };
-  systemd.services.virt-secret-init-encryption.enable = false;
   systemd.services."drkonqi-coredump-processor@".enable = false;
   programs.xwayland.enable = true;
   programs.nix-ld.enable = true;
