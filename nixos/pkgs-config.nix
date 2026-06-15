@@ -28,4 +28,9 @@ in
 
   programs.steam.enable = true;
   programs.hyprland.enable = true;
+
+  # FHS compat for pressure-vessel (Proton's container runtime)
+  systemd.tmpfiles.rules = [
+    "L+ /usr/bin/true - - - - ${pkgs.coreutils}/bin/true"
+  ];
 }

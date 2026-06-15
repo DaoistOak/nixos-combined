@@ -86,6 +86,7 @@ let
     auto-cpufreq
     bat
     brightnessctl
+    bubblewrap
     busybox
     btop
     cargo
