@@ -75,6 +75,7 @@
     };
     firewall = {
       enable = true;
+      trustedInterfaces = [ "virbr0" "virbr1" ];
       allowedTCPPortRanges = [
         {
           from = 1714;
