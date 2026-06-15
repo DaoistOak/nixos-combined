@@ -33,6 +33,6 @@ in
   systemd.tmpfiles.rules = [
     "L+ /usr/bin/true - - - - ${pkgs.coreutils}/bin/true"
     "d /var/cache/ldconfig 0755 root root -"
-    "f /var/cache/ldconfig/ld.so.cache 0644 root root -"
+    "w /var/cache/ldconfig/ld.so.cache 0644 root root - glibc-ld.so.cache1.1"
   ];
 }
