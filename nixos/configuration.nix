@@ -103,15 +103,15 @@
         virtiofsd_path = "${pkgs.qemu}/bin/virtiofsd"
       '';
     };
-    systemd.services.libvirtd.postStart = ''
-      ${pkgs.libvirt}/bin/virsh net-start default 2>/dev/null || true
-      ${pkgs.libvirt}/bin/virsh net-autostart default 2>/dev/null || true
-    '';
-    systemd.services.virtqemud.postStart = ''
-      ${pkgs.libvirt}/bin/virsh net-start default 2>/dev/null || true
-      ${pkgs.libvirt}/bin/virsh net-autostart default 2>/dev/null || true
-    '';
   };
+  systemd.services.libvirtd.postStart = ''
+    ${pkgs.libvirt}/bin/virsh net-start default 2>/dev/null || true
+    ${pkgs.libvirt}/bin/virsh net-autostart default 2>/dev/null || true
+  '';
+  systemd.services.virtqemud.postStart = ''
+    ${pkgs.libvirt}/bin/virsh net-start default 2>/dev/null || true
+    ${pkgs.libvirt}/bin/virsh net-autostart default 2>/dev/null || true
+  '';
   systemd.services."drkonqi-coredump-processor@".enable = false;
   programs.xwayland.enable = true;
   programs.nix-ld.enable = true;
