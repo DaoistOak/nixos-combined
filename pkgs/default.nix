@@ -194,7 +194,7 @@ let
     gst_all_1.gst-plugins-good
     gst_all_1.gst-plugins-bad
     gst_all_1.gst-plugins-ugly
-    wineWow64Packages
+    wineWow64Packages.stable
 
     # Utilities
     adwaita-icon-theme
