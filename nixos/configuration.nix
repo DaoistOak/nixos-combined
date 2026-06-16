@@ -75,7 +75,10 @@
     };
     firewall = {
       enable = true;
-      trustedInterfaces = [ "virbr0" "virbr1" ];
+      trustedInterfaces = [
+        "virbr0"
+        "virbr1"
+      ];
       allowedTCPPortRanges = [
         {
           from = 1714;
@@ -115,7 +118,23 @@
   '';
   systemd.services."drkonqi-coredump-processor@".enable = false;
   programs.xwayland.enable = true;
-  programs.nix-ld.enable = true;
+  programs.nix-ld = {
+    enable = true;
+    libraries =
+      with pkgs;
+      [
+        libtheora
+        speex
+        libgudev
+        libvdpau
+      ]
+      ++ (with pkgs.pkgsi686Linux; [
+        libtheora
+        speex
+        libgudev
+        libvdpau
+      ]);
+  };
   # Console settings
   # /run/current-system/sw/share/consolefonts/ter-u16n.psfu.gz
   console.font = "/run/current-system/sw/share/consolefonts/ter-u18n.psf.gz";

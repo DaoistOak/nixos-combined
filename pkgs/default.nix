@@ -86,7 +86,6 @@ let
     auto-cpufreq
     bat
     brightnessctl
-    bubblewrap
     busybox
     btop
     cargo
@@ -245,6 +244,9 @@ let
     libva
     libvdpau
     libvdpau-va-gl
+    libtheora
+    speex
+    libgudev
     nil
     pkg-config
     radeontop
