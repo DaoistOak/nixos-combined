@@ -29,14 +29,7 @@ in
   programs.steam.enable = true;
   programs.hyprland.enable = true;
 
-  # Provide 32-bit dynamic linker at FHS path (needed by pressure-vessel/Proton)
-  # Without this, nix-ld removes /lib/ld-linux.so.2 and GE-Proton can't init its bwrap container
+  # Kept for future: 32-bit ld-linux at FHS path, may be needed if running GE-Proton/
+  # pressure-vessel outside Lutris' buildFHSEnv sandbox (nix-ld removes it otherwise)
   environment.ldso32 = "${pkgs.pkgsi686Linux.glibc}/lib/ld-linux.so.2";
-
-  # FHS compat for pressure-vessel (Proton's container runtime)
-  systemd.tmpfiles.rules = [
-    "L+ /usr/bin/true - - - - ${pkgs.coreutils}/bin/true"
-    "d /var/cache/ldconfig 0755 root root -"
-    "w /var/cache/ldconfig/ld.so.cache 0644 root root - glibc-ld.so.cache1.1"
-  ];
 }
