@@ -70,9 +70,6 @@ let
     thunderbird
     ungoogled-chromium
     vesktop
-    (pkgs.viber.overrideAttrs (old: {
-      libPath = old.libPath + ":" + "${pkgs.libxshmfence}/lib";
-    }))
     virt-manager
     vscode-fhs
     waybar
