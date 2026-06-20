@@ -59,6 +59,15 @@
     };
     # openssh
     openssh.enable = true;
+
+    # 🔄 Syncthing (file sync daemon)
+    syncthing = {
+      enable = true;
+      user = "zeph";
+      dataDir = "/home/zeph/Sync";
+      configDir = "/home/zeph/.config/syncthing";
+    };
+
     # 🔌 Power Profiles (disabled)
     power-profiles-daemon.enable = false;
 
