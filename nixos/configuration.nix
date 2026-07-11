@@ -6,6 +6,7 @@
   config,
   pkgs,
   inputs,
+  lib,
   ...
 }:
 
@@ -41,13 +42,8 @@
   # System settings
   powerManagement.cpuFreqGovernor = "schedutil";
 
-  system = {
-    autoUpgrade = {
-      enable = true;
-      dates = "weekly";
-    };
-    stateVersion = "25.11";
-  };
+  system.stateVersion = "25.11";
+
   # Nix Settings
   nix = {
     gc = {
@@ -55,8 +51,11 @@
       dates = "daily";
       options = "--delete-older-than 7d";
     };
+    optimise = {
+      automatic = true;
+      dates = [ "weekly" ];
+    };
     settings = {
-      auto-optimise-store = true;
       experimental-features = [
         "nix-command"
         "flakes"
@@ -147,6 +146,10 @@
     targets.console.enable = true;
     targets.plymouth.enable = true;
   };
+
+  nixpkgs.config.permittedInsecurePackages = [
+    "pnpm-10.29.2"
+  ];
 
   environment.systemPackages = with pkgs; [
     base16-schemes
