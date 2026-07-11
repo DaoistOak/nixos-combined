@@ -60,7 +60,7 @@ let
     networkmanagerapplet
     pcmanfm
     popcorntime
-    protonvpn-gui
+    proton-vpn
     qbittorrent
     qutebrowser
     rofi
@@ -137,7 +137,7 @@ let
     speechd
     spotube
     steam-run
-    swww
+    awww
     swayidle
     syncthing
     tgpt
@@ -148,7 +148,6 @@ let
     upower
     util-linux
     vim
-    vimPlugins.nvchad
     wget
     wl-clipboard
     xclip
@@ -176,15 +175,14 @@ let
     qt5.qtbase
     qt6.qtwayland
     libxcb
-    xorg.libX11
-    xorg.libXext
-    xorg.libXau
-    xorg.libXdmcp
-    xorg.libXcursor
-    xorg.libXrandr
-    xorg.libXinerama
-    xorg.libXi
-    gdalMinimal
+    libx11
+    libxext
+    libxau
+    libxdmcp
+    libxcursor
+    libxrandr
+    libxinerama
+    libxi
     gtk3
     gdk-pixbuf
     libjpeg
@@ -231,7 +229,7 @@ let
     dxvk
     glibc
     glibc.dev
-    icu77
+    icu
     libgcc
     libgccjit
     libvirt

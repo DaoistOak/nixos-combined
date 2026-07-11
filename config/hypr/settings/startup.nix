@@ -30,7 +30,6 @@
 
       # Launch waybar with the specified configuration
       # "hyprpanel"
-      "kwalletd6"
       "noctalia-shell"
       # Launch notifications service (swaync or mako)
       "/run/current-system/sw/bin/nm-applet"

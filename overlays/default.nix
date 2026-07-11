@@ -13,9 +13,14 @@
   # You can change versions, add patches, set compilation flags, anything really.
   # https://nixos.wiki/wiki/Overlays
   modifications = final: prev: {
-    # Disable Python 3.11 docs to avoid sphinx build issues
-    # python311 = prev.python311.override { doc = false; };
+    # vulkan-validation-layers defaults UPDATE_DEPS=ON which runs
+    # update_deps.py (needs git + network). Nix provides deps, so disable it.
+    vulkan-validation-layers = prev.vulkan-validation-layers.overrideAttrs (old: {
+      nativeBuildInputs = (old.nativeBuildInputs or []) ++ [ final.git ];
+      cmakeFlags = (old.cmakeFlags or []) ++ [ "-DUPDATE_DEPS=OFF" ];
+    });
 
+    # Generalize Python package overrides to all versions
     python311Packages = prev.python311Packages.override {
       overrides = self: super: {
         sphinx = super.sphinx.overridePythonAttrs (oldAttrs: {
@@ -26,9 +31,6 @@
         });
       };
     };
-
-    # Same for python313 if present
-    # python313 = prev.python313.override { doc = false; };
     python313Packages = prev.python313Packages.override {
       overrides = self: super: {
         sphinx = super.sphinx.overridePythonAttrs (oldAttrs: {
@@ -39,6 +41,7 @@
         });
       };
     };
+
   };
 
   # NUR (Nix User Repository) overlay

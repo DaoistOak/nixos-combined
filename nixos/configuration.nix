@@ -60,6 +60,9 @@
         "nix-command"
         "flakes"
       ];
+      max-jobs = "auto";
+      min-free = 3221225472;
+      max-free = 6442450944;
     };
   };
 
@@ -147,9 +150,12 @@
     targets.plymouth.enable = true;
   };
 
-  nixpkgs.config.permittedInsecurePackages = [
-    "pnpm-10.29.2"
-  ];
+  nixpkgs.config = {
+    allowAliases = false;
+    permittedInsecurePackages = [
+      "pnpm-10.29.2"
+    ];
+  };
 
   environment.systemPackages = with pkgs; [
     base16-schemes

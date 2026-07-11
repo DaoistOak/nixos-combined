@@ -23,16 +23,7 @@
     # Now nest your KWin tweaks here—this is the correct path
   };
   # --- KWallet 6 auto-unlock at login ---------------------------
-  security.pam.services.sddm.enableKwallet = true; # still works
-  # --- Ensure kwalletd6 is running -------------------------------
-  systemd.user.services.kwalletd6 = {
-    description = "KWallet 6 Daemon";
-    wantedBy = [ "graphical-session.target" ];
-    serviceConfig = {
-      ExecStart = "${pkgs.kdePackages.kwallet}/bin/kwalletd6 --pam-login";
-      Restart = "always";
-    };
-  };
+  security.pam.services.sddm.enableKwallet = true;
   # 🎧 Blueman (Bluetooth GUI) — disabled as requested
   services.blueman.enable = false;
 
