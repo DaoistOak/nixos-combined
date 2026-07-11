@@ -8,7 +8,7 @@
 
 let
   user-packages = (import ../pkgs/default.nix { inherit pkgs inputs; }).user-packages;
-  spotify = import ../pkgs/spicetify.nix { inherit pkgs inputs; };
+  # spotify = import ../pkgs/spicetify.nix { inherit pkgs inputs; };
 in
 {
   # Force rebuild again
@@ -22,6 +22,13 @@ in
   gtk.enable = true;
   qt.enable = true;
   home.stateVersion = "24.11";
+  wayland.windowManager.hyprland.configType = "hyprlang";
+  catppuccin = {
+    enable = true;
+    autoEnable = true;
+    flavor = "macchiato";
+    accent = "mauve";
+  };
   xdg.configFile."gtk-3.0/gtk.css".force = true;
   xdg.configFile."flameshot/flameshot.ini".text = ''
     [General]
@@ -31,7 +38,7 @@ in
   home.packages =
     with pkgs;
     [
-      spotify
+      # spotify
     ]
     ++ user-packages;
 
