@@ -88,6 +88,7 @@ let
     busybox
     btop
     cargo
+    canon-cups-ufr2
     cpufrequtils
     curl
     jq
