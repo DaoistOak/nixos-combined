@@ -1,7 +1,7 @@
 { pkgs, inputs, ... }:
 
 let
-  spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.stdenv.system};
+  spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.stdenv.hostPlatform.system};
   spicetify = inputs.spicetify-nix.lib.mkSpicetify pkgs {
     enable = true;
     enabledExtensions = with spicePkgs.extensions; [
