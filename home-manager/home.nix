@@ -22,6 +22,7 @@ in
   gtk.enable = true;
   qt.enable = true;
   home.stateVersion = "24.11";
+  home.pointerCursor.enable = true;
   wayland.windowManager.hyprland.configType = "hyprlang";
   catppuccin = {
     enable = true;
