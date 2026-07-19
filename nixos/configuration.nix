@@ -153,8 +153,8 @@
   nixpkgs.config = {
     allowAliases = false;
     permittedInsecurePackages = [
-      "electron"
-      "pnpm"
+      "electron-40.10.5"
+      "pnpm-10.29.2"
     ];
   };
 
