@@ -30,7 +30,7 @@ let
     heroic
     goverlay
     hyprlock
-    hyprpanel
+    inputs.hyprpanel.packages."x86_64-linux".default
     hyprpolkitagent
     kdePackages.bluedevil
     kdePackages.bluez-qt
