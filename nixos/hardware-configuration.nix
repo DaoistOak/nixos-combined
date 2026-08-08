@@ -50,6 +50,9 @@
       "amdgpu.gpu_recovery=1"
       "amdgpu.runpm=0"
       "amdgpu.dpm=1"
+      # Disable Panel Self Refresh (PSR): fixes transient noise-strip glitches
+      # on amdgpu panels when partial updates occur (e.g. OSD popup on brightness change)
+      "amdgpu.dcdebugmask=0x10"
     ];
 
     # --- Plymouth (Boot Splash) ---
