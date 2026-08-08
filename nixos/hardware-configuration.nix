@@ -50,9 +50,6 @@
       "amdgpu.gpu_recovery=1"
       "amdgpu.runpm=0"
       "amdgpu.dpm=1"
-      # Disable Panel Self Refresh (PSR): fixes transient noise-strip glitches
-      # on amdgpu panels when partial updates occur (e.g. OSD popup on brightness change)
-      "amdgpu.dcdebugmask=0x10"
     ];
 
     # --- Plymouth (Boot Splash) ---
@@ -60,9 +57,9 @@
       enable = true;
     };
     # --- Kernel Packages ---
-    # Kernel packages
-    # kernelPackages = pkgs.linuxPackages_latest;
-    kernelPackages = pkgs.linuxPackages;
+    # Latest kernel contains AMD PSR/Replay corruption fixes for Hawk Point (drm/amd#5087)
+    kernelPackages = pkgs.linuxPackages_latest;
+    # kernelPackages = pkgs.linuxPackages;
     # kernelPackages = pkgs.linuxPackages_lqx;
 
     # --- Bootloader ---
