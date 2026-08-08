@@ -1,67 +1,154 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 {
   wayland.windowManager.hyprland.settings = {
 
     env = [
       # Environment variables for Hyprland and other apps
-      "NIXOS_OZONE_WL,1"
-      "XDG_CURRENT_DESKTOP,Hyprland"
-      "XDG_SESSION_TYPE,wayland"
-      "XDG_SESSION_DESKTOP,Hyprland"
-      "HYPRCURSOR_THEME,catppuccin-macchiato-light-cursors"
-      "HYPRCURSOR_SIZE,32"
-      "QT_WAYLAND_DISABLE_WINDOWDECORATION,1"
-      "QT_QPA_PLATFORM,wayland"
-      "QT_QPA_PLATFORMTHEME,qt5ct"
-      "GDK_BACKEND,wayland,x11,*"
-      "XCURSOR_THEME,catppuccin-macchiato-light-cursors"
-      "XCURSOR_SIZE,32"
-      # "WLR_DRM_DEVICES,/dev/dri/card1"
-      # "WLR_RENDER_DRM_DEVICE,/dev/dri/renderD128"
-      "MOZ_ENABLE_WAYLAND,1"
-      "SDL_VIDEODRIVER,wayland"
-      "CLUTTER_BACKEND,wayland"
+      {
+        _args = [
+          "NIXOS_OZONE_WL"
+          "1"
+        ];
+      }
+      {
+        _args = [
+          "XDG_CURRENT_DESKTOP"
+          "Hyprland"
+        ];
+      }
+      {
+        _args = [
+          "XDG_SESSION_TYPE"
+          "wayland"
+        ];
+      }
+      {
+        _args = [
+          "XDG_SESSION_DESKTOP"
+          "Hyprland"
+        ];
+      }
+      {
+        _args = [
+          "HYPRCURSOR_THEME"
+          "catppuccin-macchiato-light-cursors"
+        ];
+      }
+      {
+        _args = [
+          "HYPRCURSOR_SIZE"
+          "32"
+        ];
+      }
+      {
+        _args = [
+          "QT_WAYLAND_DISABLE_WINDOWDECORATION"
+          "1"
+        ];
+      }
+      {
+        _args = [
+          "QT_QPA_PLATFORM"
+          "wayland"
+        ];
+      }
+      {
+        _args = [
+          "QT_QPA_PLATFORMTHEME"
+          "qt5ct"
+        ];
+      }
+      {
+        _args = [
+          "GDK_BACKEND"
+          "wayland,x11,*"
+        ];
+      }
+      {
+        _args = [
+          "XCURSOR_THEME"
+          "catppuccin-macchiato-light-cursors"
+        ];
+      }
+      {
+        _args = [
+          "XCURSOR_SIZE"
+          "32"
+        ];
+      }
+      # {
+      #   _args = [ "WLR_DRM_DEVICES" "/dev/dri/card1" ];
+      # }
+      # {
+      #   _args = [ "WLR_RENDER_DRM_DEVICE" "/dev/dri/renderD128" ];
+      # }
+      {
+        _args = [
+          "MOZ_ENABLE_WAYLAND"
+          "1"
+        ];
+      }
+      {
+        _args = [
+          "SDL_VIDEODRIVER"
+          "wayland"
+        ];
+      }
+      {
+        _args = [
+          "CLUTTER_BACKEND"
+          "wayland"
+        ];
+      }
     ];
 
-    exec-once = [
-      # Scripts and services
-      "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
-      "dbus-update-activation-environment --systemd HYPRLAND_INSTANCE_SIGNATURE"
+    on = {
+      _args = [
+        "hyprland.start"
+        (lib.generators.mkLuaInline ''
+          function()
+            -- Launch the shell / bar
+            -- hl.exec_cmd("hyprpanel")
+            hl.exec_cmd("noctalia-shell")
+            -- Launch notifications service (swaync or mako)
+            hl.exec_cmd("/run/current-system/sw/bin/nm-applet")
+            -- Volume and brightness services
+            hl.exec_cmd("avizo-service")
 
-      # Launch waybar with the specified configuration
-      # "hyprpanel"
-      "noctalia-shell"
-      # Launch notifications service (swaync or mako)
-      "/run/current-system/sw/bin/nm-applet"
-      # Volume and brightness services
-      "avizo-service"
+            -- Polkit authentication agent
+            hl.exec_cmd("systemctl --user start hyprpolkitagent")
 
-      # Polkit authentication agent
-      "systemctl --user start hyprpolkitagent"
+            -- Idle and power management
+            hl.exec_cmd("hypridle")
 
-      # Idle and power management
-      "hypridle"
+            -- Application autostarts
+            -- hl.exec_cmd("copyq")
+            hl.exec_cmd("wl-paste --watch cliphist store")
+            hl.exec_cmd("syncthingtray")
+            hl.exec_cmd("keepassxc")
 
-      # Application autostarts
-      # "copyq"
-      "wl-paste --watch cliphist store"
-      "syncthingtray"
-      "keepassxc"
+            -- Wallpaper and background setup
+            hl.exec_cmd("swww-daemon --format xrgb")
+            hl.exec_cmd("waypaper --restore")
+            -- Uncomment and use if you want to start specific wallpaper or background managers
+            -- hl.exec_cmd("swaybg -m fill -i ~/Wallpaper/Image34.jpg")
+            -- hl.exec_cmd("hyprpaper")
 
-      # Wallpaper and background setup
-      "swww-daemon --format xrgb"
-      "waypaper --restore"
-      # Uncomment and use if you want to start specific wallpaper or background managers
-      # "exec-once = swaybg -m fill -i ~/Wallpaper/Image34.jpg"
-      # "exec-once = hyprpaper"
-
-      # Run the custom autostart script
-      # "/.config/hypr/scripts/restartbar\&wall.sh"
-      "~/bin/keyboard_led_control.sh"
-      "~/bin/hyprland-clean"
-      # Launching hyprshade for window effects
-      "hyprsunset"
-      "hyprctl dispatch submap global"
-    ];
+            -- Run the custom autostart script
+            -- hl.exec_cmd("~/.config/hypr/scripts/restartbar&wall.sh")
+            hl.exec_cmd("~/bin/keyboard_led_control.sh")
+            hl.exec_cmd("~/bin/hyprland-clean")
+            -- Launching hyprshade for window effects
+            hl.exec_cmd("hyprsunset")
+            hl.exec_cmd("hyprctl dispatch submap global")
+          end
+        '')
+      ];
+    };
   };
 }
