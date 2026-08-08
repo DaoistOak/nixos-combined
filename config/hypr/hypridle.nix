@@ -16,7 +16,7 @@
         ignore_dbus_inhibit = false;
       };
 
-      listeners = [
+      listener = [
         {
           timeout = 150; # 2.5 minutes
           on-timeout = "brightnessctl -s set 10";
