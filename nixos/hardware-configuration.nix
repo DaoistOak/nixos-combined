@@ -48,7 +48,7 @@
       "rd.systemd.show_status=auto"
       "amd_pstate=active"
       "amdgpu.gpu_recovery=1"
-      "amdgpu.runpm=1"
+      "amdgpu.runpm=0"
       "amdgpu.dpm=1"
     ];
 
