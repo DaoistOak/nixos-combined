@@ -16,7 +16,10 @@
     theme = "catppuccin-macchiato-mauve";
   };
   # Enable Hyprland
-  programs.hyprland.enable = true;
+  programs.hyprland = {
+    enable = true;
+    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+  };
   # Enable KDE Plasma 6
   services.desktopManager.plasma6 = {
     enable = true;
