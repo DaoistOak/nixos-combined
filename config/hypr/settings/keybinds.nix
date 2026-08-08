@@ -1,130 +1,120 @@
 { config, pkgs, ... }:
 {
   wayland.windowManager.hyprland.extraConfig = ''
-    $mod = SUPER
-    $workspaceSwipeFingers = 3
-    $gestureFingers = 3
+    local mod = "SUPER"
+    local workspaceSwipeFingers = 3
+    local gestureFingers = 3
 
-    bindm = SUPER, mouse:272, movewindow
-    bindm = SUPER, mouse:273, resizewindow
+    -- Mouse binds
+    hl.bind(mod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
+    hl.bind(mod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
-    # --------------------
-    # Gestures configuration
-    # --------------------
-    gestures {
-      workspace_swipe_distance = 700
-      workspace_swipe_cancel_ratio = 0.15
-      workspace_swipe_min_speed_to_force = 5
-      workspace_swipe_direction_lock = true
-      workspace_swipe_direction_lock_threshold = 10
-      workspace_swipe_create_new = true
-    }
+    -- --------------------
+    -- Gestures configuration
+    -- --------------------
+    hl.gesture({ fingers = workspaceSwipeFingers, direction = "horizontal", action = "workspace" })
+    hl.gesture({ fingers = gestureFingers, direction = "up", action = "special", workspace_name = "special" })
+    hl.gesture({ fingers = gestureFingers, direction = "down", action = function()
+        hl.exec_cmd("caelestia toggle specialws")
+    end })
 
-    gesture = $workspaceSwipeFingers, horizontal, workspace
-    gesture = $gestureFingers, up, special, special
-    gesture = $gestureFingers, down, dispatcher, exec, caelestia toggle specialws
+    -- 1. KEYBIND CHEATSHEET
+    hl.bind(mod .. " + SHIFT + K", hl.dsp.exec_cmd("noctalia-shell ipc call plugin:keybind-cheatsheet toggle"))
 
-    # 1. KEYBIND CHEATSHEET
-    bind = $mod SHIFT, K, exec, noctalia-shell ipc call plugin:keybind-cheatsheet toggle #"Show Keybinds"
+    -- 2. WORKSPACE NAVIGATION
+    hl.bind(mod .. " + mouse_down", hl.dsp.focus({ workspace = "e-1" }))
+    hl.bind(mod .. " + mouse_up", hl.dsp.focus({ workspace = "e+1" }))
 
-    # 2. WORKSPACE NAVIGATION
-    bind = $mod, mouse_down, workspace, e-1 #"Previous workspace (scroll down)"
-    bind = $mod, mouse_up, workspace, e+1 #"Next workspace (scroll up)"
+    -- 3. WINDOW MANAGEMENT
+    hl.bind(mod .. " + C", hl.dsp.window.close())
+    hl.bind(mod .. " + SHIFT + C", hl.dsp.exec_cmd("hyprctl kill"))
+    hl.bind(mod .. " + SHIFT + F", hl.dsp.window.fullscreen())
+    hl.bind(mod .. " + CONTROL + F", hl.dsp.window.float({ action = "toggle" }))
+    hl.bind(mod .. " + SHIFT + P", hl.dsp.window.pseudo())
 
-    # 3. WINDOW MANAGEMENT
-    bind = $mod, C, killactive #"Close active window"
-    bind = $mod SHIFT, C, exec, hyprctl kill #"Force kill active window"
-    bind = $mod SHIFT, F, fullscreen #"Toggle fullscreen"
-    bind = $mod CONTROL, F, togglefloating #"Toggle floating"
-    bind = $mod SHIFT, P, pseudo #"Toggle pseudo mode"
+    -- 4. FOCUS NAVIGATION
+    hl.bind(mod .. " + left", hl.dsp.focus({ direction = "l" }))
+    hl.bind(mod .. " + right", hl.dsp.focus({ direction = "r" }))
+    hl.bind(mod .. " + up", hl.dsp.focus({ direction = "u" }))
+    hl.bind(mod .. " + down", hl.dsp.focus({ direction = "d" }))
 
-    # 4. FOCUS NAVIGATION
-    bind = $mod, left, movefocus, l #"Focus left"
-    bind = $mod, right, movefocus, r #"Focus right"
-    bind = $mod, up, movefocus, u #"Focus up"
-    bind = $mod, down, movefocus, d #"Focus down"
+    -- 5. WINDOW MOVEMENT
+    hl.bind(mod .. " + SHIFT + left", hl.dsp.window.move({ direction = "l" }))
+    hl.bind(mod .. " + SHIFT + right", hl.dsp.window.move({ direction = "r" }))
+    hl.bind(mod .. " + SHIFT + up", hl.dsp.window.move({ direction = "u" }))
+    hl.bind(mod .. " + SHIFT + down", hl.dsp.window.move({ direction = "d" }))
 
-    # 5. WINDOW MOVEMENT
-    bind = $mod SHIFT, left, movewindow, l #"Move window left"
-    bind = $mod SHIFT, right, movewindow, r #"Move window right"
-    bind = $mod SHIFT, up, movewindow, u #"Move window up"
-    bind = $mod SHIFT, down, movewindow, d #"Move window down"
+    -- 6. WINDOW RESIZING
+    hl.bind(mod .. " + CONTROL + left", hl.dsp.window.resize({ x = -50, y = 0, relative = true }))
+    hl.bind(mod .. " + CONTROL + right", hl.dsp.window.resize({ x = 50, y = 0, relative = true }))
+    hl.bind(mod .. " + CONTROL + up", hl.dsp.window.resize({ x = 0, y = -50, relative = true }))
+    hl.bind(mod .. " + CONTROL + down", hl.dsp.window.resize({ x = 0, y = 50, relative = true }))
 
-    # 6. WINDOW RESIZING
-    bind = $mod CONTROL, left, resizeactive, -50 0 #"Shrink width left"
-    bind = $mod CONTROL, right, resizeactive, 50 0 #"Grow width right"
-    bind = $mod CONTROL, up, resizeactive, 0 -50 #"Shrink height up"
-    bind = $mod CONTROL, down, resizeactive, 0 50 #"Grow height down"
+    -- 7. MEDIA CONTROLS
+    hl.bind("XF86PowerOff", hl.dsp.exec_cmd("hyprpanel t powermenu"))
+    hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("volumectl -du up"), { locked = true, repeating = true })
+    hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("volumectl -du down"), { locked = true, repeating = true })
+    hl.bind("XF86AudioMute", hl.dsp.exec_cmd("volumectl -d toggle-mute"), { locked = true, repeating = true })
+    hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("volumectl -m toggle-mute"), { locked = true, repeating = true })
+    hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("lightctl -d up"), { locked = true, repeating = true })
+    hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("lightctl -d down"), { locked = true, repeating = true })
+    hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
+    hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
+    hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
 
-    # 7. MEDIA CONTROLS
-    bind = , XF86PowerOff, exec, hyprpanel t powermenu #"Power menu"
-    bind = , XF86AudioRaiseVolume, exec, volumectl -du up #"Volume up"
-    bind = , XF86AudioLowerVolume, exec, volumectl -du down #"Volume down"
-    bind = , XF86AudioMute, exec, volumectl -d toggle-mute #"Toggle mute"
-    bind = , XF86AudioMicMute, exec, volumectl -m toggle-mute #"Toggle mic mute"
-    bind = , XF86MonBrightnessUp, exec, lightctl -d up #"Brightness up"
-    bind = , XF86MonBrightnessDown, exec, lightctl -d down #"Brightness down"
-    bind = , XF86AudioNext, exec, playerctl next #"Next track"
-    bind = , XF86AudioPlay, exec, playerctl play-pause #"Play/pause"
-    bind = , XF86AudioPrev, exec, playerctl previous #"Previous track"
+    -- 8. SCREENSHOT AND TOOLS
+    hl.bind(mod .. " + S", hl.dsp.exec_cmd("flameshot gui"))
+    hl.bind(mod .. " + ALT + P", hl.dsp.exec_cmd("~/bin/colorpicker"))
 
-    # 8. SCREENSHOT AND TOOLS
-    bind = $mod ,S, exec, flameshot gui #"Take screenshot"
-    bind = $mod ALT, P, exec, ~/bin/colorpicker #"Color picker"
+    -- 9. APPLICATION LAUNCHERS
+    hl.bind(mod .. " + RETURN", hl.dsp.exec_cmd("kitty tmux"))
+    hl.bind(mod .. " + F", hl.dsp.exec_cmd("pcmanfm"))
+    hl.bind(mod .. " + H", hl.dsp.exec_cmd("kitty htop"))
+    hl.bind(mod .. " + ALT + H", hl.dsp.exec_cmd("kitty btop"))
+    hl.bind(mod .. " + ALT + RETURN", hl.dsp.exec_cmd("alacritty"))
+    hl.bind(mod .. " + W", hl.dsp.exec_cmd("zen"))
+    hl.bind(mod .. " + CONTROL + W", hl.dsp.exec_cmd("firefox -P minimalfox"))
+    hl.bind(mod .. " + ALT + W", hl.dsp.exec_cmd("qutebrowser"))
+    hl.bind(mod .. " + SHIFT + W", hl.dsp.exec_cmd("firefox --private-window"))
+    hl.bind(mod .. " + E", hl.dsp.exec_cmd("cursor"))
+    hl.bind(mod .. " + ALT + E", hl.dsp.exec_cmd("featherpad"))
+    hl.bind(mod .. " + ALT + F", hl.dsp.exec_cmd("pcmanfm"))
+    hl.bind(mod .. " + ALT + M", hl.dsp.exec_cmd("cantata"))
+    hl.bind(mod .. " + Z", hl.dsp.exec_cmd("zathura"))
+    hl.bind(mod .. " + P", hl.dsp.exec_cmd("keepassxc"))
+    hl.bind(mod .. " + G", hl.dsp.exec_cmd("lutris"))
 
-    # 9. APPLICATION LAUNCHERS
-    bind = $mod, RETURN, exec, kitty tmux #"Terminal (Kitty + Tmux)"
-    bind = $mod, F, exec, pcmanfm #"File manager"
-    bind = $mod, H, exec, kitty htop #"System monitor (Htop)"
-    bind = $mod ALT, H, exec, kitty btop #"System monitor (Btop)"
-    bind = $mod ALT, RETURN, exec, alacritty #"Terminal (Alacritty)"
-    bind = $mod, W, exec, zen #"Web browser (Zen)"
-    bind = $mod CONTROL, W, exec, firefox -P minimalfox #"Web browser (Firefox Minimal)"
-    bind = $mod ALT, W, exec, qutebrowser #"Web browser (Qutebrowser)"
-    bind = $mod SHIFT, W, exec, firefox --private-window #"Private browser"
-    bind = $mod, E, exec, cursor #"Text editor (Cursor)"
-    bind = $mod ALT, E, exec, featherpad #"Text editor (Featherpad)"
-    bind = $mod ALT, F, exec, pcmanfm #"File manager (alt)"
-    bind = $mod ALT, M, exec, cantata #"Music player"
-    bind = $mod, Z, exec, zathura #"PDF viewer"
-    bind = $mod, P, exec, keepassxc #"Password manager"
-    bind = $mod, G, exec, lutris #"Game launcher"
+    -- 10. SYSTEM CONTROLS
+    hl.bind(mod .. " + ALT + D", hl.dsp.exec_cmd("noctalia-shell ipc call controlCenter toggle"))
+    hl.bind(mod .. " + ALT + N", hl.dsp.exec_cmd("noctalia-shell ipc call notifications toggleHistory"))
+    hl.bind(mod .. " + SUPER_L", hl.dsp.exec_cmd("noctalia-shell ipc call launcher toggle"))
+    hl.bind(mod .. " + B", hl.dsp.exec_cmd("hyprpanel t bluetoothmenu"))
+    hl.bind(mod .. " + Period", hl.dsp.exec_cmd("noctalia-shell ipc call launcher emoji"))
+    hl.bind(mod .. " + X", hl.dsp.exec_cmd("noctalia-shell ipc call sessionMenu toggle"))
+    hl.bind(mod .. " + D", hl.dsp.exec_cmd("noctalia-shell ipc call wallpaper toggle"))
+    hl.bind(mod .. " + V", hl.dsp.exec_cmd("noctalia-shell ipc call plugin:clipper toggle"))
+    hl.bind(mod .. " + ALT + S", hl.dsp.exec_cmd("noctalia-shell ipc call settings open"))
+    hl.bind(mod .. " + Q", hl.dsp.exec_cmd(""))
+    hl.bind(mod .. " + M", hl.dsp.exec_cmd("noctalia-shell ipc call media toggle"))
+    hl.bind(mod .. " + N", hl.dsp.exec_cmd("noctalia-shell ipc call wifi toggle"))
 
-    # 10. SYSTEM CONTROLS
-    bind = $mod ALT, D, exec, noctalia-shell ipc call controlCenter toggle #"Control center"
-    bind = $mod ALT, N, exec,  noctalia-shell ipc call notifications toggleHistory #"Notifications history"
-    bind = $mod, SUPER_L, exec, noctalia-shell ipc call launcher toggle #"Launcher"
-    bind = $mod, B, exec, hyprpanel t bluetoothmenu #"Bluetooth menu"
-    bind = $mod, Period, exec, noctalia-shell ipc call launcher emoji #"Emoji picker"
-    bind = $mod, X, exec, noctalia-shell ipc call sessionMenu toggle #"Session menu"
-    bind = $mod, D, exec, noctalia-shell ipc call wallpaper toggle #"Wallpaper selector"
-    bind = $mod, V, exec, noctalia-shell ipc call plugin:clipper toggle #"Clipboard manager"
-    bind = $mod ALT, S, exec, noctalia-shell ipc call settings open #"Settings dialog"
-    bind = $mod, Q, exec,  #"Dashboard menu"
-    bind = $mod, M, exec, noctalia-shell ipc call media toggle #"Media menu"
-    bind = $mod, N, exec, noctalia-shell ipc call wifi toggle #"Network menu"
+    -- 11. SUBMAPS
+    hl.bind(mod .. " + SHIFT + escape", hl.dsp.submap("passthru"))
+    hl.bind(mod .. " + escape", hl.dsp.submap("reset"))
 
-    # 11. SUBMAPS
-    bind = $mod SHIFT, Escape, submap, passthru #"Enter passthrough mode"
-    bind = $mod, Escape, submap, reset #"Reset submap"
+    -- 12. SPECIAL WORKSPACE
+    hl.bind(mod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special" }))
+    hl.bind(mod .. " + SPACE", hl.dsp.workspace.toggle_special(""))
 
-    # 12. SPECIAL WORKSPACE
-    bind = $mod SHIFT, S, movetoworkspace, special #"Move to special workspace"
-    bind = $mod, SPACE, togglespecialworkspace, special #"Toggle special workspace"
-  ''
-  + "\n"
-  + (builtins.concatStringsSep "\n" (
-    builtins.concatLists (
-      builtins.genList (
-        i:
-        let
-          ws = i + 1;
-        in
-        [
-          "bind = $mod, code:1${toString i}, workspace, ${toString ws} #\"Workspace ${toString ws}\""
-          "bind = $mod SHIFT, code:1${toString i}, movetoworkspace, ${toString ws} #\"Move to workspace ${toString ws}\""
-        ]
-      ) 9
-    )
-  ));
+    -- Workspace navigation
+    for i = 1, 9 do
+      hl.bind(mod .. " + code:1" .. (i - 1), hl.dsp.focus({ workspace = i }))
+      hl.bind(mod .. " + SHIFT + code:1" .. (i - 1), hl.dsp.window.move({ workspace = i }))
+    end
+
+    -- Passthrough submap
+    hl.define_submap("passthru", "reset", function()
+      hl.bind("escape", hl.dsp.submap("reset"))
+    end)
+  '';
 }

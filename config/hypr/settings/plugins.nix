@@ -9,10 +9,5 @@
   wayland.windowManager.hyprland = {
     plugins = [
     ];
-
-    settings = {
-      plugin = {
-      };
-    };
   };
 }

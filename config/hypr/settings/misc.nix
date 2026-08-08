@@ -3,19 +3,21 @@
 {
   wayland.windowManager.hyprland = {
     settings = {
-      misc = {
-        vfr = true;
-        vrr = 1;
-        focus_on_activate = true;
-        animate_manual_resizes = true;
-        animate_mouse_windowdragging = true;
-        enable_swallow = true;
-        disable_hyprland_logo = lib.mkForce false;
-        disable_splash_rendering = false;
-      };
+      config = {
+        misc = {
+          vrr = 1;
+          focus_on_activate = true;
+          animate_manual_resizes = true;
+          animate_mouse_windowdragging = true;
+          enable_swallow = true;
+          disable_hyprland_logo = lib.mkForce false;
+          disable_splash_rendering = false;
+        };
 
-      preload = [ "/home/zeph/.config/nixos/home-manager/themes/wallpaper" ];
-      wallpaper = [ ",/home/zeph/.config/nixos/home-manager/themes/wallpaper" ];
+        debug = {
+          vfr = true;
+        };
+      };
     };
   };
 }

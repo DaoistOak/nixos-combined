@@ -23,7 +23,7 @@ in
   qt.enable = true;
   home.stateVersion = "24.11";
   home.pointerCursor.enable = true;
-  wayland.windowManager.hyprland.configType = "hyprlang";
+  wayland.windowManager.hyprland.configType = "lua";
   catppuccin = {
     enable = true;
     autoEnable = true;

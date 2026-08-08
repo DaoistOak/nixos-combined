@@ -33,7 +33,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hyprland = {
-      url = "github:hyprwm/Hyprland/v0.54.1";
+      # NOTE: keep the "github:" fetcher (no submodules) — it matches the builds
+      # uploaded to hyprland.cachix.org by Hyprland's CI. "git+...?submodules=1"
+      # produces different store hashes and forces compilation every time.
+      url = "github:hyprwm/Hyprland";
     };
     hyprland-plugins = {
       url = "github:hyprwm/hyprland-plugins";
