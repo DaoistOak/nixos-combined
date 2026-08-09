@@ -196,39 +196,43 @@
           float = true;
         }
 
-        # Firefox dialogs and picture-in-picture
+        # Browser dialogs (Save/Open file)
         {
           match = {
-            class = "^(firefox)$";
-            title = "^(Save File|Open File|Picture-in-Picture)$";
+            class = "^(firefox|zen|org.zen-browser.zen|librewolf)$";
+            title = "^(Save File|Open File)$";
+          };
+          float = true;
+        }
+
+        # Picture-in-Picture for all browsers - keep it pinned on top as an overlay
+        {
+          match = {
+            title = "^(Picture-in-Picture|Picture in Picture)$";
           };
           float = true;
         }
         {
           match = {
-            class = "^(firefox)$";
-            title = "^(Picture-in-Picture)$";
+            title = "^(Picture-in-Picture|Picture in Picture)$";
           };
           pin = true;
         }
         {
           match = {
-            class = "^(firefox)$";
-            title = "^(Picture-in-Picture)$";
+            title = "^(Picture-in-Picture|Picture in Picture)$";
           };
           decorate = false;
         }
         {
           match = {
-            class = "^(firefox)$";
-            title = "^(Picture-in-Picture)$";
+            title = "^(Picture-in-Picture|Picture in Picture)$";
           };
           rounding = 0;
         }
         {
           match = {
-            class = "^(firefox)$";
-            title = "^(Picture-in-Picture)$";
+            title = "^(Picture-in-Picture|Picture in Picture)$";
           };
           no_shadow = true;
         }

@@ -10,6 +10,38 @@
   ...
 }:
 
+let
+  # Recursively collect all files under a directory as { "rel/path" = <path>; }
+  collectFiles =
+    base: dir:
+    let
+      entries = builtins.readDir dir;
+    in
+    lib.foldl' (
+      acc: name:
+      let
+        path = dir + "/${name}";
+        type = entries.${name};
+      in
+      if type == "directory" then
+        acc // collectFiles "${base}/${name}" path
+      else if type == "regular" then
+        acc
+        // {
+          "${base}/${name}" = path;
+        }
+      else
+        acc
+    ) { } (builtins.attrNames entries);
+
+  # Windows boot files (bootmgfw.efi + BCD etc.) staged for the NixOS ESP,
+  # so systemd-boot can chainload the Windows Boot Manager (dual-boot).
+  winBootDir = ./efi/windows/Boot;
+  winExtraFiles = lib.mapAttrs' (k: v: {
+    name = "EFI/Microsoft" + (lib.removePrefix "." k);
+    value = v;
+  }) (collectFiles "." winBootDir);
+in
 {
   imports = [
     # Include the results of the hardware scan.
@@ -25,6 +57,15 @@
     resumeDevice = "/dev/disk/by-uuid/c90cb3d2-feba-424e-a25b-146d24f9bd0d";
     kernelParams = [ "resume=UUID=c90cb3d2-feba-424e-a25b-146d24f9bd0d" ];
     kernelModules = [ "ryzen_smu" ];
+
+    loader.systemd-boot = {
+      extraFiles = winExtraFiles;
+      extraEntries."windows.conf" = ''
+        title Windows
+        efi /EFI/Microsoft/bootmgfw.efi
+        sort-key z_windows
+      '';
+    };
   };
 
   # Enable hibernation
