@@ -9,7 +9,7 @@
   stylix = {
     enable = true;
     polarity = "dark";
-    # image = ./wallpaper;
+    image = ./wallpaper;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-macchiato.yaml";
     override.base0D = "c6a0f6";
     cursor = {
@@ -32,7 +32,7 @@
       };
     };
     targets.hyprland.enable = true;
-    targets.hyprland.image.enable = false;
+    targets.hyprland.image.enable = true;
     targets.gtk.enable = true;
     targets.qt.enable = true;
     targets.kde.enable = true;

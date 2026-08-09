@@ -13,13 +13,12 @@
     -- Gestures configuration
     -- --------------------
     hl.gesture({ fingers = workspaceSwipeFingers, direction = "horizontal", action = "workspace" })
-    hl.gesture({ fingers = gestureFingers, direction = "up", action = "special", workspace_name = "special" })
-    hl.gesture({ fingers = gestureFingers, direction = "down", action = function()
-        hl.exec_cmd("caelestia toggle specialws")
+    hl.gesture({ fingers = gestureFingers, direction = "up", action = function()
+        hl.exec_cmd("hyprctl dispatch workspace special:scratchpad")
     end })
-
-    -- 1. KEYBIND CHEATSHEET
-    hl.bind(mod .. " + SHIFT + K", hl.dsp.exec_cmd("noctalia-shell ipc call plugin:keybind-cheatsheet toggle"))
+    hl.gesture({ fingers = gestureFingers, direction = "down", action = function()
+        hl.exec_cmd("hyprctl dispatch togglespecialworkspace scratchpad")
+    end })
 
     -- 2. WORKSPACE NAVIGATION
     hl.bind(mod .. " + mouse_down", hl.dsp.focus({ workspace = "e-1" }))
@@ -85,26 +84,43 @@
     hl.bind(mod .. " + G", hl.dsp.exec_cmd("lutris"))
 
     -- 10. SYSTEM CONTROLS
-    hl.bind(mod .. " + ALT + D", hl.dsp.exec_cmd("noctalia-shell ipc call controlCenter toggle"))
-    hl.bind(mod .. " + ALT + N", hl.dsp.exec_cmd("noctalia-shell ipc call notifications toggleHistory"))
-    hl.bind(mod .. " + SUPER_L", hl.dsp.exec_cmd("noctalia-shell ipc call launcher toggle"))
+    hl.bind(mod .. " + ALT + D", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center"))
+    hl.bind(mod .. " + ALT + N", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center notifications"))
+    -- 1. LAUNCHER (bare SUPER tap only, not part of a chord)
+    local superTap = { armed = false }
+    hl.bind(mod .. " + SUPER_L", function()
+      superTap.armed = true
+    end)
+    hl.on("input.keyboard.key", function(keycode, _, state)
+      if state == 1 and keycode ~= 133 and keycode ~= 134 and superTap.armed then
+        superTap.armed = false
+      end
+    end)
+    hl.bind(mod .. " + SUPER_L", function()
+      if superTap.armed then
+        hl.exec_cmd("noctalia msg panel-toggle launcher")
+      end
+      superTap.armed = false
+    end, { release = true })
+    hl.bind(mod .. " + TAB", hl.dsp.exec_cmd("noctalia msg window-switcher"))
     hl.bind(mod .. " + B", hl.dsp.exec_cmd("hyprpanel t bluetoothmenu"))
-    hl.bind(mod .. " + Period", hl.dsp.exec_cmd("noctalia-shell ipc call launcher emoji"))
-    hl.bind(mod .. " + X", hl.dsp.exec_cmd("noctalia-shell ipc call sessionMenu toggle"))
-    hl.bind(mod .. " + D", hl.dsp.exec_cmd("noctalia-shell ipc call wallpaper toggle"))
-    hl.bind(mod .. " + V", hl.dsp.exec_cmd("noctalia-shell ipc call plugin:clipper toggle"))
-    hl.bind(mod .. " + ALT + S", hl.dsp.exec_cmd("noctalia-shell ipc call settings open"))
+    hl.bind(mod .. " + Period", hl.dsp.exec_cmd("noctalia msg panel-toggle launcher /emo"))
+    hl.bind(mod .. " + X", hl.dsp.exec_cmd("noctalia msg panel-toggle session"))
+    hl.bind(mod .. " + D", hl.dsp.exec_cmd("noctalia msg panel-toggle wallpaper"))
+    hl.bind(mod .. " + V", hl.dsp.exec_cmd("noctalia msg panel-toggle clipboard"))
+    hl.bind(mod .. " + ALT + S", hl.dsp.exec_cmd("noctalia msg settings-open"))
     hl.bind(mod .. " + Q", hl.dsp.exec_cmd(""))
-    hl.bind(mod .. " + M", hl.dsp.exec_cmd("noctalia-shell ipc call media toggle"))
-    hl.bind(mod .. " + N", hl.dsp.exec_cmd("noctalia-shell ipc call wifi toggle"))
+    hl.bind(mod .. " + M", hl.dsp.exec_cmd("noctalia msg media toggle"))
+    hl.bind(mod .. " + N", hl.dsp.exec_cmd("noctalia msg wifi-toggle"))
 
     -- 11. SUBMAPS
     hl.bind(mod .. " + SHIFT + escape", hl.dsp.submap("passthru"))
     hl.bind(mod .. " + escape", hl.dsp.submap("reset"))
 
-    -- 12. SPECIAL WORKSPACE
-    hl.bind(mod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special" }))
-    hl.bind(mod .. " + SPACE", hl.dsp.workspace.toggle_special(""))
+    -- 12. SCRATCHPAD (special workspace)
+    hl.bind(mod .. " + SHIFT + SPACE", hl.dsp.window.move({ workspace = "special:scratchpad" }))
+    hl.bind(mod .. " + SPACE", hl.dsp.workspace.toggle_special("scratchpad"))
+    hl.bind(mod .. " + SHIFT + RETURN", hl.dsp.exec_cmd("[workspace special:scratchpad] kitty tmux"))
 
     -- Workspace navigation
     for i = 1, 9 do

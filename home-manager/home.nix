@@ -20,6 +20,9 @@ in
   home.username = "zeph";
   home.homeDirectory = "/home/zeph";
   gtk.enable = true;
+  gtk.gtk4.extraCss = ''
+    @import url("noctalia.css");
+  '';
   qt.enable = true;
   home.stateVersion = "24.11";
   home.pointerCursor.enable = true;

@@ -9,7 +9,16 @@ in
     config = {
       allowUnfree = true;
       allowUnsupportedSystem = true;
-    };
+
+  nixpkgs.config.packageOverrides = pkgs: rec {
+    glib-networking = pkgs.glib-networking.overrideAttrs (old: rec {
+      buildInputs = old.buildInputs or [ ] ++ [ pkgs.glib ];
+    });
+    libproxy = pkgs.libproxy.overrideAttrs (old: rec {
+      buildInputs = old.buildInputs or [ ] ++ [ pkgs.glib pkgs.curl ];
+    });
+  };
+};
   };
 
   environment.systemPackages = system-packages;

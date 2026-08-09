@@ -113,8 +113,7 @@
         (lib.generators.mkLuaInline ''
           function()
             -- Launch the shell / bar
-            -- hl.exec_cmd("hyprpanel")
-            hl.exec_cmd("noctalia-shell")
+            hl.exec_cmd("noctalia")
             -- Launch notifications service (swaync or mako)
             hl.exec_cmd("/run/current-system/sw/bin/nm-applet")
             -- Volume and brightness services
@@ -135,9 +134,9 @@
             -- Wallpaper and background setup
             hl.exec_cmd("swww-daemon --format xrgb")
             hl.exec_cmd("waypaper --restore")
-            -- Uncomment and use if you want to start specific wallpaper or background managers
+            -- Configured for Sylix: Enable wallpaper daemon management
             -- hl.exec_cmd("swaybg -m fill -i ~/Wallpaper/Image34.jpg")
-            -- hl.exec_cmd("hyprpaper")
+            hl.exec_cmd("sylix --daemon")
 
             -- Run the custom autostart script
             -- hl.exec_cmd("~/.config/hypr/scripts/restartbar&wall.sh")
