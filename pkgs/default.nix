@@ -131,6 +131,7 @@ let
     p7zip
     pciutils
     picocom
+    playerctl
     powertop
     ryzenadj
     screen
