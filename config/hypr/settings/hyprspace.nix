@@ -19,12 +19,14 @@
     #   hideBackgroundLayers = 1;
     #   hideOverlayLayers = 1;
     # };
-    showNewWorkspace = 1;
-    showEmptyWorkspace = 0;
-    showSpecialWorkspace = 1;
-    exitOnClick = 1;
-    exitOnSwitch = 1;
-    switchOnDrop = 1;
-    autoDrag = 1;
+    # plugin.overview = {
+      # showNewWorkspace = 1;
+      # showEmptyWorkspace = 0;
+      # showSpecialWorkspace = 1;
+      # exitOnClick = 1;
+      # exitOnSwitch = 1;
+      # switchOnDrop = 1;
+      # autoDrag = 1;
+    # };
   };
 }
