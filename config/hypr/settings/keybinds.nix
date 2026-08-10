@@ -4,10 +4,19 @@
     local mod = "SUPER"
     local workspaceSwipeFingers = 3
     local gestureFingers = 3
+    -- Super tap handler state; shared with the mouse binds below so that
+    -- using the mouse while SUPER is held never triggers the launcher.
+    local superTap = { armed = false }
 
     -- Mouse binds
-    hl.bind(mod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
-    hl.bind(mod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+    hl.bind(mod .. " + mouse:272", function()
+      superTap.armed = false
+      hl.dispatch(hl.dsp.window.drag())
+    end, { mouse = true })
+    hl.bind(mod .. " + mouse:273", function()
+      superTap.armed = false
+      hl.dispatch(hl.dsp.window.resize())
+    end, { mouse = true })
 
     -- --------------------
     -- Gestures configuration
@@ -21,8 +30,14 @@
     end })
 
     -- 2. WORKSPACE NAVIGATION
-    hl.bind(mod .. " + mouse_down", hl.dsp.focus({ workspace = "e-1" }))
-    hl.bind(mod .. " + mouse_up", hl.dsp.focus({ workspace = "e+1" }))
+    hl.bind(mod .. " + mouse_down", function()
+      superTap.armed = false
+      hl.dispatch(hl.dsp.focus({ workspace = "e-1" }))
+    end)
+    hl.bind(mod .. " + mouse_up", function()
+      superTap.armed = false
+      hl.dispatch(hl.dsp.focus({ workspace = "e+1" }))
+    end)
 
     -- 3. WINDOW MANAGEMENT
     hl.bind(mod .. " + C", hl.dsp.window.close())
@@ -62,12 +77,12 @@
     hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
 
     -- 8. SCREENSHOT AND TOOLS
-    hl.bind(mod .. " + S", hl.dsp.exec_cmd("flameshot gui"))
+    hl.bind(mod .. " + S", hl.dsp.exec_cmd("env QT_QPA_PLATFORM=wayland flameshot gui"))
     hl.bind(mod .. " + ALT + P", hl.dsp.exec_cmd("~/bin/colorpicker"))
 
     -- 9. APPLICATION LAUNCHERS
     hl.bind(mod .. " + RETURN", hl.dsp.exec_cmd("kitty tmux"))
-    hl.bind(mod .. " + F", hl.dsp.exec_cmd("pcmanfm"))
+    hl.bind(mod .. " + F", hl.dsp.exec_cmd("dolphin"))
     hl.bind(mod .. " + H", hl.dsp.exec_cmd("kitty htop"))
     hl.bind(mod .. " + ALT + H", hl.dsp.exec_cmd("kitty btop"))
     hl.bind(mod .. " + ALT + RETURN", hl.dsp.exec_cmd("alacritty"))
@@ -75,9 +90,9 @@
     hl.bind(mod .. " + CONTROL + W", hl.dsp.exec_cmd("firefox -P minimalfox"))
     hl.bind(mod .. " + ALT + W", hl.dsp.exec_cmd("qutebrowser"))
     hl.bind(mod .. " + SHIFT + W", hl.dsp.exec_cmd("firefox --private-window"))
-    hl.bind(mod .. " + E", hl.dsp.exec_cmd("cursor"))
-    hl.bind(mod .. " + ALT + E", hl.dsp.exec_cmd("featherpad"))
-    hl.bind(mod .. " + ALT + F", hl.dsp.exec_cmd("pcmanfm"))
+    hl.bind(mod .. " + E", hl.dsp.exec_cmd("cursor --classic"))
+    hl.bind(mod .. " + ALT + E", hl.dsp.exec_cmd("kate"))
+    hl.bind(mod .. " + ALT + F", hl.dsp.exec_cmd("dolphin"))
     hl.bind(mod .. " + ALT + M", hl.dsp.exec_cmd("cantata"))
     hl.bind(mod .. " + Z", hl.dsp.exec_cmd("zathura"))
     hl.bind(mod .. " + P", hl.dsp.exec_cmd("keepassxc"))
@@ -87,7 +102,6 @@
     hl.bind(mod .. " + ALT + D", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center"))
     hl.bind(mod .. " + ALT + N", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center notifications"))
     -- 1. LAUNCHER (bare SUPER tap only, not part of a chord)
-    local superTap = { armed = false }
     hl.bind(mod .. " + SUPER_L", function()
       superTap.armed = true
     end)
@@ -109,7 +123,7 @@
     hl.bind(mod .. " + D", hl.dsp.exec_cmd("noctalia msg panel-toggle wallpaper"))
     hl.bind(mod .. " + V", hl.dsp.exec_cmd("noctalia msg panel-toggle clipboard"))
     hl.bind(mod .. " + ALT + S", hl.dsp.exec_cmd("noctalia msg settings-open"))
-    hl.bind(mod .. " + Q", hl.dsp.exec_cmd(""))
+    hl.bind(mod .. " + Q", hl.dsp.exec_cmd("hyprctl dispatch overview:toggle"))
     hl.bind(mod .. " + M", hl.dsp.exec_cmd("noctalia msg media toggle"))
     hl.bind(mod .. " + N", hl.dsp.exec_cmd("noctalia msg wifi-toggle"))
 

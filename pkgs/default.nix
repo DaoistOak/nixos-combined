@@ -283,4 +283,7 @@ in
 {
   user-packages = user-packages;
   system-packages = system-packages;
+  # Flake-less Hyprland plugins, packaged manually
+  hypr-edgehover = import ./hypr-edgehover.nix { inherit inputs; };
+  hyprglass = import ./hyprglass.nix { inherit inputs; };
 }
