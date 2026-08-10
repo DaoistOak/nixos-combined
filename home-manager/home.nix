@@ -8,10 +8,8 @@
 
 let
   user-packages = (import ../pkgs/default.nix { inherit pkgs inputs; }).user-packages;
-  # spotify = import ../pkgs/spicetify.nix { inherit pkgs inputs; };
 in
 {
-  # Force rebuild again
   imports = [
     ../config/hypr/hyprland.nix
     inputs.noctalia.homeModules.default
@@ -46,7 +44,6 @@ in
   home.packages =
     with pkgs;
     [
-      # spotify
     ]
     ++ user-packages;
 
@@ -62,16 +59,11 @@ in
     FLAKE_DIR = "/home/zeph/.config/nixos";
   };
 
-  systemd.user.sessionVariables = {
-    QT_QPA_PLATFORMTHEME = lib.mkForce "qt6ct";
-  };
-
   xdg.configFile.".gtkrc-2.0" = {
     force = true;
     text = "# Default GTK RC-2.0 Configuration\n";
   };
   programs.home-manager.enable = true;
-  nixpkgs.config.allowUnfree = true;
   systemd.user.startServices = true;
 
   programs.zsh = {

@@ -58,8 +58,6 @@
     XCOMPOSECACHE = "$XDG_CACHE_HOME/X11/xcompose";
     PYTHONSTARTUP = "/home/zeph/python/pythonrc";
   };
-  environment.sessionVariables = {
-  };
   # Enable Zsh
   programs.zsh.enable = true;
   programs.direnv.enableZshIntegration = true;

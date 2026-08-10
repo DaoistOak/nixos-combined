@@ -59,12 +59,6 @@
       }
       {
         _args = [
-          "QT_QPA_PLATFORMTHEME"
-          "qt5ct"
-        ];
-      }
-      {
-        _args = [
           "GDK_BACKEND"
           "wayland,x11,*"
         ];
