@@ -19,6 +19,7 @@
     ./hyprlock.nix
     ./hypridle.nix
     ./scripts/hyprlock.nix
+    ./scripts/media-idle.nix
   ];
   wayland.windowManager.hyprland = {
     enable = true;

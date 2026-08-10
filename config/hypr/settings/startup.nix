@@ -95,12 +95,6 @@
       }
       {
         _args = [
-          "SDL_VIDEODRIVER"
-          "wayland"
-        ];
-      }
-      {
-        _args = [
           "CLUTTER_BACKEND"
           "wayland"
         ];
@@ -123,7 +117,7 @@
             hl.exec_cmd("systemctl --user start hyprpolkitagent")
 
             -- Idle and power management
-            hl.exec_cmd("hypridle")
+            -- hl.exec_cmd("hypridle") -- disabled: run as systemd user unit via home-manager services.hypridle
 
             -- Application autostarts
             -- hl.exec_cmd("copyq")
