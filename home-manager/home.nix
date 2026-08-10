@@ -20,7 +20,7 @@ in
   home.username = "zeph";
   home.homeDirectory = "/home/zeph";
   gtk.enable = true;
-  gtk.gtk4.extraCss = ''
+  stylix.targets.gtk.extraCss = ''
     @import url("noctalia.css");
   '';
   qt.enable = true;
@@ -34,11 +34,15 @@ in
     accent = "mauve";
   };
   xdg.configFile."gtk-3.0/gtk.css".force = true;
-  xdg.configFile."flameshot/flameshot.ini".text = ''
-    [General]
-    useGrimAdapter=true
-  '';
   xdg.configFile."hypr/hyprlock.conf".force = true;
+  xdg.configFile."gtk-4.0/gtk.css".force = true;
+  xdg.configFile."mimeapps.list".force = true;
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "inode/directory" = "org.kde.dolphin.desktop";
+    };
+  };
   home.packages =
     with pkgs;
     [
@@ -53,9 +57,13 @@ in
   home.sessionVariables = {
     EDITOR = "nvim";
     BROWSER = "firefox";
-    QT_QPA_PLATFORMTHEME = lib.mkForce "kvantum";
+    QT_QPA_PLATFORMTHEME = lib.mkForce "qt6ct";
     QT_STYLE_OVERRIDE = lib.mkForce "kvantum";
     FLAKE_DIR = "/home/zeph/.config/nixos";
+  };
+
+  systemd.user.sessionVariables = {
+    QT_QPA_PLATFORMTHEME = lib.mkForce "qt6ct";
   };
 
   xdg.configFile.".gtkrc-2.0" = {
