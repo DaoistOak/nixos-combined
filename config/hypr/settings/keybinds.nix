@@ -105,11 +105,11 @@
     hl.bind(mod .. " + SUPER_L", function()
       superTap.armed = true
     end)
-    hl.on("input.keyboard.key", function(keycode, _, state)
-      if state == 1 and keycode ~= 133 and keycode ~= 134 and superTap.armed then
-        superTap.armed = false
-      end
-    end)
+    -- hl.on("input.keyboard.key", function(keycode, _, state)
+    --   if state == 1 and keycode ~= 133 and keycode ~= 134 and superTap.armed then
+    --     superTap.armed = false
+    --   end
+    -- end)
     hl.bind(mod .. " + SUPER_L", function()
       if superTap.armed then
         hl.exec_cmd("noctalia msg panel-toggle launcher")

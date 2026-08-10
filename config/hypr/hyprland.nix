@@ -12,7 +12,6 @@
     ./settings/displays.nix
     ./settings/dynamic-cursors.nix
     ./settings/edgehover.nix
-    ./settings/hyprglass.nix
     ./settings/hyprgrass.nix
     ./settings/hyprspace.nix
     ./settings/input.nix
