@@ -202,11 +202,24 @@ in
   };
 
   nixpkgs.config = {
+    allowUnfree = true;
+    allowUnsupportedSystem = true;
     allowAliases = false;
     permittedInsecurePackages = [
       "electron-40.10.5"
       "pnpm-10.29.2"
     ];
+    packageOverrides = pkgs: rec {
+      glib-networking = pkgs.glib-networking.overrideAttrs (old: rec {
+        buildInputs = old.buildInputs or [ ] ++ [ pkgs.glib ];
+      });
+      libproxy = pkgs.libproxy.overrideAttrs (old: rec {
+        buildInputs = old.buildInputs or [ ] ++ [
+          pkgs.glib
+          pkgs.curl
+        ];
+      });
+    };
   };
 
   environment.systemPackages = with pkgs; [

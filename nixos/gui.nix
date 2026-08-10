@@ -46,7 +46,6 @@
 
   xdg.portal = {
     enable = true;
-    xdgOpenUsePortal = true;
     config = {
       common.default = [ "gtk" ];
       hyprland.default = [
@@ -72,7 +71,6 @@
     jack.enable = false;
     wireplumber.enable = true;
   };
-  services.pulseaudio.enable = false;
   # Enable real-time scheduling for better audio performance
   security.rtkit.enable = true;
 }
