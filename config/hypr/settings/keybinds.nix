@@ -123,7 +123,7 @@
     hl.bind(mod .. " + D", hl.dsp.exec_cmd("noctalia msg panel-toggle wallpaper"))
     hl.bind(mod .. " + V", hl.dsp.exec_cmd("noctalia msg panel-toggle clipboard"))
     hl.bind(mod .. " + ALT + S", hl.dsp.exec_cmd("noctalia msg settings-open"))
-    # hl.bind(mod .. " + Q", hl.dsp.exec_cmd("hyprctl dispatch overview:toggle"))
+    -- hl.bind(mod .. " + Q", hl.dsp.exec_cmd("hyprctl dispatch overview:toggle"))
     hl.bind(mod .. " + M", hl.dsp.exec_cmd("noctalia msg media toggle"))
     hl.bind(mod .. " + N", hl.dsp.exec_cmd("noctalia msg wifi-toggle"))
 
