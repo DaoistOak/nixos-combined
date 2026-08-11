@@ -21,20 +21,14 @@
 
     extraConfig = ''
       if hl.plugin.hyprgrass then
-        -- workspace swipe: 3 fingers left/right
+        -- workspace swipe: 3 fingers up = previous, down = next
         hl.plugin.hyprgrass.gesture {
-          pattern = { kind = "swipe", fingers = 3, direction = "left" },
-          action = "workspace",
-        }
-        hl.plugin.hyprgrass.gesture {
-          pattern = { kind = "swipe", fingers = 3, direction = "right" },
-          action = "workspace",
-        }
-
-        -- 3 fingers up: scratchpad
-        hl.plugin.hyprgrass.bind {
           pattern = { kind = "swipe", fingers = 3, direction = "up" },
-          action = hl.dsp.workspace.toggle_special("scratchpad"),
+          action = hl.dsp.focus({ workspace = "e-1" }),
+        }
+        hl.plugin.hyprgrass.gesture {
+          pattern = { kind = "swipe", fingers = 3, direction = "down" },
+          action = hl.dsp.focus({ workspace = "e+1" }),
         }
 
         -- top edge swipe down: launcher

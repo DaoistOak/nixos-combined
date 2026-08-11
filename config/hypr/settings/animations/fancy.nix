@@ -135,6 +135,7 @@
           enabled = true;
           speed = 5;
           bezier = "standard";
+          style = "slidevert";
         }
         {
           leaf = "specialWorkspace";

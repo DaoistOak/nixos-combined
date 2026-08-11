@@ -136,7 +136,6 @@ let
     ryzenadj
     screen
     spotube
-    steam-run
     awww
     swayidle
     syncthing
