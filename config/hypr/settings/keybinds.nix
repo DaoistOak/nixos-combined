@@ -21,13 +21,13 @@
     -- --------------------
     -- Gestures configuration
     -- --------------------
-    hl.gesture({ fingers = workspaceSwipeFingers, direction = "horizontal", action = "workspace" })
-    hl.gesture({ fingers = gestureFingers, direction = "up", action = function()
-        hl.exec_cmd("hyprctl dispatch workspace special:scratchpad")
-    end })
-    hl.gesture({ fingers = gestureFingers, direction = "down", action = function()
-        hl.exec_cmd("hyprctl dispatch togglespecialworkspace scratchpad")
-    end })
+    hl.gesture({ fingers = workspaceSwipeFingers, direction = "vertical", action = "workspace" })
+    -- hl.gesture({ fingers = gestureFingers, direction = "up", action = function()
+    --    hl.dispatch(hl.dsp.focus({ workspace = "e-1" }))
+    -- end })
+    -- hl.gesture({ fingers = gestureFingers, direction = "down", action = function()
+    --     hl.dispatch(hl.dsp.focus({ workspace = "e+1" }))
+    -- end })
 
     -- 2. WORKSPACE NAVIGATION
     hl.bind(mod .. " + mouse_down", function()
