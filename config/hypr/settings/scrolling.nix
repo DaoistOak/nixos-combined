@@ -19,7 +19,6 @@
           wrap_swapcol = true;
           direction = "right";
         };
-          layout_aware = true;
       };
     };
   };
