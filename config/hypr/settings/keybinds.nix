@@ -22,6 +22,8 @@
     -- Gestures configuration
     -- --------------------
     hl.gesture({ fingers = workspaceSwipeFingers, direction = "vertical", action = "workspace" })
+    -- horizontal swipe: drag the scrolling layout tape (no-op on other layouts)
+    hl.gesture({ fingers = gestureFingers, direction = "horizontal", action = "scroll_move", scale = 3.5 })
     -- hl.gesture({ fingers = gestureFingers, direction = "up", action = function()
     --    hl.dispatch(hl.dsp.focus({ workspace = "e-1" }))
     -- end })
@@ -82,7 +84,7 @@
 
     -- 9. APPLICATION LAUNCHERS
     hl.bind(mod .. " + RETURN", hl.dsp.exec_cmd("kitty tmux"))
-    hl.bind(mod .. " + F", hl.dsp.exec_cmd("dolphin"))
+    hl.bind(mod .. " + F", hl.dsp.exec_cmd("pcmanfm"))
     hl.bind(mod .. " + H", hl.dsp.exec_cmd("kitty htop"))
     hl.bind(mod .. " + ALT + H", hl.dsp.exec_cmd("kitty btop"))
     hl.bind(mod .. " + ALT + RETURN", hl.dsp.exec_cmd("alacritty"))
