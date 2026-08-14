@@ -14,6 +14,8 @@ let
     gpu-screen-recorder
     # nur.repos.mikilio.ttf-ms-fonts
     klassy
+    superfile
+    pay-respects
   ];
 
   system-packages = with pkgs; [
@@ -25,6 +27,8 @@ let
     brave
     inputs.zen-browser.packages."x86_64-linux".default
     copyq
+    drawy
+    ferdium
     firefox
     genymotion
     heroic
@@ -55,7 +59,7 @@ let
     keepassxc
     kicad-small
     kitty
-    # lact
+    lact
     qalculate-qt
     networkmanagerapplet
     pcmanfm

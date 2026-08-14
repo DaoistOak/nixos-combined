@@ -39,6 +39,7 @@ in
     enable = true;
     defaultApplications = {
       "inode/directory" = "org.kde.dolphin.desktop";
+      "application/pdf" = "org.kde.okular.desktop";
     };
   };
   home.packages =
