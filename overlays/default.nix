@@ -71,13 +71,6 @@
       '';
     };
 
-    # vulkan-validation-layers defaults UPDATE_DEPS=ON which runs
-    # update_deps.py (needs git + network). Nix provides deps, so disable it.
-    vulkan-validation-layers = prev.vulkan-validation-layers.overrideAttrs (old: {
-      nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ final.git ];
-      cmakeFlags = (old.cmakeFlags or [ ]) ++ [ "-DUPDATE_DEPS=OFF" ];
-    });
-
     # Generalize Python package overrides to all versions
     python311Packages = prev.python311Packages.override {
       overrides = self: super: {
