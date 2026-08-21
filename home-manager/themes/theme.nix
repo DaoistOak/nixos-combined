@@ -42,6 +42,11 @@
     targets.kde.applicationStyle = "kvantum-dark";
     targets.kde.widgetStyle = "qtcde";
     targets.noctalia-shell.enable = false;
+    # Stylix's gtksourceview overlay (applied via nixpkgs.overlays in HM)
+    # changes gtksourceview's hash, forcing inkscape and catppuccin-cursors
+    # to compile locally on every nixpkgs bump. No gtksourceview-based editor
+    # is used.
+    targets.gtksourceview.enable = false;
     # targets.hyprland.colors.override = {
     #   "col.active_border" = "#c6a0f6";
     # };

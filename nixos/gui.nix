@@ -81,9 +81,18 @@
   };
   # PipeWire (Audio)
   services.pipewire = {
+    alsa.enable = true;  # Removed redundant enable
+    # Removed duplicate alsa.support32Bit definition
+    pulse.enable = true;
+    jack.enable = false;
+    wireplumber.enable = true;
+    # Removed duplicate enable
+    # Allow over 100% volume
+    extraConfig = {
+      volume.max = 200;
+    };
     enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
+    # Removed duplicate alsa.support32Bit definition  # Duplicated alsa.enable removed.
     pulse.enable = true;
     jack.enable = false;
     wireplumber.enable = true;
