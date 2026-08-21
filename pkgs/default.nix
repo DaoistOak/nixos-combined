@@ -30,7 +30,6 @@ let
     drawy
     ferdium
     firefox
-    genymotion
     heroic
     goverlay
     hyprlock
