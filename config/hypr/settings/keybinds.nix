@@ -55,16 +55,18 @@
     hl.bind(mod .. " + down", hl.dsp.focus({ direction = "d" }))
 
     -- 5. WINDOW MOVEMENT
-    hl.bind(mod .. " + SHIFT + left", hl.dsp.window.move({ direction = "l" }))
-    hl.bind(mod .. " + SHIFT + right", hl.dsp.window.move({ direction = "r" }))
+    hl.bind(mod .. " + SHIFT + left", hl.dsp.layout("swapcol l"))
+    hl.bind(mod .. " + SHIFT + right", hl.dsp.layout("swapcol r"))
     hl.bind(mod .. " + SHIFT + up", hl.dsp.window.move({ direction = "u" }))
     hl.bind(mod .. " + SHIFT + down", hl.dsp.window.move({ direction = "d" }))
+    hl.bind(mod .. " + SHIFT + ALT + left", hl.dsp.window.move({ direction = "l" }))
+    hl.bind(mod .. " + SHIFT + ALT + right", hl.dsp.window.move({ direction = "r" }))
 
     -- 6. WINDOW RESIZING
     hl.bind(mod .. " + CONTROL + left", hl.dsp.window.resize({ x = -50, y = 0, relative = true }))
     hl.bind(mod .. " + CONTROL + right", hl.dsp.window.resize({ x = 50, y = 0, relative = true }))
-    hl.bind(mod .. " + CONTROL + up", hl.dsp.window.resize({ x = 0, y = -50, relative = true }))
-    hl.bind(mod .. " + CONTROL + down", hl.dsp.window.resize({ x = 0, y = 50, relative = true }))
+    hl.bind(mod .. " + CONTROL + up", hl.dsp.layout("colresize +conf"))
+    hl.bind(mod .. " + CONTROL + down", hl.dsp.layout("colresize -conf"))
 
     -- 7. MEDIA CONTROLS
     hl.bind("XF86PowerOff", hl.dsp.exec_cmd("hyprpanel t powermenu"))
@@ -101,17 +103,18 @@
     hl.bind(mod .. " + G", hl.dsp.exec_cmd("lutris"))
 
     -- 10. SYSTEM CONTROLS
+    hl.bind(mod .. " + CONTROL + ALT + R", hl.dsp.exec_cmd("hyprctl reload"))
     hl.bind(mod .. " + ALT + D", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center"))
     hl.bind(mod .. " + ALT + N", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center notifications"))
     -- 1. LAUNCHER (bare SUPER tap only, not part of a chord)
     hl.bind(mod .. " + SUPER_L", function()
       superTap.armed = true
     end)
-    -- hl.on("input.keyboard.key", function(keycode, _, state)
-    --   if state == 1 and keycode ~= 133 and keycode ~= 134 and superTap.armed then
-    --     superTap.armed = false
-    --   end
-    -- end)
+    hl.on("input.keyboard.key", function(keycode, _, state)
+      if state == 1 and keycode ~= 133 and keycode ~= 134 and superTap.armed then
+        superTap.armed = false
+      end
+    end)
     hl.bind(mod .. " + SUPER_L", function()
       if superTap.armed then
         hl.exec_cmd("noctalia msg panel-toggle launcher")

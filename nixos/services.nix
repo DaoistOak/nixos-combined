@@ -42,6 +42,12 @@
       };
     };
 
+    # 🧹 Btrfs monthly scrub
+    btrfs.autoScrub = {
+      enable = true;
+      interval = "monthly";
+    };
+
     # 🖐️ Fingerprint reader
     fprintd.enable = true;
 

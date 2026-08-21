@@ -107,8 +107,8 @@
             -- Volume and brightness services
             hl.exec_cmd("avizo-service")
 
-            -- Polkit authentication agent
-            hl.exec_cmd("systemctl --user start hyprpolkitagent")
+            -- Polkit authentication agent (KDE)
+            hl.exec_cmd("${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1")
 
             -- Idle and power management
             -- hl.exec_cmd("hypridle") -- disabled: run as systemd user unit via home-manager services.hypridle
