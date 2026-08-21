@@ -70,8 +70,8 @@
 
     -- 7. MEDIA CONTROLS
     hl.bind("XF86PowerOff", hl.dsp.exec_cmd("hyprpanel t powermenu"))
-    hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("volumectl -du up"), { locked = true, repeating = true })
-    hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("volumectl -du down"), { locked = true, repeating = true })
+    hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("volumectl -bdu up"), { locked = true, repeating = true })
+    hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("volumectl -bdu down"), { locked = true, repeating = true })
     hl.bind("XF86AudioMute", hl.dsp.exec_cmd("volumectl -d toggle-mute"), { locked = true, repeating = true })
     hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("volumectl -m toggle-mute"), { locked = true, repeating = true })
     hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("lightctl -d up"), { locked = true, repeating = true })
@@ -122,7 +122,7 @@
       superTap.armed = false
     end, { release = true })
     hl.bind(mod .. " + TAB", hl.dsp.exec_cmd("noctalia msg window-switcher"))
-    hl.bind(mod .. " + B", hl.dsp.exec_cmd("hyprpanel t bluetoothmenu"))
+    hl.bind(mod .. " + B", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center bluetooth"))
     hl.bind(mod .. " + Period", hl.dsp.exec_cmd("noctalia msg panel-toggle launcher /emo"))
     hl.bind(mod .. " + X", hl.dsp.exec_cmd("noctalia msg panel-toggle session"))
     hl.bind(mod .. " + D", hl.dsp.exec_cmd("noctalia msg panel-toggle wallpaper"))
@@ -130,7 +130,7 @@
     hl.bind(mod .. " + ALT + S", hl.dsp.exec_cmd("noctalia msg settings-open"))
     -- hl.bind(mod .. " + Q", hl.dsp.exec_cmd("hyprctl dispatch overview:toggle"))
     hl.bind(mod .. " + M", hl.dsp.exec_cmd("noctalia msg media toggle"))
-    hl.bind(mod .. " + N", hl.dsp.exec_cmd("noctalia msg wifi-toggle"))
+    hl.bind(mod .. " + N", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center network"))
 
     -- 11. SUBMAPS
     hl.bind(mod .. " + SHIFT + escape", hl.dsp.submap("passthru"))
