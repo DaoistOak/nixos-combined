@@ -27,6 +27,13 @@
   };
   # --- KWallet 6 auto-unlock at login ---------------------------
   security.pam.services.sddm.enableKwallet = true;
+
+  # Polkit + setuid pkexec wrapper (KDE polkit agent provides GUI auth)
+  security.polkit = {
+    enable = true;
+    enablePkexecWrapper = true;
+  };
+
   # 🎧 Blueman (Bluetooth GUI) — disabled as requested
   services.blueman.enable = false;
 
