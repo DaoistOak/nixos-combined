@@ -171,6 +171,10 @@ in
   '';
   systemd.services."drkonqi-coredump-processor@".enable = false;
   programs.xwayland.enable = true;
+  # Use the stock xwayland build so it comes from the binary cache instead of
+  # compiling locally (NixOS otherwise injects default_font_path, changing the
+  # hash away from cache.nixos.org's build).
+  programs.xwayland.package = pkgs.xwayland;
   programs.nix-ld = {
     enable = true;
     libraries =
@@ -199,6 +203,10 @@ in
     image = null;
     targets.console.enable = true;
     targets.plymouth.enable = true;
+    # Stylix's gtksourceview override changes the package hash, forcing
+    # gtksourceview, inkscape, virt-manager and catppuccin-cursors to compile
+    # locally on every nixpkgs bump. No gtksourceview-based editor is used.
+    targets.gtksourceview.enable = false;
   };
 
   nixpkgs.config = {

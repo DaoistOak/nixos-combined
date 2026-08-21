@@ -74,9 +74,7 @@ let
     qbittorrent
     qutebrowser
     rofi
-    (pkgs.rpi-imager.overrideAttrs (oldAttrs: {
-      buildInputs = oldAttrs.buildInputs ++ [ pkgs.qt6.qt5compat ];
-    }))
+    rpi-imager
     thunderbird
     ungoogled-chromium
     vesktop
@@ -98,7 +96,6 @@ let
     busybox
     btop
     cargo
-    canon-cups-ufr2
     cpufrequtils
     curl
     jq

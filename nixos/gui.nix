@@ -19,6 +19,16 @@
   programs.hyprland = {
     enable = true;
     package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    # Use the stock portal so it comes from the binary cache. The module's
+    # portalPackage.apply re-overrides anything accepting a `hyprland` arg
+    # (forcing a local build against the flake's Hyprland), so mask `override`
+    # to make the stock package pass through untouched. Portal and compositor
+    # versions are allowed to differ per the module docs.
+    portalPackage =
+      let
+        stock = pkgs.xdg-desktop-portal-hyprland;
+      in
+      stock // { override = _: stock; };
   };
   # Enable KDE Plasma 6
   services.desktopManager.plasma6 = {
