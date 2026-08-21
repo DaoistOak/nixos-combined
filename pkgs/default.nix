@@ -63,7 +63,14 @@ let
     qalculate-qt
     networkmanagerapplet
     pcmanfm
-    popcorntime
+    (popcorntime.overrideAttrs (old: {
+      postFixup = (old.postFixup or "") + ''
+        substituteInPlace $out/opt/popcorntime/node_modules/butter-settings-popcorntime.app/index.js \
+          --replace-quiet "'https://yts.mx/'" "'https://yts.gg/'"
+        substituteInPlace $out/opt/popcorntime/src/app/lib/views/movie_detail.js \
+          --replace-quiet 'https://yts.mx/' 'https://yts.gg/'
+      '';
+    }))
     proton-vpn
     qbittorrent
     qutebrowser
