@@ -11,7 +11,7 @@ let
 in
 {
   imports = [
-    ../config/hypr/hyprland.nix
+    ../modules/config/hypr/hyprland.nix
     inputs.noctalia.homeModules.default
     ./themes/theme.nix
   ];
@@ -35,7 +35,7 @@ in
   xdg.configFile."hypr/hyprlock.conf".force = true;
   xdg.configFile."gtk-4.0/gtk.css".force = true;
   xdg.configFile."mimeapps.list".force = true;
-  home.file.".config/quickshell/overview".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.config/nixos/_git-clones/quickshell-overview";
+  home.file.".config/quickshell/overview".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.config/nixos/modules/_git-clones/quickshell-overview";
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
