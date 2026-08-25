@@ -35,7 +35,6 @@ in
   xdg.configFile."hypr/hyprlock.conf".force = true;
   xdg.configFile."gtk-4.0/gtk.css".force = true;
   xdg.configFile."mimeapps.list".force = true;
-  home.file.".config/quickshell/overview".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.config/nixos/modules/_git-clones/quickshell-overview";
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
