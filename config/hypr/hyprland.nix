@@ -12,6 +12,8 @@
     ./settings/displays.nix
     ./settings/input.nix
     ./settings/keybinds.nix
+    ./settings/plugins.nix
+    ./settings/dynamic-cursors.nix
     ./settings/scrolling.nix
     ./settings/misc.nix
     ./settings/startup.nix
