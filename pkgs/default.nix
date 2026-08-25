@@ -147,6 +147,7 @@ let
     pciutils
     picocom
     playerctl
+    quickshell
     powertop
     ryzenadj
     screen

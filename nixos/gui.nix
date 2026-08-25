@@ -18,6 +18,7 @@
   # Enable Hyprland
   programs.hyprland = {
     enable = true;
+    withUWSM = true;
     package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
     # Use the stock portal so it comes from the binary cache. The module's
     # portalPackage.apply re-overrides anything accepting a `hyprland` arg

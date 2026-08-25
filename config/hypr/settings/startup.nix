@@ -130,6 +130,12 @@
             -- hl.exec_cmd("~/.config/hypr/scripts/restartbar&wall.sh")
             hl.exec_cmd("~/bin/keyboard_led_control.sh")
             hl.exec_cmd("~/bin/hyprland-clean")
+
+            -- Session restore
+            hl.exec_cmd("${config.xdg.configHome}/hypr/scripts/session-restore.sh")
+
+            -- Quickshell overview
+            hl.exec_cmd("qs -c overview")
             -- Launching hyprshade for window effects
             hl.exec_cmd("hyprsunset")
             hl.exec_cmd("hyprctl dispatch submap global")
