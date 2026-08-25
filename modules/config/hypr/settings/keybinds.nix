@@ -121,7 +121,7 @@
       end
       superTap.armed = false
     end, { release = true })
-    hl.bind(mod .. " + TAB", hl.dsp.exec_cmd("noctalia msg window-switcher"))
+    hl.bind(mod .. " + ALT + TAB", hl.dsp.exec_cmd("noctalia msg window-switcher"))
     hl.bind(mod .. " + B", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center bluetooth"))
     hl.bind(mod .. " + Period", hl.dsp.exec_cmd("noctalia msg panel-toggle launcher /emo"))
     hl.bind(mod .. " + X", hl.dsp.exec_cmd("noctalia msg panel-toggle session"))
