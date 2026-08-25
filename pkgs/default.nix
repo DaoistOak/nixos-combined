@@ -275,6 +275,7 @@ let
     speechd
     nh
     nix-output-monitor
+    nix-search-tv
     nixfmt
     nixfmt-tree
     lohit-fonts.devanagari
