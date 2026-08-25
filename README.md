@@ -42,4 +42,4 @@ A comprehensive, declarative NixOS and home-manager setup for seamless system an
 
 ## 🤝 Contributing
 
-Feel free to fork, modify, and submit PRs. Follow the guidelines in `AGENTS.md` for consistency.
+Feel free to fork, modify, and submit PRs.
