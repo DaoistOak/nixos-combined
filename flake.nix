@@ -42,6 +42,10 @@
     hyprpanel = {
       url = "github:Jas-SinghFSU/HyprPanel";
     };
+    hypr-dynamic-cursors = {
+      url = "github:VirtCode/hypr-dynamic-cursors";
+      inputs.hyprland.follows = "hyprland";
+    };
   };
 
   outputs =

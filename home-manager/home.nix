@@ -22,7 +22,7 @@ in
     @import url("noctalia.css");
   '';
   qt.enable = true;
-  home.stateVersion = "24.11";
+  home.stateVersion = "26.05";
   home.pointerCursor.enable = true;
   wayland.windowManager.hyprland.configType = "lua";
   catppuccin = {
