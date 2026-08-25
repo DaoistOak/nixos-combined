@@ -13,7 +13,6 @@
     ./settings/input.nix
     ./settings/keybinds.nix
     ./settings/plugins.nix
-    ./settings/dynamic-cursors.nix
     ./settings/scrolling.nix
     ./settings/misc.nix
     ./settings/startup.nix
@@ -22,12 +21,11 @@
     ./hypridle.nix
     ./scripts/hyprlock.nix
     ./scripts/media-idle.nix
+    ./scripts/session.nix
   ];
   wayland.windowManager.hyprland = {
     enable = true;
-    # Use the plain pinned package: cachix stores the exact builds uploaded by
-    # Hyprland CI for the github: fetcher, so this path hits the cache without
-    # any overrideAttrs (which would change the hash and force a local compile).
+    systemd.enable = false;
     package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
   };
 }
