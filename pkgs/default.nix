@@ -109,7 +109,6 @@ let
     freerdp
     fzf
     gemini-cli
-    geoserver
     git
     gnirehtet
     gnumake

@@ -113,5 +113,22 @@
     };
   };
 
+  # 🌀 IdeaPad fan: force "Efficient Thermal Dissipation" EC profile on boot.
+  # Not persisted by firmware; modes: 0=silent 1=standard 2=dust-cleaning 4=max cooling.
+  systemd.services.ideapad-fan-max = {
+    description = "Set Lenovo IdeaPad EC fan_mode to Efficient Thermal Dissipation";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "multi-user.target" ];
+    unitConfig.ConditionPathExists =
+      [ "/sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/fan_mode" ];
+    script = ''
+      echo 4 > /sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/fan_mode
+    '';
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+  };
+
   systemd.services.NetworkManager-wait-online.enable = true;
 }
