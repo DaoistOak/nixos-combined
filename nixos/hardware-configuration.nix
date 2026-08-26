@@ -28,17 +28,9 @@
 
     initrd.kernelModules = [ "amdgpu" ];
 
-    # Core modules (added binder + ashmem)
     kernelModules = [
       "kvm-amd"
-      "binder_linux"
-      "ashmem_linux"
     ];
-
-    # Needed for Waydroid binder functionality
-    extraModprobeConfig = ''
-      options binder_linux devices=binder,hwbinder,vndbinder
-    '';
 
     # --- Kernel Parameters ---
     kernelParams = [
