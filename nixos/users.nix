@@ -57,6 +57,15 @@
     # XAUTHORITY = "$XDG_RUNTIME_DIR/Xauthority";
     XCOMPOSECACHE = "$XDG_CACHE_HOME/X11/xcompose";
     PYTHONSTARTUP = "/home/zeph/python/pythonrc";
+    GRADLE_USER_HOME = "$XDG_DATA_HOME/gradle";
+    CODEX_HOME = "$XDG_CONFIG_HOME/codex";
+    DOTNET_CLI_HOME = "$XDG_DATA_HOME/dotnet";
+    SCREENDIR = "$XDG_RUNTIME_DIR/screen";
+    PLATFORMIO_CORE_DIR = "$XDG_DATA_HOME/platformio";
+    SCIHOME = "$XDG_STATE_HOME/scilab";
+    PYTHON_HISTORY = "$XDG_STATE_HOME/python_history";
+    _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=$XDG_CONFIG_HOME/java";
+    WGETRC = "$XDG_CONFIG_HOME/wget/wgetrc";
   };
   # Enable Zsh
   programs.zsh.enable = true;
