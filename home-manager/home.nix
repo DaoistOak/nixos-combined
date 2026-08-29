@@ -66,6 +66,11 @@ in
   };
   programs.home-manager.enable = true;
   systemd.user.startServices = true;
+  home.file.".config/wget/wgetrc" = {
+    text = ''
+      hsts-file = ${config.home.homeDirectory}/.local/share/wget-hsts
+    '';
+  };
 
   programs.zsh = {
     enable = true;

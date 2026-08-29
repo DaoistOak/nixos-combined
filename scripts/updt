@@ -92,6 +92,24 @@ check_git_status() {
     fi
 }
 
+# Update flatpak applications and runtimes
+update_flatpak() {
+    log_info "Updating flatpak applications and runtimes..."
+
+    if command -v flatpak &> /dev/null; then
+        if flatpak update -y; then
+            log_success "Flatpak applications updated"
+            return 0
+        else
+            log_error "Flatpak update failed"
+            return 1
+        fi
+    else
+        log_warning "flatpak is not installed"
+        return 1
+    fi
+}
+
 # Update flake inputs
 update_flake_inputs() {
     log_info "Updating flake inputs..."
@@ -328,9 +346,22 @@ execute_option() {
             commit_changes
             ;;
          5)
-             push_changes
+             echo -e "${BOLD}${GREEN}🚀 Updating flatpak applications...${NC}"
+             echo -e "${GREEN}==================================================${NC}"
+             log_info "Updating flatpak applications and runtimes..."
+             if ! update_flatpak; then
+                 notify "❌ Flatpak Update Failed" "Check terminal for details." "critical"
+                 play_sound "$ERROR_SOUND"
+                 return 1
+             fi
+             log_success "🎉 Flatpak update completed successfully!"
+             notify "✅ Flatpak Update Complete" "Flatpak applications updated successfully!"
+             play_sound "$SUCCESS_SOUND"
              ;;
          6)
+             push_changes
+             ;;
+         7)
              echo -e "${BOLD}${GREEN}🚀 Starting comprehensive NixOS & Home-Manager update + push...${NC}"
              echo -e "${GREEN}==================================================${NC}"
 
@@ -389,7 +420,7 @@ execute_option() {
              notify "✅ Update Complete" "NixOS and Home-Manager updated and pushed successfully!"
              play_sound "$SUCCESS_SOUND"
              ;;
-          7)
+          8)
               exit 0
               ;;
           *) 
@@ -417,12 +448,13 @@ main() {
     echo -e "2. ${YELLOW}Update Flake Only${NC}    - Update flake inputs only"
     echo -e "3. ${RED}Update System Only${NC}    - NixOS system only"
     echo -e "4. ${BLUE}Update Home-Manager Only${NC} - Home-manager only"
-    echo -e "5. ${GREEN}Git Push${NC}             - Push changes to remote"
-    echo -e "6. ${YELLOW}Update & Push${NC}         - Update all + push"
-    echo -e "7. ${RED}Exit${NC}"
+    echo -e "5. ${GREEN}Update Flatpak${NC}         - Update flatpak applications"
+    echo -e "6. ${GREEN}Git Push${NC}             - Push changes to remote"
+    echo -e "7. ${YELLOW}Update & Push${NC}         - Update all + push"
+    echo -e "8. ${RED}Exit${NC}"
     echo -e "${YELLOW}You can enter multiple options separated by commas (e.g., 3,4) or ranges (e.g., 3-5)${NC}"
     echo
-    read -p "Enter choice(s) (1-7): " input
+    read -p "Enter choice(s) (1-8): " input
     
     # Parse the input
     local parsed_choices
