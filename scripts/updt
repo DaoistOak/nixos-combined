@@ -120,7 +120,7 @@ build_nixos() {
 build_home_manager() {
     log_info "Building home-manager configuration ($HOME_USER)..."
 
-    if home-manager build --flake .#"$HOME_USER"; then
+    if nh home build .; then
         log_success "Home-manager build successful"
         return 0
     else
@@ -146,7 +146,7 @@ switch_nixos() {
 switch_home_manager() {
     log_info "Switching to new home-manager configuration..."
 
-    if home-manager switch --flake .#"$HOME_USER"; then
+    if nh home switch .; then
         log_success "Home-manager switch successful"
         # Refresh KDE application cache for GUI launchers
         if command -v kbuildsycoca6 &> /dev/null; then
