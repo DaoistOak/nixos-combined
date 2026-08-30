@@ -12,6 +12,9 @@ in
 {
   imports = [
     ../modules/config/hypr/hyprland.nix
+    ../modules/config/herdr
+    ../modules/config/yazi
+    ../modules/config/superfile
     ../modules/config/zsh
     inputs.noctalia.homeModules.default
     ./themes/theme.nix

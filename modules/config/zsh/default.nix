@@ -44,6 +44,15 @@ in
     initContent = lib.mkOrder 1000 (builtins.readFile ./zshrc.custom);
   };
 
+  # fzf + keybindings (Ctrl-T files, Alt-C cd, Ctrl-R history) via zsh integration.
+  # The old manual `source fzf/fzf.zsh` in zshrc.custom is now a no-op.
+  programs.fzf = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+  # Writes FZF_DEFAULT_OPTS_FILE from the global catppuccin flavor (macchiato).
+  catppuccin.fzf.enable = true;
+
   # Powerlevel10k theme (pinned fetchFromGitHub, replaces the manual clone).
   home.file."${zshDir}/powerlevel10k".source = powerlevel10k;
 

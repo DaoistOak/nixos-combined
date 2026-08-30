@@ -47,6 +47,9 @@
     # to compile locally on every nixpkgs bump. No gtksourceview-based editor
     # is used.
     targets.gtksourceview.enable = false;
+    # yazi themed by catppuccin (modules/config/yazi) with the macchiato-mauve
+    # flavor file instead of stylix's base16 scheme.
+    targets.yazi.enable = false;
     # targets.hyprland.colors.override = {
     #   "col.active_border" = "#c6a0f6";
     # };

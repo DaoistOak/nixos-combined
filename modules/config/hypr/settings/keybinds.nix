@@ -85,8 +85,8 @@
     hl.bind(mod .. " + ALT + P", hl.dsp.exec_cmd("~/bin/colorpicker"))
 
     -- 9. APPLICATION LAUNCHERS
-    hl.bind(mod .. " + RETURN", hl.dsp.exec_cmd("kitty tmux"))
-    hl.bind(mod .. " + F", hl.dsp.exec_cmd("pcmanfm"))
+    hl.bind(mod .. " + RETURN", hl.dsp.exec_cmd("kitty herdr"))
+    hl.bind(mod .. " + F", hl.dsp.exec_cmd("${config.xdg.configHome}/herdr/scripts/launch-yazi.sh"))
     hl.bind(mod .. " + H", hl.dsp.exec_cmd("kitty htop"))
     hl.bind(mod .. " + ALT + H", hl.dsp.exec_cmd("kitty btop"))
     hl.bind(mod .. " + ALT + RETURN", hl.dsp.exec_cmd("alacritty"))
@@ -141,7 +141,7 @@
     -- 12. SCRATCHPAD (special workspace)
     hl.bind(mod .. " + SHIFT + SPACE", hl.dsp.window.move({ workspace = "special:scratchpad" }))
     hl.bind(mod .. " + SPACE", hl.dsp.workspace.toggle_special("scratchpad"))
-    hl.bind(mod .. " + SHIFT + RETURN", hl.dsp.exec_cmd("[workspace special:scratchpad] kitty tmux"))
+    hl.bind(mod .. " + SHIFT + RETURN", hl.dsp.exec_cmd("[workspace special:scratchpad] kitty herdr"))
 
     -- Workspace navigation
     for i = 1, 9 do

@@ -23,7 +23,7 @@
          | "\((.x + .width / 2) | floor) \((.y + 120) | floor)"')
       if [ -n "$coord" ]; then
         read -r cx cy <<< "$coord"
-        hyprctl dispatch "hl.cursor.move({ x = $cx, y = $cy })"
+        hyprctl dispatch "hl.dsp.cursor.move({ x = $cx, y = $cy })"
       fi
     '';
   };
