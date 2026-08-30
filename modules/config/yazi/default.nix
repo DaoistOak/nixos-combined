@@ -12,6 +12,7 @@
     package = null;
 
     settings = {
+      show_hidden = true;
       # Text files open in nvim by default via the `edit` opener.
       opener = {
         edit = [

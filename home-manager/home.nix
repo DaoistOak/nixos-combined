@@ -15,9 +15,9 @@ in
     ../modules/config/herdr
     ../modules/config/yazi
     ../modules/config/superfile
+    ../modules/config/theme
     ../modules/config/zsh
     inputs.noctalia.homeModules.default
-    ./themes/theme.nix
   ];
   home.username = "zeph";
   home.homeDirectory = "/home/zeph";
@@ -77,6 +77,13 @@ in
   home.pointerCursor.dotIcons.enable = false;
 
   programs.home-manager.enable = true;
+
+  # devenv shell integration: auto-activates devenv.nix dev environments on cd.
+  programs.devenv = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
   systemd.user.startServices = true;
   home.file.".config/wget/wgetrc" = {
     text = ''
