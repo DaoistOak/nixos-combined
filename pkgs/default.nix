@@ -23,7 +23,6 @@ let
     gpu-screen-recorder
     # nur.repos.mikilio.ttf-ms-fonts
     klassy
-    superfile
     pay-respects
   ];
 
@@ -117,7 +116,6 @@ let
     ffmpeg
     fish
     freerdp
-    fzf
     gemini-cli
     git
     gnirehtet
@@ -167,6 +165,8 @@ let
     wget
     wl-clipboard
     xclip
+    superfile
+    yazi
     zellij
     zoxide
     zsh
