@@ -42,6 +42,13 @@
     targets.kde.applicationStyle = "kvantum-dark";
     targets.kde.widgetStyle = "qtcde";
     targets.noctalia-shell.enable = false;
+    # Terminals/dotfiles are owned by the declarative modules under
+    # modules/config/{kitty,alacritty,wezterm,tmux} which draw from the
+    # centralized colors.active palette; keep Stylix from re-theming them.
+    targets.kitty.enable = false;
+    targets.alacritty.enable = false;
+    targets.wezterm.enable = false;
+    targets.tmux.enable = false;
     # Stylix's gtksourceview overlay (applied via nixpkgs.overlays in HM)
     # changes gtksourceview's hash, forcing inkscape and catppuccin-cursors
     # to compile locally on every nixpkgs bump. No gtksourceview-based editor

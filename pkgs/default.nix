@@ -77,7 +77,6 @@ let
     kdePackages.kdeconnect-kde
     keepassxc
     kicad-small
-    kitty
     lact
     qalculate-qt
     networkmanagerapplet
@@ -169,7 +168,6 @@ let
     tgpt
     thermald
     tlp
-    tmux
     unzip
     upower
     util-linux
