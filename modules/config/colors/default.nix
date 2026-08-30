@@ -538,18 +538,23 @@ in
     # scripts/theme overwrites these (no rebuild) on ./theme set ...
     home.file.".config/theme-switcher/kitty-theme.conf" = {
       text = kittyTheme;
+      force = true;
     };
     home.file.".config/theme-switcher/alacritty-theme.toml" = {
       text = alacrittyTheme;
+      force = true;
     };
     home.file.".config/theme-switcher/wezterm-theme.lua" = {
       text = weztermTheme;
+      force = true;
     };
     home.file.".config/theme-switcher/tmux-theme.conf" = {
       text = tmuxTheme;
+      force = true;
     };
     home.file.".config/theme-switcher/hyprland-theme.lua" = {
       text = hyprlandTheme;
+      force = true;
     };
 
     # The runtime theme files above arrive as read-only store symlinks, but
