@@ -13,6 +13,14 @@ let
   };
   user-packages = with pkgs; [
     ns
+    # Kvantum widget style engine; required so QT_STYLE_OVERRIDE=kvantum renders
+    # for regular Qt widget apps.
+    kdePackages.qtstyleplugin-kvantum
+    # KDE's QtQuick Controls style ("org.kde.desktop"). It reads the KDE color
+    # scheme (e.g. CatppuccinMacchiatoMauve), so the KDE polkit agent's
+    # QtQuick dialog matches the catppuccin theme instead of the unstyled
+    # default.
+    kdePackages.qqc2-desktop-style
     # Flake-specific packages
     hyprnome
     hyprprop
@@ -22,6 +30,8 @@ let
     cliphist
     gpu-screen-recorder
     jrnl
+    jujutsu
+    chafa
     # nur.repos.mikilio.ttf-ms-fonts
     klassy
     pay-respects
@@ -110,6 +120,7 @@ let
     curl
     jq
     direnv
+    devenv
     distrobox
     docker-compose
     podman

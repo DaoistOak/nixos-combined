@@ -4,6 +4,20 @@
   lib,
   ...
 }:
+let
+  # The KDE polkit agent's QtQuick dialog must NOT inherit QT_STYLE_OVERRIDE=
+  # kvantum (the Kvantum QtQuick QML module isn't installed, so it crashes and
+  # pkexec auto-denies). Instead we point its dialog at KDE's "org.kde.desktop"
+  # QtQuick style (qqc2-desktop-style) so it renders with the catppuccin color
+  # scheme, while regular Qt widgets keep kvantum. A wrapper script is used
+  # because hl.exec_cmd doesn't reliably pass env assignments/flags.
+  polkitAgentWrapper = pkgs.writeShellScriptBin "polkit-kde-agent-wrapper" ''
+    exec ${pkgs.coreutils}/bin/env \
+      -u QT_STYLE_OVERRIDE \
+      QT_QUICK_CONTROLS_STYLE=org.kde.desktop \
+      ${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1
+  '';
+in
 {
   wayland.windowManager.hyprland.settings = {
 
@@ -102,13 +116,16 @@
           function()
             -- Launch the shell / bar
             hl.exec_cmd("noctalia")
+            -- GUI polkit authentication agent (KDE). Launched from Hyprland so
+            -- it inherits the full graphical env (DISPLAY, WAYLAND, session bus)
+            -- and can register with polkitd. The wrapper strips QT_STYLE_OVERRIDE
+            -- (Kvantum QtQuick QML would crash the dialog) and sets the
+            -- "org.kde.desktop" QtQuick style so it matches catppuccin.
+            hl.exec_cmd("${polkitAgentWrapper}/bin/polkit-kde-agent-wrapper")
             -- Launch notifications service (swaync or mako)
             hl.exec_cmd("/run/current-system/sw/bin/nm-applet")
             -- Volume and brightness services
             hl.exec_cmd("avizo-service")
-
-            -- Polkit authentication agent (KDE)
-            hl.exec_cmd("${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1")
 
             -- Idle and power management
             -- hl.exec_cmd("hypridle") -- disabled: run as systemd user unit via home-manager services.hypridle
