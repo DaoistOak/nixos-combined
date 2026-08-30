@@ -10,10 +10,14 @@
   # fresh build looks right before the first ./theme run. scripts/theme rewrites
   # hyprland-theme.lua and hyprctl reload re-applies it (extraConfig below), so
   # switching needs no rebuild.
-  wayland.windowManager.hyprland.settings.config = {
-    general.col = {
-      active_border = "0x${config.colors.active.accent}";
-      inactive_border = "0x${config.colors.active.overlay1}";
+  wayland.windowManager.hyprland.settings = {
+    config = {
+      general = {
+        col = {
+          active_border = "0x${config.colors.active.accent}";
+          inactive_border = "0x${config.colors.active.overlay1}";
+        };
+      };
     };
   };
 
