@@ -34,13 +34,15 @@
       peach = "#f5a97f"
 
       [keys]
-      prefix = "ctrl+space"
+      prefix = "ctrl+b"
       new_tab = "prefix+n"
       previous_tab = "alt+p"
       next_tab = "alt+l"
       split_horizontal = "prefix+v"
       split_vertical = "prefix+b"
       detach = "prefix+d"
+      toggle_sidebar = "prefix+shift+b"
+      settings = "prefix+shift+s"
 
       [ui]
       sidebar_start_collapsed = true
