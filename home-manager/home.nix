@@ -15,6 +15,11 @@ in
     ../modules/config/herdr
     ../modules/config/yazi
     ../modules/config/superfile
+    ../modules/config/kitty
+    ../modules/config/alacritty
+    ../modules/config/wezterm
+    ../modules/config/tmux
+    ../modules/config/colors
     ../modules/config/theme
     ../modules/config/zsh
     inputs.noctalia.homeModules.default
@@ -34,6 +39,13 @@ in
     autoEnable = true;
     flavor = "macchiato";
     accent = "mauve";
+    # These terminals are owned by modules/config/{kitty,alacritty,wezterm,tmux}
+    # which draw from the centralized colors.active palette; keep the catppuccin
+    # module from also theming them.
+    kitty.enable = false;
+    alacritty.enable = false;
+    wezterm.enable = false;
+    tmux.enable = false;
   };
   xdg.configFile."gtk-3.0/gtk.css".force = true;
   xdg.configFile."hypr/hyprlock.conf".force = true;
