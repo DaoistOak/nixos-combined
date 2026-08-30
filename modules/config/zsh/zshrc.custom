@@ -1,0 +1,124 @@
+#!/bin/bash
+# Enable Powerlevel10k instant prompt
+#if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+#  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+#fi
+# Path to your oh-my-zsh installation.
+source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
+
+# Load private API keys from untracked secrets file (zsh syntax) if present.
+[[ -f "$HOME/.config/nixos/modules/config/zsh/secrets.zsh" ]] && source "$HOME/.config/nixos/modules/config/zsh/secrets.zsh"
+export PATH="$PATH:$HOME/bin"
+export HISTFILE="$HOME"/.config/zsh/.zsh_history
+export PATH=$PATH:/home/shridal/.spicetify
+export ZSH_TMUX_AUTOSTART_ONC_ONCE=true
+export ZSH_TMUX_DEFAULT_SESSION_NAME=Base
+export NIX_LD_LIBRARY_PATH=$(nix eval --raw nixpkgs#glibc.outPath)/lib
+export XCOMPOSECACHE="$XDG_CACHE_HOME"/X11/xcompose
+export WINEPREFIX="$XDG_DATA_HOME"/wine
+export PSQL_HISTORY="$XDG_DATA_HOME/psql_history"
+export PYTHONSTARTUP="$HOME"/python/pythonrc
+export PATH=$PATH:/home/zeph/.spicetify
+export TERM=tmux-256color
+export NIXPKGS_ALLOW_UNFREE=1
+# XDG Base Directory exports for cleaning homedir
+export XDG_STATE_HOME="$HOME/.local/state"
+export ANDROID_USER_HOME="$XDG_DATA_HOME"/android
+export CARGO_HOME="$XDG_DATA_HOME"/cargo
+export GTK2_RC_FILES="$XDG_CONFIG_HOME"/gtk-2.0/gtkrc
+export JULIA_DEPOT_PATH="$XDG_DATA_HOME/julia:$JULIA_DEPOT_PATH"
+export NPM_CONFIG_INIT_MODULE="$XDG_CONFIG_HOME"/npm/config/npm-init.js
+export NPM_CONFIG_CACHE="$XDG_CACHE_HOME"/npm
+export NPM_CONFIG_TMP="$XDG_RUNTIME_DIR"/npm
+export PSQL_HISTORY="$XDG_STATE_HOME/psql_history"
+export SCIHOME="$XDG_STATE_HOME"/scilab
+export WAKATIME_HOME="$XDG_CONFIG_HOME"/wakatime
+export WINEPREFIX="$XDG_DATA_HOME"/wine
+# export XAUTHORITY="$XDG_RUNTIME_DIR"/Xauthority
+# export COLORTERM=truecolor
+# HISTSIZE=10000000
+# Theme (Powerlevel10k, tracked via the powerlevel10k flake input)
+source ${ZDOTDIR:-$HOME/.config/zsh}/powerlevel10k/powerlevel10k.zsh-theme
+# Source custom Powerlevel10k configuration
+[[ ! -f ${ZDOTDIR:-~}/.p10k.zsh ]] || source ${ZDOTDIR:-~}/.p10k.zsh
+POWERLEVEL9K_MODE='nerdfont-complete'
+POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
+[ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
+# Custom aliases
+alias -g ls='eza --icons -a --color=always --group-directories-first'
+alias -g la='eza --icons -al --color=always --group-directories-first'
+alias -g cls='clear'
+# alias -g updt='(sudo nixos-rebuild switch --show-trace --impure --flake /etc/nixos#Overlord --upgrade && notify-send "✅ NixOS Rebuild Done" "System updated successfully!" && pw-play /run/current-system/sw/share/sounds/freedesktop/stereo/complete.oga) || (notify-send "❌ NixOS Rebuild Failed" "Check the terminal for error details." && pw-play /run/current-system/sw/share/sounds/freedesktop/stereo/dialog-error.oga)'
+alias -g instl='sudo nixos-rebuild switch --show-trace --impure --flake /etc/nixos#Overlord'
+alias -g clean='sudo nix-env --delete-generations old && sudo nix-collect-garbage -d'
+# alias -g vi='nvim'
+alias -g cat='bat'
+alias -g emacs='emacsclient -c -a 'emacs''
+alias -g rr='curl -s -L https://raw.githubusercontent.com/keroserene/rickrollrc/master/roll.sh | bash'
+alias -g parrot='curl parrot.live'
+alias -g portainer='sudo docker start Portainer'
+alias -g dotfiles='git --git-dir=/home/shridal/.dotfiles --work-tree=/home/shridal'
+alias -g web='qutebrowser'
+alias -g weather='curl wttr.in/kathmandu'
+alias -g greet='cermic 1 ~/Pictures/cermic/'
+alias -g al='ollama run Alfred'
+alias -g nix-shell='nix-shell --run zsh'
+alias -g hm="home-manager switch --flake ~/.config/home-manager"
+alias -g nix-init="~/bin/nix-shell-boilerplate.sh"
+alias -g vi='edit_file'
+alias wget=wget --hsts-file="$XDG_DATA_HOME/wget-hsts"
+alias dosbox=dosbox -conf "$XDG_CONFIG_HOME"/dosbox/dosbox.conf
+alias tabby_start='sudo tabby serve --model DeepSeekCoder-1.3B --chat-model Qwen3-4B --device rocm'
+
+eval "$(zoxide init zsh)"
+# Greater prompt
+greet
+echo "\n"
+#tmux
+
+#
+# Start Sound
+#systemctl --user restart pipewire
+#systemctl --user restart wireplumber
+#Functions
+edit_file() {
+    if [[ -e "$1" ]]; then
+        if [[ -f "$1" ]]; then
+            if [[ -w "$1" ]]; then
+                echo "[Regular file] Editing: $1"
+                nvim "$1"
+            else
+                echo "[SU file] Editing as root: $1"
+                sudoedit "$1"
+            fi
+        else
+            echo "Error: '$1' is not a regular file."
+            return 1
+        fi
+    else
+        echo "File '$1' does not exist. Create it? (Y/N)"
+        read -r response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            dir=$(dirname "$1")
+            if [[ -w "$dir" ]]; then
+                touch "$1"
+                echo "File created: $1"
+                nvim "$1"
+            else
+                echo "No write permission. Create with sudo? (Y/N)"
+                read -r sudo_response
+                if [[ "$sudo_response" =~ ^[Yy]$ ]]; then
+                    sudo touch "$1" && sudo chown "$USER:$USER" "$1"
+                    echo "File created with sudo: $1"
+                      sudoedit "$1"
+                else
+                    echo "Aborted."
+                    return 1
+                fi
+            fi
+        else
+            echo "Aborted."
+            return 1
+        fi
+    fi
+}

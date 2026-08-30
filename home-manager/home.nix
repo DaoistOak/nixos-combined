@@ -12,6 +12,7 @@ in
 {
   imports = [
     ../modules/config/hypr/hyprland.nix
+    ../modules/config/zsh
     inputs.noctalia.homeModules.default
     ./themes/theme.nix
   ];
@@ -78,24 +79,6 @@ in
     text = ''
       hsts-file = ${config.home.homeDirectory}/.local/share/wget-hsts
     '';
-  };
-
-  # Zsh managed by home-manager. Config lives in $ZDOTDIR (~/.config/zsh),
-  # set in nixos/users.nix. HM writes .zshenv/.zprofile there; a thin
-  # ~/.zshenv in $HOME bootstraps ZDOTDIR.
-  programs.zsh = {
-    enable = true;
-    enableCompletion = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
-    dotDir = "${config.xdg.configHome}/zsh";
-  };
-
-  # Keep the exact custom .zshrc (oh-my-zsh, p10k, aliases, API keys) instead
-  # of HM's generated one. Referenced by path so secrets stay out of the repo.
-  xdg.configFile."zsh/.zshrc" = {
-    source = /home/zeph/.config/zsh/.zshrc;
-    force = true;
   };
 
   # programs.caelestia = {
