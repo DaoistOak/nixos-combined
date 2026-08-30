@@ -21,6 +21,7 @@ let
     flameshot
     cliphist
     gpu-screen-recorder
+    jrnl
     # nur.repos.mikilio.ttf-ms-fonts
     klassy
     pay-respects
