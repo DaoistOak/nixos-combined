@@ -117,7 +117,7 @@
     end)
     hl.bind(mod .. " + SUPER_L", function()
       if superTap.armed then
-        hl.exec_cmd("noctalia msg panel-toggle launcher")
+        hl.exec_cmd("${config.xdg.configHome}/hypr/scripts/super-tap-launcher.sh")
       end
       superTap.armed = false
     end, { release = true })
