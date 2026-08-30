@@ -22,6 +22,7 @@
     ./scripts/hyprlock.nix
     ./scripts/media-idle.nix
     ./scripts/session.nix
+    ./scripts/super-tap-launcher.nix
   ];
   wayland.windowManager.hyprland = {
     enable = true;
