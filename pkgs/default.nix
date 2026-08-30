@@ -44,6 +44,7 @@ let
     hyprlock
     inputs.hyprpanel.packages."x86_64-linux".default
     hyprpolkitagent
+    hydralauncher
     kdePackages.bluedevil
     kdePackages.bluez-qt
     kdePackages.dragon

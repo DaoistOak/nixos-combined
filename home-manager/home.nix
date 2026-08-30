@@ -64,6 +64,14 @@ in
     force = true;
     text = "# Default GTK RC-2.0 Configuration\n";
   };
+
+  # Keep dotfiles out of $HOME per XDG.
+  # Relocate .Xresources to $XDG_CONFIG_HOME/X11/xresources (xrdb -merge still wired up).
+  xresources.path = "${config.xdg.configHome}/X11/xresources";
+  # ~/.icons would otherwise be created for backwards compat; instead rely on
+  # $XDG_DATA_HOME/icons + XCURSOR_PATH (already set by home-manager).
+  home.pointerCursor.dotIcons.enable = false;
+
   programs.home-manager.enable = true;
   systemd.user.startServices = true;
   home.file.".config/wget/wgetrc" = {
@@ -72,11 +80,22 @@ in
     '';
   };
 
+  # Zsh managed by home-manager. Config lives in $ZDOTDIR (~/.config/zsh),
+  # set in nixos/users.nix. HM writes .zshenv/.zprofile there; a thin
+  # ~/.zshenv in $HOME bootstraps ZDOTDIR.
   programs.zsh = {
     enable = true;
     enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
+    dotDir = "${config.xdg.configHome}/zsh";
+  };
+
+  # Keep the exact custom .zshrc (oh-my-zsh, p10k, aliases, API keys) instead
+  # of HM's generated one. Referenced by path so secrets stay out of the repo.
+  xdg.configFile."zsh/.zshrc" = {
+    source = /home/zeph/.config/zsh/.zshrc;
+    force = true;
   };
 
   # programs.caelestia = {
