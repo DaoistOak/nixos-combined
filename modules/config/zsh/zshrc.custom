@@ -44,6 +44,30 @@ source ${ZDOTDIR:-$HOME/.config/zsh}/powerlevel10k/powerlevel10k.zsh-theme
 POWERLEVEL9K_MODE='nerdfont-complete'
 POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
 [ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
+# FZF keybindings moved to Alt+ (frees Ctrl-T/Ctrl-R), plus Alt+F file search.
+if [[ $options[zle] = on ]]; then
+  # Unbind fzf's default Ctrl-T/Ctrl-R so they can be reclaimed by other tools.
+  for km in emacs vicmd viins; do
+    bindkey -M "$km" -r '^T'
+    bindkey -M "$km" -r '^R'
+  done
+
+  # Alt+T files (files+dirs), Alt+R history. Alt+C (cd) is already bound by fzf.
+  for km in emacs vicmd viins; do
+    bindkey -M "$km" '\et' fzf-file-widget
+    bindkey -M "$km" '\er' fzf-history-widget
+  done
+
+  # Alt+F: search only files (paste matching file path).
+  fzf-file-search-widget() {
+    local cmd="rg --files -uu --hidden 2>/dev/null"
+    FZF_CTRL_T_COMMAND="$cmd" fzf-file-widget
+  }
+  zle -N fzf-file-search-widget
+  for km in emacs vicmd viins; do
+    bindkey -M "$km" '\ef' fzf-file-search-widget
+  done
+fi
 # Custom aliases
 alias -g ls='eza --icons -a --color=always --group-directories-first'
 alias -g la='eza --icons -al --color=always --group-directories-first'
@@ -122,3 +146,36 @@ edit_file() {
         fi
     fi
 }
+
+# ---------------------------------------------------------------------------
+# chpwd hooks: run on every directory change.
+# ---------------------------------------------------------------------------
+autoload -Uz add-zsh-hook
+
+# 1) List directory contents after every cd (mirrors the `ls` alias).
+chpwd_ls() {
+  setopt localoptions aliases
+  command eza --icons -a --color=always --group-directories-first
+}
+add-zsh-hook chpwd chpwd_ls
+
+# 2) Auto-activate a local environment: source a python venv, or enter a
+#    nix-shell when shell.nix is present (guarded against recursion).
+chpwd_autoenv() {
+  # Python virtualenv (.venv or venv)
+  local vd
+  for vd in .venv venv; do
+    if [[ -f "$vd/bin/activate" && -z "$VIRTUAL_ENV" ]]; then
+      source "$vd/bin/activate"
+      echo "Activated virtualenv: $vd"
+      break
+    fi
+  done
+
+  # Nix shell
+  if [[ -f shell.nix && -z "$IN_NIX_SHELL" ]]; then
+    echo "shell.nix detected. Starting nix-shell..."
+    exec nix-shell --run zsh
+  fi
+}
+add-zsh-hook chpwd chpwd_autoenv

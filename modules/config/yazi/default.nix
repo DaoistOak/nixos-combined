@@ -21,6 +21,24 @@
             desc = "Edit with nvim";
           }
         ];
+        image = [
+          {
+            run = "gwenview %s";
+            desc = "Open with Gwenview";
+          }
+        ];
+        pdf = [
+          {
+            run = "okular %s";
+            desc = "Open with Okular";
+          }
+        ];
+        word = [
+          {
+            run = "wps %s";
+            desc = "Open with WPS Office";
+          }
+        ];
       };
       open = {
         # Prepend: takes precedence over yazi's defaults (which route text/*
@@ -29,6 +47,32 @@
           {
             mime = "text/*";
             use = "edit";
+          }
+          {
+            mime = "image/*";
+            use = "image";
+          }
+          {
+            mime = "application/pdf";
+            use = "pdf";
+          }
+          # Word docs (.doc / .docx)
+          {
+            mime = "application/msword";
+            use = "word";
+          }
+          {
+            mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+            use = "word";
+          }
+          # Fall back to name matching in case mime detection misses docx/doc.
+          {
+            name = "*.docx";
+            use = "word";
+          }
+          {
+            name = "*.doc";
+            use = "word";
           }
         ];
       };
