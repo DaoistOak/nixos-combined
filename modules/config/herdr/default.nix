@@ -45,7 +45,7 @@
       [ui]
       sidebar_start_collapsed = true
     '';
-    recursive = false;
+    force = true;
   };
 
   # super+f launcher: open herdr inside kitty and start yazi in a fresh

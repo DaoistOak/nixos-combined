@@ -92,6 +92,16 @@ check_git_status() {
     fi
 }
 
+# Authenticate via polkit (GUI dialog from KDE agent) instead of sudo's
+# terminal password prompt. Auth is cached, so later pkexec calls won't re-prompt.
+auth_pkexec() {
+    # Use $(command -v true): pkexec needs an absolute path and NixOS has no /bin.
+    if ! pkexec "$(command -v true)" 2>/dev/null; then
+        log_error "Failed to authenticate via pkexec"
+        return 1
+    fi
+}
+
 # Update flatpak applications and runtimes
 update_flatpak() {
     log_info "Updating flatpak applications and runtimes..."
@@ -151,7 +161,9 @@ build_home_manager() {
 switch_nixos() {
     log_info "Switching to new NixOS system..."
 
-    if nh os switch .#nixosConfigurations."$NIXOS_HOST"; then
+    # Run the switch as the user; nh escalates itself internally. Pick pkexec
+    # (GUI polkit auth) so sudo is never prompted.
+    if nh os switch --elevation-strategy pkexec .#nixosConfigurations."$NIXOS_HOST"; then
         log_success "NixOS switch successful"
         return 0
     else
@@ -256,9 +268,9 @@ execute_option() {
             echo -e "${BOLD}${GREEN}🚀 Starting comprehensive NixOS & Home-Manager update...${NC}"
             echo -e "${GREEN}==================================================${NC}"
 
-            # Ask for sudo password upfront
-            log_info "Requesting sudo access..."
-            sudo -v
+            # Ask for root access upfront (pkexec GUI auth)
+            log_info "Requesting root access via pkexec..."
+            auth_pkexec || return 1
 
             # Update phase
             update_flake_inputs
@@ -317,8 +329,8 @@ execute_option() {
             ;;
         3)
             log_info "Updating system only..."
-            log_info "Requesting sudo access..."
-            sudo -v
+            log_info "Requesting root access via pkexec..."
+            auth_pkexec || return 1
             if ! build_nixos; then
                 notify "❌ Build Failed" "NixOS build failed. Check terminal for details." "critical"
                 play_sound "$ERROR_SOUND"
@@ -365,9 +377,9 @@ execute_option() {
              echo -e "${BOLD}${GREEN}🚀 Starting comprehensive NixOS & Home-Manager update + push...${NC}"
              echo -e "${GREEN}==================================================${NC}"
 
-             # Ask for sudo password upfront
-             log_info "Requesting sudo access..."
-             sudo -v
+             # Ask for root access upfront (pkexec GUI auth)
+             log_info "Requesting root access via pkexec..."
+             auth_pkexec || return 1
 
              # Update phase
              update_flake_inputs
