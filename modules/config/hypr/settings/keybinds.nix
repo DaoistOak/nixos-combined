@@ -86,7 +86,7 @@
 
     -- 9. APPLICATION LAUNCHERS
     hl.bind(mod .. " + RETURN", hl.dsp.exec_cmd("kitty tmux"))
-    hl.bind(mod .. " + F", hl.dsp.exec_cmd("kitty -e tmux new-window yazi"))
+    hl.bind(mod .. " + F", hl.dsp.exec_cmd("kitty yazi"))
     hl.bind(mod .. " + H", hl.dsp.exec_cmd("kitty htop"))
     hl.bind(mod .. " + ALT + H", hl.dsp.exec_cmd("kitty btop"))
     hl.bind(mod .. " + ALT + RETURN", hl.dsp.exec_cmd("alacritty"))
