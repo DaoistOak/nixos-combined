@@ -56,12 +56,30 @@ resolve_json() {
   jq -c --arg t "$theme" --arg v "$variant" --arg a "$accent" '
     .[$t] as $th |
     ($th.flavors[$v]) as $f |
-    (($f.accents[$a]) // ($f.accents.default) // ($f.accents | to_entries[0].value)) as $acc |
-    {
-      theme: $t,
-      variant: $v,
-      accentName: (if $f.accents[$a] then $a else ((if $f.accents.default then "default" else ($f.accents | keys[0]) end)) end),
-      accent: $acc,
+    # A custom hex accent ("#aabbcc" / "aabbcc") bypasses the named accent map.
+    ( (($a | sub("^#"; "")) | test("^[0-9a-fA-F]{6}$")) as $isHex |
+      if $isHex then
+        ($f.accents[$a] // $f.accents.default // ($f.accents | to_entries[0].value)) as $fallback |
+        {
+          theme: $t, variant: $v,
+          accentName: ($a | sub("^#"; "")),
+          accent: ($a | sub("^#"; "")),
+          polarity: $f.polarity,
+          title: (($th.title // $t) + " " + ($f.title // $v)),
+          base: $f.base, mantle: $f.mantle, crust: $f.crust,
+          surface0: $f.surface0, surface1: $f.surface1, surface2: $f.surface2,
+          overlay0: $f.overlay0, overlay1: $f.overlay1, overlay2: $f.overlay2,
+          subtext0: $f.subtext0, subtext1: $f.subtext1,
+          text: $f.text, ansi: $f.ansi,
+          secondary: ($f.ansi[4]), tertiary: ($f.ansi[6]), hover: ($f.ansi[2])
+        }
+      else
+        (($f.accents[$a]) // ($f.accents.default) // ($f.accents | to_entries[0].value)) as $acc |
+        {
+          theme: $t,
+          variant: $v,
+          accentName: (if $f.accents[$a] then $a else ((if $f.accents.default then "default" else ($f.accents | keys[0]) end)) end),
+          accent: $acc,
       polarity: $f.polarity,
       title: (($th.title // $t) + " " + ($f.title // $v)),
       base: $f.base, mantle: $f.mantle, crust: $f.crust,
@@ -76,7 +94,9 @@ resolve_json() {
       secondary: ($f.ansi[4]),
       tertiary:  ($f.ansi[6]),
       hover:     ($f.ansi[2])
-    }' "$SCHEMES"
+    }
+      end
+    )' "$SCHEMES"
 }
 
 # Validate theme/variant exist; resolve the accent with case-insensitive names.
@@ -91,6 +111,9 @@ check_sel() {
   [[ -n "$cvariant" ]] || { echo "error: unknown variant '$variant' for '$ctheme'" >&2; die_list_variants "$ctheme"; }
   if [[ -z "$accent" ]]; then
     caccent=$(jq -r --arg t "$ctheme" --arg v "$cvariant" '.[$t].flavors[$v].accents | (if has("default") then "default" else keys[0] end)' "$SCHEMES")
+  elif grep -qiE '^#?[0-9a-f]{6}$' <<<"$accent"; then
+    # Custom hex accent: pass through raw so resolve_json injects it verbatim.
+    caccent="$accent"
   else
     caccent=$(ci_accent "$ctheme" "$cvariant" "$accent")
     [[ -n "$caccent" ]] || {

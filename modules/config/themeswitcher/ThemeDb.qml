@@ -46,6 +46,22 @@ Singleton {
         return variantAccents(themeIdx, vIdx)[aIdx]?.hex ?? "#888888";
     }
 
+    // Key-based lookups for the fuzzy-finder.
+    function themeByKey(k) {
+        const kl = (k ?? "").toLowerCase();
+        return themes.find(t => (t.key ?? "").toLowerCase() === kl) ?? null;
+    }
+    function variantByKey(themeKey, vKey) {
+        const th = themeByKey(themeKey);
+        const kl = (vKey ?? "").toLowerCase();
+        return (th?.variants ?? []).find(v => (v.key ?? "").toLowerCase() === kl) ?? null;
+    }
+    // Accent objects with a stable { key, hex, title } shape (hex prefixed with #).
+    function accentsOf(themeKey, vKey) {
+        const v = variantByKey(themeKey, vKey);
+        return (v?.accents ?? []).map(a => ({ key: a.key, hex: a.hex, title: a.key }));
+    }
+
     // Case-insensitive current-selection matches for highlighting.
     function isCurrentTheme(themeIdx) {
         if (!root.loaded || !root.currentTheme) return false;
