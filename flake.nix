@@ -56,8 +56,14 @@
         ./nixos
       ];
       flake.homeConfigurations."zeph" = inputs.home-manager.lib.homeManagerConfiguration {
+        # home-manager's pkgs is a plain nixpkgs import (no NUR overlay), so
+        # expose NUR explicitly for flake-sourced packages like the Charm
+        # `crush` package (nur.repos.charmbracelet.crush), and allow its
+        # FSL-1.1-MIT (unfree) license.
         pkgs = import inputs.nixpkgs {
           system = "x86_64-linux";
+          config.allowUnfree = true;
+          overlays = [ inputs.nur.overlays.default ];
         };
         extraSpecialArgs = { inherit inputs; };
         modules = [

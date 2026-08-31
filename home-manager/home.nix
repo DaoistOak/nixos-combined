@@ -13,6 +13,7 @@ in
   imports = [
     ../modules/config/hypr/hyprland.nix
     ../modules/config/herdr
+    ../modules/config/crush
     ../modules/config/yazi
     ../modules/config/superfile
     ../modules/config/kitty
