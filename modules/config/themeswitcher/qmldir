@@ -1,6 +1,4 @@
 singleton ThemePalette 1.0 ThemePalette.qml
 singleton ThemeDb 1.0 ThemeDb.qml
 ThemeSwitcher 1.0 ThemeSwitcher.qml
-Chip 1.0 Chip.qml
-Swatch 1.0 Swatch.qml
-SectionLabel 1.0 SectionLabel.qml
+ListRow 1.0 ListRow.qml

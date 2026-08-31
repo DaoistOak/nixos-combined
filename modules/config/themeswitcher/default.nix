@@ -4,9 +4,9 @@
   ...
 }:
 {
-  # Runtime theme switcher as a Quickshell floating capsule panel, styled after
-  # the Noctalia design language. Launched by Hyprland on startup (startup.nix)
-  # and toggled with super+t (keybinds.nix) via:
+  # Runtime theme switcher as a Quickshell fuzzy-finder, styled after the
+  # Noctalia design language. Launched by Hyprland on startup (startup.nix) and
+  # toggled with super+t (keybinds.nix) via:
   #   qs ipc -c themeswitcher call themeswitcher toggle
   #
   # The widget reads the same runtime state as scripts/theme (themes.json + the
@@ -34,16 +34,8 @@
         source = ./ThemeSwitcher.qml;
         force = true;
       };
-      "quickshell/themeswitcher/Chip.qml" = {
-        source = ./Chip.qml;
-        force = true;
-      };
-      "quickshell/themeswitcher/Swatch.qml" = {
-        source = ./Swatch.qml;
-        force = true;
-      };
-      "quickshell/themeswitcher/SectionLabel.qml" = {
-        source = ./SectionLabel.qml;
+      "quickshell/themeswitcher/ListRow.qml" = {
+        source = ./ListRow.qml;
         force = true;
       };
     };
