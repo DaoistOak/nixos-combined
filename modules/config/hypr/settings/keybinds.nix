@@ -106,6 +106,9 @@
     hl.bind(mod .. " + CONTROL + ALT + R", hl.dsp.exec_cmd("hyprctl reload"))
     hl.bind(mod .. " + ALT + D", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center"))
     hl.bind(mod .. " + ALT + N", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center notifications"))
+
+    -- 10.5 THEME SWITCHER (Quickshell floating capsule panel)
+    hl.bind(mod .. " + T", hl.dsp.exec_cmd("qs ipc -c themeswitcher call themeswitcher toggle"))
     -- 1. LAUNCHER (bare SUPER tap only, not part of a chord)
     hl.bind(mod .. " + SUPER_L", function()
       superTap.armed = true
