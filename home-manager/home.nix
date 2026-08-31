@@ -21,6 +21,7 @@ in
     ../modules/config/wezterm
     ../modules/config/tmux
     ../modules/config/colors
+    ../modules/config/themeswitcher
     ../modules/config/theme
     ../modules/config/zsh
     inputs.noctalia.homeModules.default

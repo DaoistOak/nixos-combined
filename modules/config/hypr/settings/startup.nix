@@ -153,6 +153,8 @@ in
 
             -- Quickshell overview
             hl.exec_cmd("qs -c overview")
+            -- Quickshell theme switcher (floating capsule, super+t)
+            hl.exec_cmd("qs -c themeswitcher")
             -- Launching hyprshade for window effects
             hl.exec_cmd("hyprsunset")
             hl.exec_cmd("hyprctl dispatch submap global")
