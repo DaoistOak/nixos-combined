@@ -116,7 +116,6 @@ let
     btop
     cargo
     cpufrequtils
-    crush
     curl
     jq
     direnv
