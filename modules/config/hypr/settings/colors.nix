@@ -16,14 +16,14 @@
     local th_file = os.getenv("HOME") .. "/.config/theme-switcher/hyprland-theme.lua"
     local ok, th = pcall(dofile, th_file)
     if ok and type(th) == "table" then
-      hl.settings({
-        general = {
-          col = {
-            active_border = th.active_border,
-            inactive_border = th.inactive_border or th.active_border,
-          },
-        },
-      })
+      -- hl.settings({
+      --   general = {
+      --     col = {
+      --       active_border = th.active_border,
+      --       inactive_border = th.inactive_border or th.active_border,
+      --     },
+      --   },
+      -- })
     end
   '';
 }
