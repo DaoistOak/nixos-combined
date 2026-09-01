@@ -4,11 +4,16 @@
   pkgs,
   ...
 }:
-# Tmux: static config (terminal features, status layout, keybinds, plugins) via
-# home-manager programs.tmux. Colors are NOT baked in — they live in
-# ~/.config/theme-switcher/tmux-theme.conf (rewritten by scripts/theme on
-# ./theme set ...) and are loaded with source-file, so no rebuild to switch and
-# the same file themes any theme in the DB.
+# Tmux: terminal features, keybinds and the official catppuccin/tmux status bar
+# via home-manager programs.tmux (tmuxPlugins.catppuccin).
+#
+# Runtime theme switching: the catppuccin plugin sources a per-flavor
+# themes/catppuccin_<flavor>_tmux.conf that defines @thm_* colors, and builds the
+# bar from #{@thm_*} format strings that expand lazily at render time. We pick a
+# base flavor for the plugin, then source ~/.config/theme-switcher/tmux-theme.conf
+# (rewritten by scripts/theme on ./theme set ...) AFTER the plugin so its @thm_*
+# values override the flavor defaults — recoloring the whole bar on every switch
+# with no rebuild.
 {
   programs.tmux = {
     enable = true;
@@ -20,6 +25,16 @@
     plugins = with pkgs.tmuxPlugins; [
       sensible
       vim-tmux-navigator
+      {
+        plugin = catppuccin;
+        # These options are read by the plugin at load time (before its
+        # run-shell), so they must be set here in the plugin's own extraConfig —
+        # the main extraConfig runs after all plugins.
+        extraConfig = ''
+          set -g @catppuccin_flavor "mocha"
+          set -g @catppuccin_window_status_style "rounded"
+        '';
+      }
     ];
 
     extraConfig = ''
@@ -45,42 +60,23 @@
       set-window-option -g pane-base-index 1
       set-option -g renumber-windows on
 
-      # ------------------------------------------------------------------
-      # Native pill status bar (no theming plugin).
-      #
-      # COLORS are NOT baked in — they come from runtime tmux variables
-      # (@thm_tab_*, @thm_m_*) defined in ~/.config/theme-switcher/tmux-theme.conf
-      # (rewritten by scripts/theme on ./theme set ... and sourced at the end).
-      # The format strings use `set -g` (not -gF), so the #{@thm_*} refs expand
-      # at render time and a theme switch recolors the whole bar with no rebuild.
-      # The pill half-circle separator glyphs are  (left) and  (right).
-      #
-      # Transparent bar, tabs left-justified, modules on the right.
-      set -g status-style "bg=default"
-      set -g status-justify left
-      set -g status-left ""
+      # Status line module pills (self-contained — no extra tmux plugins needed).
+      # The catppuccin plugin defines @catppuccin_status_<module>; runtime @thm_*
+      # overrides (sourced at the end) recolor them on every theme switch.
       set -g status-left-length 100
       set -g status-right-length 150
-
-      # --- WINDOW TABS (Left side) ---
-      # Each tab: pill (index) + body (name). One quoted value per command.
-      set -g window-status-format "#[fg=#{@thm_tab_inactive},bg=default] #[fg=#{@thm_on_pill},bg=#{@thm_tab_inactive}] #I #[fg=#{@thm_tab_fg},bg=#{@thm_tab_bg}] #W #[fg=#{@thm_tab_bg},bg=default]"
-      set -g window-status-current-format "#[fg=#{@thm_tab_accent},bg=default] #[fg=#{@thm_on_pill},bg=#{@thm_tab_accent}] #I #[fg=#{@thm_tab_fg},bg=#{@thm_tab_bg}] #W #[fg=#{@thm_tab_bg},bg=default]"
-      set -g window-status-separator ""
-
-      # --- STATUS MODULES (Right side) ---
-      # Each module is a pill: colored icon+body segment.
-      set -g status-right ""
-      set -ag status-right "#[fg=#{@thm_m_user},bg=default] #[fg=#{@thm_on_pill},bg=#{@thm_m_user}]  #[fg=#{@thm_tab_fg},bg=#{@thm_tab_bg}] #(basename "$SHELL") #[fg=#{@thm_tab_bg},bg=default]"
-      set -ag status-right "#[fg=#{@thm_m_battery},bg=default] #[fg=#{@thm_on_pill},bg=#{@thm_m_battery}] #[fg=#{@thm_tab_fg},bg=#{@thm_tab_bg}] #(cat /sys/class/power_supply/BAT0/capacity 2>/dev/null || echo ?)% #[fg=#{@thm_tab_bg},bg=default]"
-      set -ag status-right "#[fg=#{@thm_m_cpu},bg=default] #[fg=#{@thm_on_pill},bg=#{@thm_m_cpu}] #[fg=#{@thm_tab_fg},bg=#{@thm_tab_bg}] #(ps -eo %cpu --sort=-%cpu | head -2 | tail -1 | tr -d ' ')% #[fg=#{@thm_tab_bg},bg=default]"
-      set -ag status-right "#[fg=#{@thm_m_uptime},bg=default] #[fg=#{@thm_on_pill},bg=#{@thm_m_uptime}] #[fg=#{@thm_tab_fg},bg=#{@thm_tab_bg}] #(uptime -p | sed 's/^up //; s/,.*//') #[fg=#{@thm_tab_bg},bg=default]"
+      set -g status-left ""
+      set -g status-right "#{E:@catppuccin_status_application}"
+      set -ag status-right "#{E:@catppuccin_status_session}"
+      set -ag status-right "#{E:@catppuccin_status_user}"
+      set -ag status-right "#{E:@catppuccin_status_uptime}"
 
       # Keybinds
       bind-key v split-window -v -c "#{pane_current_path}"
       bind-key b split-window -h -c "#{pane_current_path}"
 
-      # Runtime theme (rewritten by scripts/theme, no rebuild to switch).
+      # Runtime theme. Sourced AFTER the plugin so our @thm_* values override the
+      # flavor defaults; rewritable by scripts/theme for hot-swapping.
       source-file ~/.config/theme-switcher/tmux-theme.conf
     '';
   };

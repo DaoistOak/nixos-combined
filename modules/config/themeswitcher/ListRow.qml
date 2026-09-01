@@ -8,32 +8,33 @@ import "."
 Item {
     id: row
     required property string title
-    property bool selected: false   // the currently-active theme / current accent
-    property bool active: false     // highlighted via arrow-key navigation
-    property bool custom: false     // renders as the Custom hex row
-    property string hex: ""         // optional accent swatch color
-    property string sub: ""         // optional secondary text (e.g. polarity)
+    property bool selected: false
+    property bool active: false
+    property bool custom: false
+    property string hex: ""
+    property string sub: ""
     signal clicked()
 
-    height: 34
+    height: 40
 
-    // Active (arrow-key) row: primaryContainer tint w/ primary accent bar.
     Rectangle {
         id: highlight
         anchors.fill: parent
         radius: ThemePalette.roundingVerysmall
         color: row.active
             ? ThemePalette.colPrimaryContainer
-            : (hover.hovered
-                ? ThemePalette.colLayer2Hover
-                : "transparent")
+            : (hover.hovered ? ThemePalette.colLayer2Hover : "transparent")
         Behavior on color { ColorAnimation { duration: 90 } }
     }
+
     Rectangle {
         visible: row.active
-        x: 4
         width: 3
-        height: 16
+        Layout.fillHeight: true
+        anchors.left: parent.left
+        anchors.leftMargin: 6
+        anchors.topMargin: 8
+        anchors.bottomMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         radius: 1.5
         color: ThemePalette.colPrimary
@@ -41,11 +42,11 @@ Item {
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: 12
-        anchors.rightMargin: 10
-        spacing: 6
+        anchors.leftMargin: 14
+        anchors.rightMargin: 12
+        spacing: 8
 
-        // Accent color dot (only for accent/custom rows).
+        // Accent swatch dot (accent/custom rows only).
         Rectangle {
             visible: row.hex !== ""
             Layout.preferredWidth: 14
@@ -71,29 +72,30 @@ Item {
             font.family: ThemePalette.fontFamily
             font.pixelSize: ThemePalette.fontSmall
             elide: Text.ElideRight
+            verticalAlignment: Text.AlignVCenter
             color: row.custom
                 ? ThemePalette.colPrimary
                 : row.active ? ThemePalette.colOnPrimaryContainer : ThemePalette.colOnLayer2
             opacity: row.active ? 1 : (row.selected ? 0.95 : 0.8)
         }
 
-        // Sub text (dark/light marker above)
+        // Sub text (e.g. polarity marker)
         Text {
             visible: row.sub !== ""
             text: row.sub
             font.family: ThemePalette.fontFamily
             font.pixelSize: ThemePalette.fontSmaller
-            Layout.leftMargin: 4
+            Layout.leftMargin: 6
             color: row.active ? ThemePalette.colOnPrimaryContainer : ThemePalette.colOnLayer1
         }
 
-        // "current" check accent
+        // Current check
         Text {
             visible: row.selected
             text: "✓"
             font.family: ThemePalette.fontFamily
             font.pixelSize: ThemePalette.fontSmall
-            Layout.leftMargin: 2
+            Layout.leftMargin: 4
             color: ThemePalette.colPrimary
         }
     }
