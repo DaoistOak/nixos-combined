@@ -5,13 +5,19 @@
   ...
 }:
 
+let
+  t = import ../colors/themes.nix { inherit lib; };
+  sel = t.readSelection ../colors/selection;
+in
 {
   stylix = {
     enable = true;
-    polarity = "dark";
+    polarity = sel.r.polarity;
     image = ./wallpaper;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-macchiato.yaml";
-    override.base0D = "c6a0f6";
+    # Derived from the active theme selection (modules/config/colors/selection,
+    # updated by scripts/theme), so switching theme/accent and rebuilding makes
+    # Stylix' GTK/KDE/Qt outputs follow. base0D carries the selected accent.
+    base16Scheme = t.toBase16 sel.r;
     cursor = {
       package = pkgs.catppuccin-cursors.macchiatoLight;
       name = "Catppuccin-Macchiato-Light-Cursors";
