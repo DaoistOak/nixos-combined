@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 #
-# theme — hot-swap the desktop colour scheme at runtime (no rebuild).
+# theme — switch the desktop colour scheme and keep Stylix in sync.
+#
+# Terminal/tmux/noctalia/icon changes apply live (no rebuild). Stylix
+# (GTK/KDE/Qt/..) renders its colors at build time, so `theme set` also writes
+# the tracked modules/config/colors/selection file and rebuilds home-manager so
+# the desktop follows the same selection. Pass --runtime to skip the rebuild and
+# --system to ALSO switch the NixOS system (console/plymouth; needs polkit).
 #
 # Reads the generic theme DB exported by modules/config/colors and drives:
 #   * The four terminals via runtime theme files that their declarative
@@ -25,6 +31,10 @@ set -euo pipefail
 SCHEMES="$HOME/.local/share/theme-switcher/themes.json"
 STATE="$HOME/.local/share/theme-switcher/current"
 CFG="$HOME/.config/theme-switcher"
+
+# Tracked build-time selection (drives Stylix + build-time defaults).
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SELECTION="$REPO_ROOT/modules/config/colors/selection"
 
 PALETTES_DIR="$HOME/.config/noctalia/palettes"
 PALETTE_NAME="themeswapper"
@@ -428,6 +438,29 @@ apply() {
   notify-send "Theme" "Switched to $label" >/dev/null 2>&1 || true
 }
 
+# Persist the selection into the tracked repo file so build-time consumers
+# (Stylix on the home + system side, the catppuccin module) follow it.
+write_selection() {
+  mkdir -p "$(dirname "$SELECTION")"
+  printf '%s %s %s\n' "$(f '.theme')" "$(f '.variant')" "$(f '.accentName')" > "$SELECTION"
+}
+
+# Rebuild home-manager so Stylix (GTK/KDE/Qt/..) picks up the new selection.
+rebuild_stylix() {
+  local label="$1"
+  echo "Rebuilding home-manager so Stylix (GTK/KDE/Qt/..) follows..."
+  if ( cd "$REPO_ROOT" && home-manager switch --flake .#zeph ); then
+    # Persist the selection in git so future clean builds stay consistent.
+    ( cd "$REPO_ROOT" \
+      && git add modules/config/colors/selection \
+      && git commit -m "Theme: $label" --quiet ) || true
+    echo "✓ Stylix updated to '$label'"
+  else
+    echo "error: home-manager rebuild failed (Stylix not updated)" >&2
+    return 1
+  fi
+}
+
 cmd_set() {
   check_sel "$@"
   local polarity
@@ -437,8 +470,20 @@ cmd_set() {
   set_noctalia_theme "$polarity"
   mkdir -p "$(dirname "$STATE")"
   printf '%s %s %s\n' "$(f '.theme')" "$(f '.variant')" "$(f '.accentName')" > "$STATE"
+  write_selection
   apply "$(f '.title') ($(f '.accentName'))"
   echo "theme: $(f '.title') / $(f '.accentName')"
+  if [[ "${RUNTIME_ONLY:-0}" == "0" ]]; then
+    rebuild_stylix "$(f '.title') ($(f '.accentName'))" || return 1
+    if [[ "${SYSTEM_SWITCH:-0}" == "1" ]]; then
+      echo "Switching NixOS system (console/plymouth follow)..."
+      ( cd "$REPO_ROOT" \
+        && nh os switch --elevation-strategy pkexec .#nixosConfigurations.Overlord ) \
+        || { echo "error: system switch failed" >&2; return 1; }
+    fi
+  else
+    echo "(skipping rebuild: --runtime)"
+  fi
 }
 
 cmd_list() {
@@ -458,25 +503,51 @@ cmd_current() {
   fi
 }
 
-cmd="${1:-}"
-if [[ "$cmd" == "set" ]]; then
-  shift
-  cmd_set "${1:?theme required}" "${2:?variant required}" "${3:-}"
-elif [[ "$cmd" =~ ^(list|-l)$ ]]; then
-  cmd_list
-elif [[ "$cmd" =~ ^(current|status)$ ]]; then
-  cmd_current
-elif [[ "$cmd" =~ ^(help|-h|--help)$ ]]; then
+usage() {
   echo "usage:"
-  echo "  $0 <theme> <variant> [accent]"
-  echo "  $0 set <theme> <variant> [accent]"
+  echo "  $0 <theme> <variant> [accent] [--runtime] [--system]"
+  echo "  $0 set <theme> <variant> [accent] [--runtime] [--system]"
   echo "  $0 list"
   echo "  $0 current"
+  echo
+  echo "  --runtime  hot-swap terminals/tmux only (skip the Stylix rebuild)"
+  echo "  --system   also switch the NixOS system (console/plymouth; polkit)"
+}
+
+cmd="${1:-}"
+
+# Position-independent flags; everything else is treated as the theme selection.
+RUNTIME_ONLY=0
+SYSTEM_SWITCH=0
+SEL_ARGS=()
+for a in "$@"; do
+  case "$a" in
+    --runtime) RUNTIME_ONLY=1 ;;
+    --system) SYSTEM_SWITCH=1 ;;
+    set) : ;; # subcommand keyword
+    *) SEL_ARGS+=("$a") ;;
+  esac
+done
+
+if [[ "$cmd" == "set" ]]; then
+  cmd_set "${SEL_ARGS[0]:?theme required}" "${SEL_ARGS[1]:?variant required}" "${SEL_ARGS[2]:-}"
   exit 0
-elif [[ -n "$cmd" ]]; then
-  # Bare form: theme variant optional-accent
-  cmd_set "$cmd" "${2:?variant required}" "${3:-}"
+fi
+handled=0
+case "$cmd" in
+  list | -l) cmd_list; handled=1 ;;
+  current | status) cmd_current; handled=1 ;;
+  help | -h | --help)
+    usage
+    handled=1
+    ;;
+esac
+if [[ "$handled" -eq 1 ]]; then
+  exit 0
+fi
+if [[ ${#SEL_ARGS[@]} -gt 0 ]]; then
+  cmd_set "${SEL_ARGS[0]}" "${SEL_ARGS[1]:?variant required}" "${SEL_ARGS[2]:-}"
 else
-  echo "usage: $0 {<theme> <variant> [accent] | set <theme> <variant> [accent] | list | current}" >&2
+  usage >&2
   exit 1
 fi

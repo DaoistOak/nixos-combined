@@ -41,6 +41,11 @@ let
     name = "EFI/Microsoft" + (lib.removePrefix "." k);
     value = v;
   }) (collectFiles "." winBootDir);
+
+  # Theme selection driving system-level Stylix (console/plymouth). Same source
+  # of truth as home-manager's Stylix — see modules/config/colors/themes.nix.
+  themeMod = import ../modules/config/colors/themes.nix { inherit lib; };
+  themeSel = themeMod.readSelection ../modules/config/colors/selection;
 in
 {
   imports = [
@@ -198,7 +203,7 @@ in
   # Stylix theming
   stylix = {
     enable = true;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-macchiato.yaml";
+    base16Scheme = themeMod.toBase16 themeSel.r;
     image = null;
     targets.console.enable = true;
     targets.plymouth.enable = true;

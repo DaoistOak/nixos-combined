@@ -8,6 +8,13 @@
 
 let
   user-packages = (import ../pkgs/default.nix { inherit pkgs inputs; }).user-packages;
+  themeMod = import ../modules/config/colors/themes.nix { inherit lib; };
+  themeSel = themeMod.readSelection ../modules/config/colors/selection;
+  catppuccinAccent =
+    if themeMod.themes.catppuccin.flavors.macchiato.accents ? ${themeSel.accentName} then
+      themeSel.accentName
+    else
+      "mauve";
 in
 {
   imports = [
@@ -37,10 +44,14 @@ in
   home.pointerCursor.enable = true;
   wayland.windowManager.hyprland.configType = "lua";
   catppuccin = {
-    enable = true;
+    enable = themeSel.themeName == "catppuccin";
     autoEnable = true;
-    flavor = "macchiato";
-    accent = "mauve";
+    flavor =
+      if builtins.hasAttr themeSel.flavorName themeMod.themes.catppuccin.flavors then
+        themeSel.flavorName
+      else
+        "macchiato";
+    accent = catppuccinAccent;
     # These terminals are owned by modules/config/{kitty,alacritty,wezterm,tmux}
     # which draw from the centralized colors.active palette; keep the catppuccin
     # module from also theming them.
