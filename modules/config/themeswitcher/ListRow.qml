@@ -2,9 +2,10 @@ import QtQuick
 import QtQuick.Layouts
 import "."
 
-// A full-width selectable row in the fuzzy-find list, styled with the Noctalia
-// design language: layered surface highlight on hover, primary-tinted active
-// (arrow-key) row, a "current" check accent, and a swatch dot for accent rows.
+// A full-width selectable row in the fuzzy-find list. Pure anchor-based layout:
+// the check and swatch cells are always reserved (fixed width, children hidden
+// when inactive), so the title starts at a constant x on every row and every
+// glyph is pinned to the row's vertical center.
 Item {
     id: row
     required property string title
@@ -15,6 +16,7 @@ Item {
     property string sub: ""
     signal clicked()
 
+    width: parent.width
     height: 40
 
     Rectangle {
@@ -30,27 +32,46 @@ Item {
     Rectangle {
         visible: row.active
         width: 3
-        Layout.fillHeight: true
         anchors.left: parent.left
         anchors.leftMargin: 6
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
         anchors.topMargin: 8
         anchors.bottomMargin: 8
-        anchors.verticalCenter: parent.verticalCenter
         radius: 1.5
         color: ThemePalette.colPrimary
     }
 
-    RowLayout {
-        anchors.fill: parent
+    // Check cell (always reserved so the title never shifts).
+    Item {
+        id: checkCell
+        width: 18
+        anchors.left: parent.left
         anchors.leftMargin: 14
-        anchors.rightMargin: 12
-        spacing: 8
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        Text {
+            anchors.centerIn: parent
+            visible: row.selected
+            text: "✓"
+            font.family: ThemePalette.fontFamily
+            font.pixelSize: ThemePalette.fontSmall
+            color: ThemePalette.colPrimary
+        }
+    }
 
-        // Accent swatch dot (accent/custom rows only).
+    // Swatch cell (always reserved).
+    Item {
+        id: swatchCell
+        width: 18
+        anchors.left: checkCell.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
         Rectangle {
+            anchors.centerIn: parent
             visible: row.hex !== ""
-            Layout.preferredWidth: 14
-            Layout.preferredHeight: 14
+            width: 14
+            height: 14
             radius: 7
             color: row.hex
             border.color: ThemePalette.applyAlpha(ThemePalette.colOutline, 0.5)
@@ -64,40 +85,40 @@ Item {
                 rotation: 45
             }
         }
+    }
 
-        // Title
+    // Sub text cell (always reserved; marker shown only when present).
+    Item {
+        id: subCell
+        width: 24
+        anchors.right: parent.right
+        anchors.rightMargin: 12
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
         Text {
-            Layout.fillWidth: true
-            text: row.title
-            font.family: ThemePalette.fontFamily
-            font.pixelSize: ThemePalette.fontSmall
-            elide: Text.ElideRight
-            verticalAlignment: Text.AlignVCenter
-            color: row.custom
-                ? ThemePalette.colPrimary
-                : row.active ? ThemePalette.colOnPrimaryContainer : ThemePalette.colOnLayer2
-            opacity: row.active ? 1 : (row.selected ? 0.95 : 0.8)
-        }
-
-        // Sub text (e.g. polarity marker)
-        Text {
+            anchors.centerIn: parent
             visible: row.sub !== ""
             text: row.sub
             font.family: ThemePalette.fontFamily
             font.pixelSize: ThemePalette.fontSmaller
-            Layout.leftMargin: 6
+            horizontalAlignment: Text.AlignHCenter
             color: row.active ? ThemePalette.colOnPrimaryContainer : ThemePalette.colOnLayer1
         }
+    }
 
-        // Current check
-        Text {
-            visible: row.selected
-            text: "✓"
-            font.family: ThemePalette.fontFamily
-            font.pixelSize: ThemePalette.fontSmall
-            Layout.leftMargin: 4
-            color: ThemePalette.colPrimary
-        }
+    // Title (fills between the cells and the sub cell).
+    Text {
+        text: row.title
+        font.family: ThemePalette.fontFamily
+        font.pixelSize: ThemePalette.fontSmall
+        elide: Text.ElideRight
+        anchors.left: swatchCell.right
+        anchors.right: subCell.left
+        anchors.verticalCenter: parent.verticalCenter
+        color: row.custom
+            ? ThemePalette.colPrimary
+            : row.active ? ThemePalette.colOnPrimaryContainer : ThemePalette.colOnLayer2
+        opacity: row.active ? 1 : (row.selected ? 0.95 : 0.8)
     }
 
     MouseArea {

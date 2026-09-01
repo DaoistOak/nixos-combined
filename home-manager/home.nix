@@ -79,6 +79,15 @@ in
 
   programs.noctalia = {
     enable = true;
+    # The noctalia homeModule defaults to custom_palette = "stylix"; override so
+    # config.toml points at the runtime themeswapper palette written by
+    # scripts/theme (gen_noctalia_palette) — that's what makes live theme
+    # switches recolour the shell immediately.
+    settings.theme = lib.mkForce {
+      source = "custom";
+      custom_palette = "themeswapper";
+      mode = if themeSel.r.polarity == "light" then "light" else "dark";
+    };
   };
 
   home.sessionVariables = {

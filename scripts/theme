@@ -5,7 +5,8 @@
 # Terminal/tmux/noctalia/icon changes apply live (no rebuild). Stylix
 # (GTK/KDE/Qt/..) renders its colors at build time, so `theme set` also writes
 # the tracked modules/config/colors/selection file and rebuilds home-manager so
-# the desktop follows the same selection. Pass --runtime to skip the rebuild and
+# the desktop follows the same selection. Noctalia's config.toml (HM-managed)
+# is also updated by the rebuild. Pass --runtime to skip the rebuild and
 # --system to ALSO switch the NixOS system (console/plymouth; needs polkit).
 #
 # Reads the generic theme DB exported by modules/config/colors and drives:
@@ -15,9 +16,9 @@
 #       - alacritty  ~/.config/theme-switcher/alacritty-theme.toml
 #       - wezterm    ~/.config/theme-switcher/wezterm-theme.lua
 #       - tmux       ~/.config/theme-switcher/tmux-theme.conf
-#   * Noctalia v5 native theming (palette JSON + [theme] header)
+#   * Noctalia v5+ native theming (palette JSON + config.toml via HM)
 #   * The GTK/Qt icon theme (Papirus) + gsettings dark/light
-#   * Live reloads (kitty USR1, tmux source-file, Noctalia, hyprctl)
+#   * Live reloads (kitty USR1, tmux source-file, noctalia msg config-reload + templates-apply, hyprctl)
 #
 # Usage:
 #   theme Catppuccin Macchiato Mauve     Switch to a theme/variant/accent
@@ -39,7 +40,6 @@ SELECTION="$REPO_ROOT/modules/config/colors/selection"
 PALETTES_DIR="$HOME/.config/noctalia/palettes"
 PALETTE_NAME="themeswapper"
 PALETTE_JSON="$PALETTES_DIR/$PALETTE_NAME.json"
-NOCTALIA_CFG="$HOME/.config/noctalia/noctalia-config.toml"
 
 require() { command -v "$1" >/dev/null 2>&1 || { echo "error: $1 not found" >&2; exit 1; }; }
 [[ -f "$SCHEMES" ]] || { echo "error: $SCHEMES missing (rebuild home-manager)" >&2; exit 1; }
@@ -100,11 +100,11 @@ resolve_json() {
           secondary: ($f.ansi[4]), tertiary: ($f.ansi[6]), hover: ($f.ansi[2])
         }
       else
-        (($f.accents[$a]) // ($f.accents.default) // ($f.accents | to_entries[0].value)) as $acc |
+        ((if $a == "default" then $f.text else (($f.accents[$a]) // ($f.accents.default) // ($f.accents | to_entries[0].value)) end)) as $acc |
         {
           theme: $t,
           variant: $v,
-          accentName: (if $f.accents[$a] then $a else ((if $f.accents.default then "default" else ($f.accents | keys[0]) end)) end),
+          accentName: (if $a == "default" then "default" else (if $f.accents[$a] then $a else ((if $f.accents.default then "default" else ($f.accents | keys[0]) end)) end) end),
           accent: $acc,
       polarity: $f.polarity,
       title: (($th.title // $t) + " " + ($f.title // $v)),
@@ -138,6 +138,9 @@ check_sel() {
   [[ -n "$cvariant" ]] || { echo "error: unknown variant '$variant' for '$ctheme'" >&2; die_list_variants "$ctheme"; }
   if [[ -z "$accent" ]]; then
     caccent=$(jq -r --arg t "$ctheme" --arg v "$cvariant" '.[$t].flavors[$v].accents | (if has("default") then "default" else keys[0] end)' "$SCHEMES")
+  elif [[ "${accent,,}" == "default" ]]; then
+    # "Default" accent = the theme's primary text color.
+    caccent="default"
   elif grep -qiE '^#?[0-9a-f]{6}$' <<<"$accent"; then
     # Custom hex accent: pass through raw so resolve_json injects it verbatim.
     caccent="$accent"
@@ -317,40 +320,6 @@ POWERLEVEL9K_DIR_BACKGROUND=$p10k_dir_bg
 EOF
 }
 
-# Point Noctalia's [theme] section at our palette.
-set_noctalia_theme() {
-  local polarity="$1"
-  local mode
-  case "$polarity" in
-    light) mode="light" ;;
-    *) mode="dark" ;;
-  esac
-  [[ -f "$NOCTALIA_CFG" ]] || return 0
-  if grep -q '^\[theme\]' "$NOCTALIA_CFG"; then
-    python3 - "$NOCTALIA_CFG" "$PALETTE_NAME" "$mode" <<'PY'
-import sys, re
-path, name, mode = sys.argv[1:4]
-lines = open(path).read().splitlines()
-out, in_theme = [], False
-for ln in lines:
-    s = ln.strip()
-    if s == '[theme]':
-        in_theme = True; out.append(ln); continue
-    if in_theme and s.startswith('[') and not s.startswith('[theme.'):
-        in_theme = False
-    if in_theme:
-        if re.match(r'^source\s*=', s):      out.append('source = "custom"'); continue
-        if re.match(r'^custom_palette\s*=', s): out.append(f'custom_palette = "{name}"'); continue
-        if re.match(r'^mode\s*=', s):        out.append(f'mode = "{mode}"'); continue
-        if s.startswith('builtin'):          continue
-    out.append(ln)
-open(path, 'w').write('\n'.join(out) + '\n')
-PY
-  else
-    printf '\n[theme]\nsource = "custom"\ncustom_palette = "%s"\nmode = "%s"\n' "$PALETTE_NAME" "$mode" >> "$NOCTALIA_CFG"
-  fi
-}
-
 # Build the Noctalia palette JSON for the resolved roles + accent.
 gen_noctalia_palette() {
   mkdir -p "$PALETTES_DIR"
@@ -430,8 +399,8 @@ apply() {
   fi
   # Noctalia + Hyprland
   if command -v noctalia >/dev/null 2>&1; then
-    noctalia msg config reload >/dev/null 2>&1 || true
-    noctalia msg templates apply >/dev/null 2>&1 || true
+    noctalia msg config-reload >/dev/null 2>&1 || true
+    noctalia msg templates-apply >/dev/null 2>&1 || true
   fi
   hyprctl reload >/dev/null 2>&1 || true
   # wezterm auto-reloads via its watch list when the theme file changes.
@@ -467,14 +436,13 @@ cmd_set() {
   polarity=$(f '.polarity')
   gen_noctalia_palette
   write_runtime_files
-  set_noctalia_theme "$polarity"
   mkdir -p "$(dirname "$STATE")"
   printf '%s %s %s\n' "$(f '.theme')" "$(f '.variant')" "$(f '.accentName')" > "$STATE"
   write_selection
-  apply "$(f '.title') ($(f '.accentName'))"
-  echo "theme: $(f '.title') / $(f '.accentName')"
+  local label="$(f '.title') ($(f '.accentName'))"
+  echo "theme: $label"
   if [[ "${RUNTIME_ONLY:-0}" == "0" ]]; then
-    rebuild_stylix "$(f '.title') ($(f '.accentName'))" || return 1
+    rebuild_stylix "$label" || return 1
     if [[ "${SYSTEM_SWITCH:-0}" == "1" ]]; then
       echo "Switching NixOS system (console/plymouth follow)..."
       ( cd "$REPO_ROOT" \
@@ -484,6 +452,7 @@ cmd_set() {
   else
     echo "(skipping rebuild: --runtime)"
   fi
+  apply "$label"
 }
 
 cmd_list() {
