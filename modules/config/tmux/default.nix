@@ -71,10 +71,10 @@
       # Window list (left). Active window: mint pill index + slate path.
       set -g window-status-separator " "
       set -g window-status-format " #[fg=#{@thm_overlay_1},bg=#{@thm_bg}]#{window_index}:#{window_name} "
-      set -g window-status-current-format "#[fg=#{@thm_green},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{@thm_green}] #{window_index} #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #{=40:#{window_name}} #[fg=#{@thm_surface_0},bg=#{@thm_bg}]"
+      set -g window-status-current-format "#[fg=#{@thm_green},bg=colour0]#[fg=#{@thm_bg},bg=#{@thm_green}]#{window_index} #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #{=40:#{window_name}} #[fg=#{@thm_surface_0},bg=#{@thm_bg}]"
 
-      # Right modules (Active Process, Sessions, User, Uptime).
-      set -g status-right "#[fg=#{@thm_maroon},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{@thm_maroon}]  #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #{pane_current_command} #[default] #[fg=#{@thm_green},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{@thm_green}]  #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #{session_windows} #[default] #[fg=#{@thm_sky},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{@thm_sky}]  #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #{user} #[default] #[fg=#{@thm_sapphire},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{@thm_sapphire}]  #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #(${config.home.homeDirectory}/.config/tmux/uptime.sh) #[default]"
+      # Right modules (Active Process, Sessions, Uptime).
+      set -g status-right "#[fg=#{@thm_maroon},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{@thm_maroon}]󰇅󰟀 #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #{pane_current_command} #[default] #[fg=#{@thm_green},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{@thm_green}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #{session_windows} #[default] #[fg=#{@thm_sapphire},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{@thm_sapphire}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #(${config.home.homeDirectory}/.config/tmux/uptime.sh) #[fg=#{@thm_surface_0},bg=colour0]"
 
       # Keybinds
       bind-key v split-window -v -c "#{pane_current_path}"

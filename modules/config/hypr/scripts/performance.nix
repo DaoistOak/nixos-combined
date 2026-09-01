@@ -8,6 +8,10 @@ let
   isEnabled = (config.wayland.windowManager.hyprland.settings.config.animations.enabled or true);
   gapsIn = (config.wayland.windowManager.hyprland.settings.config.general.gaps_in or 3);
   gapsOut = (config.wayland.windowManager.hyprland.settings.config.general.gaps_out or 4);
+  rounding = (config.wayland.windowManager.hyprland.settings.config.decoration.rounding or 14);
+  shadowEnabled = (
+    config.wayland.windowManager.hyprland.settings.config.decoration.shadow.enabled or true
+  );
 in
 {
   xdg.configFile."hypr/scripts/toggle-performance.sh" = {
@@ -33,7 +37,9 @@ in
         "$HYPRCTL_BIN" eval 'hl.config({
           animations = { enabled = ${lib.boolToString isEnabled} },
           general = { gaps_in = ${toString gapsIn}, gaps_out = ${toString gapsOut} },
-          decoration = { active_opacity = 1.0, inactive_opacity = 1.0 },
+          decoration = { active_opacity = 1.0, inactive_opacity = 1.0,
+            rounding = ${toString rounding},
+            shadow = { enabled = ${lib.boolToString shadowEnabled} } },
         })'
         rm -f "$STATE_FILE"
         "$NOTIFY" -i media-playback-stop "Performance mode" "Previous desktop settings restored"
@@ -45,9 +51,10 @@ in
         "$HYPRCTL_BIN" eval 'hl.config({
           animations = { enabled = false },
           general = { gaps_in = 0, gaps_out = 0 },
-          decoration = { active_opacity = 1.0, inactive_opacity = 1.0 },
+          decoration = { active_opacity = 1.0, inactive_opacity = 1.0,
+            rounding = 0, shadow = { enabled = false } },
         })'
-        "$NOTIFY" -i media-playback-start "Performance mode" "Animations, gaps and transparency disabled"
+        "$NOTIFY" -i media-playback-start "Performance mode" "Animations, gaps, shadows and rounding disabled"
       fi
     '';
   };
