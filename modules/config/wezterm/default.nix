@@ -20,6 +20,8 @@
       hide_tab_bar_if_only_one_tab = true;
       window_decorations = "RESIZE";
       default_prog = [ "zsh" ];
+      # Transparent-ish background, mirroring kitty's background_opacity.
+      window_background_opacity = 0.60;
     };
 
     extraConfig = ''
