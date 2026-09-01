@@ -152,6 +152,14 @@ edit_file() {
 # ---------------------------------------------------------------------------
 autoload -Uz add-zsh-hook
 
+# Re-source the theme-switcher's p10k overrides on every prompt so a
+# mid-session `./theme set ...` recolors POWERLEVEL9K_DIR_BACKGROUND
+# (and any future p10k overrides) on the next render.
+theme_p10k_sync() {
+  [[ -f "$HOME/.config/theme-switcher/p10k-theme.zsh" ]] && source "$HOME/.config/theme-switcher/p10k-theme.zsh"
+}
+add-zsh-hook precmd theme_p10k_sync
+
 # 1) List directory contents after every cd (mirrors the `ls` alias).
 chpwd_ls() {
   setopt localoptions aliases
