@@ -33,10 +33,17 @@
         builtin_box_drawing = true;
       };
 
+      # Transparent-ish background window, mirroring kitty's background_opacity.
+      window.opacity = 0.60;
+
       # Runtime-swappable colors (scripts/theme rewrites the imported file).
       general.import = [
         "~/.config/theme-switcher/alacritty-theme.toml"
       ];
     };
   };
+
+  # home-manager's programs.alacritty writes alacritty.toml; force clobber the
+  # legacy unmanaged file at ~/.config/alacritty/alacritty.toml.
+  xdg.configFile."alacritty/alacritty.toml".force = true;
 }
