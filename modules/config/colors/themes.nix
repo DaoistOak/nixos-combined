@@ -274,7 +274,6 @@ let
           subtext1 = "c9ced8";
           text = "f8f8f2"; # foreground
           accents = {
-            default = "bd93f9"; # purple
             purple = "bd93f9";
             green = "50fa7b";
             cyan = "8be9fd";
@@ -312,19 +311,16 @@ let
   # Pure-builtin string helpers (kept dependency-free on purpose: { lib } is
   # still accepted for call-site compatibility, but the logic below must not
   # rely on any lib.* attribute).
-  stripHash = s:
-    if builtins.substring 0 1 s == "#" then
-      builtins.substring 1 (-1) s
-    else
-      s;
+  stripHash = s: if builtins.substring 0 1 s == "#" then builtins.substring 1 (-1) s else s;
 
   # Split on single spaces, drop empties and newlines. Handles the persisted
   # "theme flavor accent\n" selection file. (builtins.split yields the
   # separators themselves as inert `[ ]` entries — drop anything non-string.)
-  words = s:
-    builtins.filter (
-      x: builtins.typeOf x == "string" && x != ""
-    ) (builtins.split " " (builtins.replaceStrings [ "\n" ] [ "" ] s));
+  words =
+    s:
+    builtins.filter (x: builtins.typeOf x == "string" && x != "") (
+      builtins.split " " (builtins.replaceStrings [ "\n" ] [ "" ] s)
+    );
 
   # Resolve a raw variant slot into normalized roles given a chosen accent name.
   # Returns raw hex (no '#'). Supports custom hex accents ("#aabbcc" / "aabbcc")
@@ -336,6 +332,8 @@ let
       resolvedAccent =
         if v.accents ? ${accent} then
           v.accents.${accent}
+        else if accent == "default" then
+          v.text
         else if isHex accent then
           stripped
         else
@@ -344,7 +342,7 @@ let
     {
       polarity = v.polarity;
       title = v.title;
-      accentName = if v.accents ? ${accent} then accent else stripped;
+      accentName = if (v.accents ? ${accent}) || accent == "default" then accent else stripped;
       accent = resolvedAccent;
       inherit (v)
         base
@@ -408,45 +406,50 @@ let
       };
       raw = if builtins.pathExists selFile then builtins.readFile selFile else "";
       parts = words raw;
-      part =
-        n:
-        if builtins.length parts > n then
-          builtins.elemAt parts n
-        else
-          "";
+      part = n: if builtins.length parts > n then builtins.elemAt parts n else "";
       themeName =
-        let t = part 0; in
+        let
+          t = part 0;
+        in
         if t != "" && builtins.hasAttr t themes then t else defaults.theme;
       flavorName =
-        let f = part 1; in
-        if f != "" && builtins.hasAttr f themes.${themeName}.flavors then
-          f
-        else
-          defaults.flavor;
+        let
+          f = part 1;
+        in
+        if f != "" && builtins.hasAttr f themes.${themeName}.flavors then f else defaults.flavor;
       accentsOf = themes.${themeName}.flavors.${flavorName}.accents;
       accentName =
-        let a = part 2; in
-        if a != "" && (builtins.hasAttr a accentsOf || isHex a) then
+        let
+          a = part 2;
+        in
+        if a != "" && (a == "default" || builtins.hasAttr a accentsOf || isHex a) then
           a
         else
           defaults.accent;
       flavor = themes.${themeName}.flavors.${flavorName};
       # Override selective base16-scheme `name` is derived from the DB keys:
       # no builtin promotes to lowercase, but the theme/flavor keys already are.
-      name =
-        if flavorName == "default" then
-          themeName
-        else
-          "${themeName}-${flavorName}";
-      r =
-        (resolve flavor accentName) // {
-          inherit name;
-        };
+      name = if flavorName == "default" then themeName else "${themeName}-${flavorName}";
+      r = (resolve flavor accentName) // {
+        inherit name;
+      };
     in
     {
-      inherit themeName flavorName accentName name flavor r;
+      inherit
+        themeName
+        flavorName
+        accentName
+        name
+        flavor
+        r
+        ;
     };
 in
 {
-  inherit themes resolve toBase16 readSelection;
+  inherit
+    themes
+    resolve
+    toBase16
+    readSelection
+    ;
 }

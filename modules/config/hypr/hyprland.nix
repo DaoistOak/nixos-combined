@@ -21,6 +21,7 @@
     ./hypridle.nix
     ./scripts/hyprlock.nix
     ./scripts/media-idle.nix
+    ./scripts/performance.nix
     ./scripts/session.nix
     ./scripts/super-tap-launcher.nix
   ];

@@ -101,6 +101,7 @@
     hl.bind(mod .. " + Z", hl.dsp.exec_cmd("zathura"))
     hl.bind(mod .. " + P", hl.dsp.exec_cmd("keepassxc"))
     hl.bind(mod .. " + G", hl.dsp.exec_cmd("lutris"))
+    hl.bind(mod .. " + CONTROL + G", hl.dsp.exec_cmd("${config.xdg.configHome}/hypr/scripts/toggle-performance.sh"))
 
     -- 10. SYSTEM CONTROLS
     hl.bind(mod .. " + CONTROL + ALT + R", hl.dsp.exec_cmd("hyprctl reload"))
@@ -108,7 +109,7 @@
     hl.bind(mod .. " + ALT + N", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center notifications"))
 
     -- 10.5 THEME SWITCHER (Quickshell floating capsule panel)
-    hl.bind(mod .. " + T", hl.dsp.exec_cmd("qs ipc -c themeswitcher call themeswitcher toggle"))
+    hl.bind(mod .. " + CONTROL + T", hl.dsp.exec_cmd("qs ipc -c themeswitcher call themeswitcher toggle"))
     -- 1. LAUNCHER (bare SUPER tap only, not part of a chord)
     hl.bind(mod .. " + SUPER_L", function()
       superTap.armed = true

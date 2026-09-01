@@ -313,7 +313,7 @@ Item {
                         ListView {
                             id: flic
                             anchors.fill: parent
-                            anchors.margins: 4
+                            anchors.margins: 12
                             clip: true
                             model: root.filtered
                             currentIndex: root.selIndex
@@ -327,7 +327,7 @@ Item {
                                 title: modelData?.custom
                                     ? modelData.title
                                     : (root.level === root.lvlFlavour ? "☾ " + modelData.title : modelData.title)
-                                sub: modelData?.polarity === "light" ? "light" : ""
+                                sub: modelData?.polarity === "light" ? "󰃞" : ""
                                 hex: modelData?.hex ?? ""
                                 custom: modelData?.custom ?? false
                                 selected: root.isSelected(modelData)
@@ -384,9 +384,27 @@ Item {
                 root.syncCurrent();
                 ThemePalette.reload();
                 ThemeDb.reload();
-                root.refresh();
                 input.forceActiveFocus();
             }
+        }
+    }
+
+    Connections {
+        target: ThemeDb
+        function onLoadedChanged() {
+            if (root.open) {
+                root.syncCurrent();
+                root.refresh();
+            }
+        }
+    }
+
+    Component.onCompleted: {
+        if (root.open) {
+            root.syncCurrent();
+            ThemePalette.reload();
+            ThemeDb.reload();
+            input.forceActiveFocus();
         }
     }
 

@@ -57,9 +57,13 @@ Singleton {
         return (th?.variants ?? []).find(v => (v.key ?? "").toLowerCase() === kl) ?? null;
     }
     // Accent objects with a stable { key, hex, title } shape (hex prefixed with #).
+    // Also offers the "Default" accent: the theme's primary text color.
     function accentsOf(themeKey, vKey) {
         const v = variantByKey(themeKey, vKey);
-        return (v?.accents ?? []).map(a => ({ key: a.key, hex: a.hex, title: a.key }));
+        const list = (v?.accents ?? [])
+            .map(a => ({ key: a.key, hex: a.hex, title: a.key }));
+        list.unshift({ key: "default", hex: v?.text ?? "", title: "Default" });
+        return list;
     }
 
     // Case-insensitive current-selection matches for highlighting.
@@ -113,15 +117,16 @@ Singleton {
                         const variants = [];
                         for (const vkey of Object.keys(th.flavors ?? {})) {
                             const f = th.flavors[vkey];
-                            const accents = Object.keys(f.accents ?? {})
-                                .filter(a => a !== "default")
-                                .map(a => ({ key: a, hex: "#" + (f.accents[a] ?? "#888888") }));
-                            variants.push({
-                                key: vkey,
-                                title: f.title ?? vkey,
-                                polarity: f.polarity ?? "dark",
-                                accents
-                            });
+const accents = Object.keys(f.accents ?? {})
+                        .filter(a => a !== "default")
+                        .map(a => ({ key: a, hex: "#" + (f.accents[a] ?? "#888888") }));
+                    variants.push({
+                        key: vkey,
+                        title: f.title ?? vkey,
+                        polarity: f.polarity ?? "dark",
+                        text: f.text ?? "",
+                        accents
+                    });
                         }
                         built.push({ key, title: th.title ?? key, variants });
                     }

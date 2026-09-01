@@ -4,6 +4,33 @@
   pkgs,
   ...
 }:
+
+let
+  # Active theme roles (modules/config/colors resolves the persisted selection).
+  a = config.colors.active;
+  h = v: "#${v}";
+  # Named accent hue with a role/ANSI fallback so every theme stays decent.
+  acc = name: fallback: a.accents.${name} or fallback;
+  accent = h a.accent;
+  fg = h a.text;
+  sub0 = h a.subtext0;
+  sub1 = h a.subtext1;
+  base = h a.base;
+  surface0 = h a.surface0;
+  surface1 = h a.surface1;
+  surface2 = h a.surface2;
+  overlay0 = h a.overlay0;
+  overlay1 = h a.overlay1;
+  overlay2 = h a.overlay2;
+  green = h (acc "green" (builtins.elemAt a.ansi 2));
+  red = h (acc "red" (builtins.elemAt a.ansi 1));
+  yellow = h (acc "yellow" (builtins.elemAt a.ansi 3));
+  pink = h (acc "pink" (builtins.elemAt a.ansi 5));
+  teal = h (acc "teal" (acc "cyan" (builtins.elemAt a.ansi 6)));
+  blue = h (acc "blue" (builtins.elemAt a.ansi 4));
+  sapphire = h (acc "sapphire" teal);
+  flamingo = h (acc "flamingo" (acc "maroon" (builtins.elemAt a.ansi 9)));
+in
 {
   programs.yazi = {
     enable = true;
@@ -75,9 +102,9 @@
       };
     };
 
-    # Catppuccin macchiato theme, but with a transparent background (`reset`)
-    # so the terminal's background shows through. catppuccin.yazi is disabled
-    # below so we can control the background ourselves.
+    # Theme driven by the active selection, with a transparent background
+    # (`reset`) so the terminal's background shows through. catppuccin.yazi is
+    # disabled below so we can control the background ourselves.
     theme = {
       app.overall = {
         bg = "reset";
@@ -85,52 +112,52 @@
 
       mgr = {
         cwd = {
-          fg = "#8bd5ca";
+          fg = accent;
         };
 
         find_keyword = {
-          fg = "#eed49f";
+          fg = yellow;
           italic = true;
         };
         find_position = {
-          fg = "#f5bde6";
+          fg = pink;
           bg = "reset";
           italic = true;
         };
 
         marker_copied = {
-          fg = "#a6da95";
-          bg = "#a6da95";
+          fg = green;
+          bg = green;
         };
         marker_cut = {
-          fg = "#ed8796";
-          bg = "#ed8796";
+          fg = red;
+          bg = red;
         };
         marker_marked = {
-          fg = "#8bd5ca";
-          bg = "#8bd5ca";
+          fg = teal;
+          bg = teal;
         };
         marker_selected = {
-          fg = "#c6a0f6";
-          bg = "#c6a0f6";
+          fg = accent;
+          bg = accent;
         };
 
         count_copied = {
-          fg = "#24273a";
-          bg = "#a6da95";
+          fg = base;
+          bg = green;
         };
         count_cut = {
-          fg = "#24273a";
-          bg = "#ed8796";
+          fg = base;
+          bg = red;
         };
         count_selected = {
-          fg = "#24273a";
-          bg = "#c6a0f6";
+          fg = base;
+          bg = accent;
         };
 
         border_symbol = "│";
         border_style = {
-          fg = "#8087a2";
+          fg = overlay1;
         };
 
         syntect_theme = "~/.config/yazi/Catppuccin-macchiato.tmTheme";
@@ -138,60 +165,60 @@
 
       tabs = {
         active = {
-          fg = "#24273a";
-          bg = "#cad3f5";
+          fg = base;
+          bg = fg;
           bold = true;
         };
         inactive = {
-          fg = "#cad3f5";
-          bg = "#494d64";
+          fg = fg;
+          bg = surface1;
         };
       };
 
       mode = {
         normal_main = {
-          fg = "#24273a";
-          bg = "#c6a0f6";
+          fg = base;
+          bg = accent;
           bold = true;
         };
         normal_alt = {
-          fg = "#c6a0f6";
-          bg = "#363a4f";
+          fg = accent;
+          bg = surface0;
         };
 
         select_main = {
-          fg = "#24273a";
-          bg = "#a6da95";
+          fg = base;
+          bg = green;
           bold = true;
         };
         select_alt = {
-          fg = "#a6da95";
-          bg = "#363a4f";
+          fg = green;
+          bg = surface0;
         };
 
         unset_main = {
-          fg = "#24273a";
-          bg = "#f0c6c6";
+          fg = base;
+          bg = flamingo;
           bold = true;
         };
         unset_alt = {
-          fg = "#f0c6c6";
-          bg = "#363a4f";
+          fg = flamingo;
+          bg = surface0;
         };
       };
 
       indicator = {
         parent = {
-          fg = "#24273a";
-          bg = "#cad3f5";
+          fg = base;
+          bg = fg;
         };
         current = {
-          fg = "#24273a";
-          bg = "#c6a0f6";
+          fg = base;
+          bg = accent;
         };
         preview = {
-          fg = "#24273a";
-          bg = "#cad3f5";
+          fg = base;
+          bg = fg;
         };
       };
 
@@ -210,34 +237,34 @@
           bold = true;
         };
         progress_normal = {
-          fg = "#a6da95";
-          bg = "#494d64";
+          fg = green;
+          bg = surface1;
         };
         progress_error = {
-          fg = "#eed49f";
-          bg = "#ed8796";
+          fg = yellow;
+          bg = red;
         };
 
         perm_type = {
-          fg = "#8aadf4";
+          fg = blue;
         };
         perm_read = {
-          fg = "#eed49f";
+          fg = yellow;
         };
         perm_write = {
-          fg = "#ed8796";
+          fg = red;
         };
         perm_exec = {
-          fg = "#a6da95";
+          fg = green;
         };
         perm_sep = {
-          fg = "#8087a2";
+          fg = overlay1;
         };
       };
 
       input = {
         border = {
-          fg = "#c6a0f6";
+          fg = accent;
         };
         title = { };
         value = { };
@@ -248,20 +275,20 @@
 
       pick = {
         border = {
-          fg = "#c6a0f6";
+          fg = accent;
         };
         active = {
-          fg = "#f5bde6";
+          fg = pink;
         };
         inactive = { };
       };
 
       confirm = {
         border = {
-          fg = "#c6a0f6";
+          fg = accent;
         };
         title = {
-          fg = "#c6a0f6";
+          fg = accent;
         };
         body = { };
         list = { };
@@ -273,69 +300,69 @@
 
       cmp = {
         border = {
-          fg = "#c6a0f6";
+          fg = accent;
         };
       };
 
       tasks = {
         border = {
-          fg = "#c6a0f6";
+          fg = accent;
         };
         title = { };
         hovered = {
-          fg = "#f5bde6";
+          fg = pink;
           bold = true;
         };
       };
 
       which = {
         mask = {
-          bg = "#363a4f";
+          bg = surface0;
         };
         cand = {
-          fg = "#8bd5ca";
+          fg = teal;
         };
         rest = {
-          fg = "#939ab7";
+          fg = overlay2;
         };
         desc = {
-          fg = "#f5bde6";
+          fg = pink;
         };
         separator = "  ";
         separator_style = {
-          fg = "#5b6078";
+          fg = surface2;
         };
       };
 
       help = {
         on = {
-          fg = "#8bd5ca";
+          fg = teal;
         };
         run = {
-          fg = "#f5bde6";
+          fg = pink;
         };
         desc = {
-          fg = "#939ab7";
+          fg = overlay2;
         };
         hovered = {
-          bg = "#5b6078";
+          bg = surface2;
           bold = true;
         };
         footer = {
-          fg = "#cad3f5";
-          bg = "#494d64";
+          fg = fg;
+          bg = surface1;
         };
       };
 
       notify = {
         title_info = {
-          fg = "#8bd5ca";
+          fg = teal;
         };
         title_warn = {
-          fg = "#eed49f";
+          fg = yellow;
         };
         title_error = {
-          fg = "#ed8796";
+          fg = red;
         };
       };
 
@@ -343,71 +370,71 @@
         # Media
         {
           mime = "image/*";
-          fg = "#eed49f";
+          fg = yellow;
         }
         {
           mime = "{audio,video}/*";
-          fg = "#f5bde6";
+          fg = pink;
         }
 
         # Archives
         {
           mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}";
-          fg = "#ed8796";
+          fg = red;
         }
 
         # Documents
         {
           mime = "application/{pdf,doc,rtf}";
-          fg = "#91d7e3";
+          fg = sapphire;
         }
 
         # Virtual file system
         {
           mime = "vfs/{absent,stale}";
-          fg = "#494d64";
+          fg = surface1;
         }
 
         # Special file
         {
           url = "*";
           is = "orphan";
-          bg = "#ed8796";
+          bg = red;
         }
         {
           url = "*";
           is = "exec";
-          fg = "#a6da95";
+          fg = green;
         }
 
         # Dummy file
         {
           url = "*";
           is = "dummy";
-          bg = "#ed8796";
+          bg = red;
         }
         {
           url = "*/";
           is = "dummy";
-          bg = "#ed8796";
+          bg = red;
         }
 
-        # Fallback
+        # Fallback (directories use the accent)
         {
           url = "*/";
-          fg = "#c6a0f6";
+          fg = accent;
         }
       ];
 
       spot = {
         border = {
-          fg = "#c6a0f6";
+          fg = accent;
         };
         title = {
-          fg = "#c6a0f6";
+          fg = accent;
         };
         tbl_cell = {
-          fg = "#c6a0f6";
+          fg = accent;
           reversed = true;
         };
         tbl_col = {
@@ -420,72 +447,72 @@
           {
             name = ".config";
             text = "";
-            fg = "#c6a0f6";
+            fg = accent;
           }
           {
             name = ".git";
             text = "";
-            fg = "#c6a0f6";
+            fg = accent;
           }
           {
             name = ".github";
             text = "";
-            fg = "#c6a0f6";
+            fg = accent;
           }
           {
             name = ".npm";
             text = "";
-            fg = "#c6a0f6";
+            fg = accent;
           }
           {
             name = "Desktop";
             text = "";
-            fg = "#c6a0f6";
+            fg = accent;
           }
           {
             name = "Development";
             text = "";
-            fg = "#c6a0f6";
+            fg = accent;
           }
           {
             name = "Documents";
             text = "";
-            fg = "#c6a0f6";
+            fg = accent;
           }
           {
             name = "Downloads";
             text = "";
-            fg = "#c6a0f6";
+            fg = accent;
           }
           {
             name = "Library";
             text = "";
-            fg = "#c6a0f6";
+            fg = accent;
           }
           {
             name = "Movies";
             text = "";
-            fg = "#c6a0f6";
+            fg = accent;
           }
           {
             name = "Music";
             text = "";
-            fg = "#c6a0f6";
+            fg = accent;
           }
           {
             name = "Pictures";
             text = "";
-            fg = "#c6a0f6";
+            fg = accent;
           }
           {
             name = "Public";
             text = "";
-            fg = "#c6a0f6";
+            fg = accent;
           }
           {
             name = "Videos";
             text = "";
-            fg = "#c6a0f6";
+            fg = accent;
           }
         ];
         conds = [
@@ -493,59 +520,59 @@
           {
             "if" = "orphan";
             text = "";
-            fg = "#cad3f5";
+            fg = fg;
           }
           {
             "if" = "link";
             text = "";
-            fg = "#a5adcb";
+            fg = sub0;
           }
           {
             "if" = "block";
             text = "";
-            fg = "#eed49f";
+            fg = yellow;
           }
           {
             "if" = "char";
             text = "";
-            fg = "#eed49f";
+            fg = yellow;
           }
           {
             "if" = "fifo";
             text = "";
-            fg = "#eed49f";
+            fg = yellow;
           }
           {
             "if" = "sock";
             text = "";
-            fg = "#eed49f";
+            fg = yellow;
           }
           {
             "if" = "sticky";
             text = "";
-            fg = "#eed49f";
+            fg = yellow;
           }
           {
             "if" = "dummy";
             text = "";
-            fg = "#ed8796";
+            fg = red;
           }
 
           # Fallback
           {
             "if" = "dir";
             text = "";
-            fg = "#c6a0f6";
+            fg = accent;
           }
           {
             "if" = "exec";
             text = "";
-            fg = "#a6da95";
+            fg = green;
           }
           {
             "if" = "!dir";
             text = "";
-            fg = "#cad3f5";
+            fg = fg;
           }
         ];
       };
