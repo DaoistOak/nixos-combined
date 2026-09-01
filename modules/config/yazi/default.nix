@@ -12,7 +12,12 @@
     package = null;
 
     settings = {
-      show_hidden = true;
+      # [mgr] manager options (show_hidden etc. live under this section, not at
+      # the top level — yazi rejects unknown root keys as "must be 1-20
+      # characters in kebab-case").
+      mgr = {
+        show_hidden = true;
+      };
       # Text files open in nvim by default via the `edit` opener.
       opener = {
         edit = [

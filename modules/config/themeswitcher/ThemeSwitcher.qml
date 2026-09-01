@@ -305,7 +305,7 @@ Item {
                         id: listFrame
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        Layout.minimumHeight: 60
+                        Layout.minimumHeight: 300
                         color: ThemePalette.colLayer2
                         radius: ThemePalette.roundingSmall
                         clip: true
