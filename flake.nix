@@ -21,6 +21,11 @@
     nur = {
       url = "github:nix-community/NUR";
     };
+    nix-cachyos-kernel = {
+      # release branch: kernels built by the author's Hydra CI, present in the
+      # Attic binary cache (https://attic.xuyh0120.win/lantian).
+      url = "github:xddxdd/nix-cachyos-kernel/release";
+    };
 
     catppuccin = {
       url = "github:catppuccin/nix";

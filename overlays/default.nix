@@ -93,6 +93,24 @@
       };
     };
 
+    # Neovim: expose libsqlite3 so Lua plugins like nvim-neoclip (via
+    # sqlite.lua) can dlopen it at runtime -- NixOS has no system library dirs.
+    neovim = prev.symlinkJoin {
+      name = "neovim-with-libsqlite-${prev.neovim.version}";
+      paths = [ prev.neovim ];
+      nativeBuildInputs = [ final.makeWrapper ];
+      postBuild = ''
+        rm -f $out/bin/nvim
+        makeWrapper ${prev.neovim}/bin/nvim $out/bin/nvim \
+          --prefix LD_LIBRARY_PATH : ${
+            final.lib.concatStringsSep ":" [
+              "${final.sqlite.dev}/lib"
+              "${final.sqlite.out}/lib"
+            ]
+          }
+      '';
+    };
+
   };
 
   # NUR (Nix User Repository) overlay
