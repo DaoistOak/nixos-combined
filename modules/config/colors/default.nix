@@ -179,6 +179,7 @@ let
       set -gq @thm_overlay_2 "${c r.overlay2}"
       set -gq @thm_subtext_0 "${c r.subtext0}"
       set -gq @thm_subtext_1 "${c r.subtext1}"
+      set -gq @thm_accent "${c r.accent}"
       set -gq @thm_mauve "${c r.accent}"
       set -gq @thm_red "${c named.red}"
       set -gq @thm_green "${c named.green}"
