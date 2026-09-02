@@ -63,11 +63,11 @@ in
     kernelParams = [ "resume=UUID=c90cb3d2-feba-424e-a25b-146d24f9bd0d" ];
     kernelModules = [ "ryzen_smu" ];
 
-    # CachyOS kernel with BORE scheduler, Zen 4 tuned (Hawk Point). Uses the
+    # CachyOS kernel with BORE scheduler compiled with Clang ThinLTO. Uses the
     # release branch's pinned overlay so the build is fetched from the Attic
     # binary cache instead of compiling locally. Overrides the stock
     # linuxPackages_latest set in hardware-configuration.nix.
-    kernelPackages = lib.mkForce pkgs.cachyosKernels.linuxPackages-cachyos-bore-zen4;
+    kernelPackages = lib.mkForce pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto;
 
     loader.systemd-boot = {
       extraFiles = winExtraFiles;
