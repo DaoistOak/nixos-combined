@@ -273,6 +273,7 @@ set -gq @thm_overlay_1 "#$(f '.overlay1')"
 set -gq @thm_overlay_2 "#$(f '.overlay2')"
 set -gq @thm_subtext_0 "#$(f '.subtext0')"
 set -gq @thm_subtext_1 "#$(f '.subtext1')"
+set -gq @thm_accent "#$accent"
 set -gq @thm_mauve "#$accent"
 set -gq @thm_red "#$rd"
 set -gq @thm_green "#$gn"
@@ -411,7 +412,15 @@ apply() {
 # (Stylix on the home + system side, the catppuccin module) follow it.
 write_selection() {
   mkdir -p "$(dirname "$SELECTION")"
-  printf '%s %s %s\n' "$(f '.theme')" "$(f '.variant')" "$(f '.accentName')" > "$SELECTION"
+  local accentName
+  accentName=$(f '.accentName')
+  # The home-manager catppuccin module accepts a fixed accent list that lacks
+  # "cyan"; map DB-only names to their hex-identical module-valid neighbor so
+  # build-time (Stylix/catppuccin) colors stay consistent with the runtime.
+  case "$accentName" in
+    cyan) accentName="sky" ;;
+  esac
+  printf '%s %s %s\n' "$(f '.theme')" "$(f '.variant')" "$accentName" > "$SELECTION"
 }
 
 # Rebuild home-manager so Stylix (GTK/KDE/Qt/..) picks up the new selection.

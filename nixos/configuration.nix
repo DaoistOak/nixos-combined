@@ -63,6 +63,12 @@ in
     kernelParams = [ "resume=UUID=c90cb3d2-feba-424e-a25b-146d24f9bd0d" ];
     kernelModules = [ "ryzen_smu" ];
 
+    # CachyOS kernel with BORE scheduler, Zen 4 tuned (Hawk Point). Uses the
+    # release branch's pinned overlay so the build is fetched from the Attic
+    # binary cache instead of compiling locally. Overrides the stock
+    # linuxPackages_latest set in hardware-configuration.nix.
+    kernelPackages = lib.mkForce pkgs.cachyosKernels.linuxPackages-cachyos-bore-zen4;
+
     loader.systemd-boot = {
       extraFiles = winExtraFiles;
       extraEntries."windows.conf" = ''
@@ -112,12 +118,14 @@ in
       substituters = [
         "https://hyprland.cachix.org"
         "https://noctalia.cachix.org"
+        "https://attic.xuyh0120.win/lantian"
         "https://cache.nixos.org"
       ];
       trusted-public-keys = [
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspc1gZ5Q="
         "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
         "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+        "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
       ];
     };
   };
