@@ -124,7 +124,7 @@ let
     docker-compose
     podman
     eza
-    ffmpeg
+    ffmpeg-full
     fish
     freerdp
     gemini-cli
@@ -271,6 +271,13 @@ let
     libtheora
     speex
     libgudev
+    # Proprietary / nonfree media codecs
+    lame
+    x264
+    x265
+    fdk_aac
+    libde265
+    openh264
     nil
     pkg-config
     radeontop
