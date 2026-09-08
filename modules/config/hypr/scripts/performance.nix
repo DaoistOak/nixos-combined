@@ -6,8 +6,8 @@
 }:
 let
   isEnabled = (config.wayland.windowManager.hyprland.settings.config.animations.enabled or true);
-  gapsIn = (config.wayland.windowManager.hyprland.settings.config.general.gaps_in or 20);
-  gapsOut = (config.wayland.windowManager.hyprland.settings.config.general.gaps_out or 20);
+  gapsIn = (config.wayland.windowManager.hyprland.settings.config.general.gaps_in or 8);
+  gapsOut = (config.wayland.windowManager.hyprland.settings.config.general.gaps_out or 16);
   rounding = (config.wayland.windowManager.hyprland.settings.config.decoration.rounding or 14);
   shadowEnabled = (
     config.wayland.windowManager.hyprland.settings.config.decoration.shadow.enabled or true
