@@ -45,6 +45,8 @@
       # Phoenix (DCN 3.14) Panel Replay/PSR corrupts partial updates
       # (drm/amd#5087) -> artifacts on translucent windows after idle
       "amdgpu.dcdebugmask=0x410"
+      # Reduce GPU page pinning so hibernation can migrate all RAM pages
+      "amdgpu.sg_display=0"
     ];
 
     # --- Plymouth (Boot Splash) ---

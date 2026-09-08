@@ -60,7 +60,6 @@ in
   # Hibernation settings
   boot = {
     resumeDevice = "/dev/disk/by-uuid/c90cb3d2-feba-424e-a25b-146d24f9bd0d";
-    kernelParams = [ "resume=UUID=c90cb3d2-feba-424e-a25b-146d24f9bd0d" ];
     # NOTE: 'ryzen_smu' is NOT shipped by the CachyOS kernel package; loading it
     # via boot.kernelModules only produced a "Failed to find module" journal
     # warning. It is dropped from the modules-load config below to avoid the noise.
