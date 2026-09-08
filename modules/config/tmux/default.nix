@@ -53,7 +53,7 @@
       # tabs read as themed blocks instead of plain text.
       set -g window-status-separator " "
       set -g window-status-format "#[fg=#{@thm_overlay_1},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{@thm_overlay_1}]#{window_index} #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #{=40:#{window_name}}#[fg=#{@thm_surface_0},bg=#{@thm_bg}]"
-      set -g window-status-current-format "#[fg=#{@thm_accent},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{@thm_accent}]#{window_index} #[fg=#{@thm_fg},bg=#{@thm_accent}] #{=40:#{window_name}}#[fg=#{@thm_surface_0},bg=#{@thm_bg}]"
+      set -g window-status-current-format "#[fg=#{@thm_accent},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{@thm_accent}]#{window_index} #[fg=#{@thm_accent},bg=#{@thm_surface_0}] #{=40:#{window_name}}#[fg=#{@thm_surface_0},bg=#{@thm_bg}]"
 
       # Right modules (Active Process, Sessions, Uptime).
       set -g status-right "#[fg=#{@thm_maroon},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{@thm_maroon}]󰇅󰟀 #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #{pane_current_command} #[fg=#{@thm_green},bg=#{@thm_surface_0}]#[fg=#{@thm_bg},bg=#{@thm_green}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #{session_name} #[fg=#{@thm_sapphire},bg=#{@thm_surface_0}]#[fg=#{@thm_bg},bg=#{@thm_sapphire}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #(${config.home.homeDirectory}/.config/tmux/uptime.sh)#[fg=#{@thm_surface_0},bg=colour0]"
