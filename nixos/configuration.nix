@@ -82,6 +82,16 @@ in
     };
   };
 
+  # Enable zram: compressed swap in RAM, higher priority than the SSD swap,
+  # so allocation spikes are absorbed by speed instead of hammering the disk
+  # (the Radeon 780M iGPU shares system RAM via TTM and failed under pressure).
+  zramSwap = {
+    enable = true;
+    memoryPercent = 50;
+    algorithm = "zstd";
+    priority = 100;
+  };
+
   # Enable hibernation
   services.logind = {
     settings.Login = {
