@@ -3,13 +3,23 @@
 { pkgs, inputs, ... }:
 
 let
+  # nix-search-tv's default "nix-shell" action uses `--run $SHELL`, but
+  # nix-shell --run overrides $SHELL to its own bash, so the interactive shell
+  # was always bash. Patch it to always provision and exec zsh.
   ns = pkgs.writeShellApplication {
     name = "ns";
     runtimeInputs = with pkgs; [
       fzf
       nix-search-tv
     ];
-    text = builtins.readFile "${pkgs.nix-search-tv.src}/nixpkgs.sh";
+    text = builtins.replaceStrings
+      [
+        "NIX_SHELL_CMD='nix-shell --run $SHELL -p $(echo \"{}\" | sed \"s:nixpkgs/::g\""
+      ]
+      [
+        "NIX_SHELL_CMD='nix-shell --run zsh -p zsh $(echo \"{}\" | sed \"s:nixpkgs/::g\""
+      ]
+      (builtins.readFile "${pkgs.nix-search-tv.src}/nixpkgs.sh");
   };
   user-packages = with pkgs; [
     ns
