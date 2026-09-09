@@ -5,6 +5,23 @@
   ...
 }:
 
+let
+  # Conservative ryzenadj power limits on battery (24W STAPM), full limits on AC.
+  # `|| true` so a failed init (missing ryzen_smu / restricted /dev/mem) is not fatal.
+  applyAcPower = pkgs.writeShellScript "apply-ac-power" ''
+    set -u
+    ONLINE="$(cat /sys/class/power_supply/ACAD/online 2>/dev/null || echo 0)"
+    if [ "$ONLINE" = "1" ]; then
+      ${pkgs.ryzenadj}/bin/ryzenadj \
+        --stapm-limit=54000 --fast-limit=60000 --slow-limit=54000 --tctl-temp=95 \
+        2>/dev/null || true
+    else
+      ${pkgs.ryzenadj}/bin/ryzenadj \
+        --stapm-limit=25000 --fast-limit=30000 --slow-limit=25000 --tctl-temp=90 \
+        2>/dev/null || true
+    fi
+  '';
+in
 {
   powerManagement.powertop.enable = true;
 
@@ -34,10 +51,12 @@
         battery = {
           governor = "powersave";
           turbo = "never";
+          energy_performance_bias = "powersave";
         };
         charger = {
           governor = "performance";
           turbo = "auto";
+          energy_performance_bias = "performance";
         };
       };
     };
@@ -47,6 +66,9 @@
       enable = true;
       interval = "monthly";
     };
+
+    # 💾 SSD TRIM (weekly), keeps bloated Btrfs/SSD cells fresh
+    fstrim.enable = true;
 
     # 🖐️ Fingerprint reader
     fprintd.enable = true;
@@ -58,9 +80,9 @@
     gpm.enable = true;
 
     # 🖥️ Lact (AMD GPU tuning)
-    # lact = {
-    #   enable = true;
-    # };
+    lact = {
+      enable = true;
+    };
 
     # ✔️ Ollama Service
     ollama = {
@@ -82,6 +104,19 @@
 
     # 🖨️ Printing (CUPS)
     printing.enable = true;
+
+    # ⚡ preload-ng: tracks frequently-used binaries/libraries and prefetches
+    # them into RAM at idle for faster cold starts. NixOS-specific prefixes:
+    # map/exePrefix tell it to treat the immutable /nix/store as the live files
+    # (only pruned GC paths are dropped). Conservative memory/minsize cycle so it
+    # doesn't starve the zram/hibernation image reserve on this 13GiB box.
+    preload-ng = {
+      enable = true;
+      settings = {
+        mapPrefix = "/nix/store/;/run/current-system/;!/";
+        exePrefix = "/nix/store/;/run/current-system/;!/";
+      };
+    };
 
     resolved.enable = true;
 
@@ -106,6 +141,12 @@
     udev.extraRules = ''
       SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="ec:91:61:47:2d:13", NAME="wlan0"
       ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1ea7", ATTR{idProduct}=="0066", ATTR{power/control}="on"
+
+      # ⚡ USB autosuspend for the rest of the bus
+      ACTION=="add", SUBSYSTEM=="usb", ATTR{authorized}=="1", ATTR{power/autosuspend}="1", ATTR{power/control}="auto"
+
+      # 🔌 Re-apply power limits when the power supply state changes
+      ACTION=="change", KERNEL=="ACAD", SUBSYSTEM=="power_supply", RUN+="${applyAcPower}"
     '';
 
     # 🎛️ Other services...
@@ -115,6 +156,9 @@
       variant = "";
     };
   };
+
+  # 📶 Allow WiFi NIC to enter low-power states
+  networking.networkmanager.wifi.powersave = true;
 
   # 🌀 IdeaPad fan: force "Efficient Thermal Dissipation" EC profile on boot.
   # Not persisted by firmware; modes: 0=silent 1=standard 2=dust-cleaning 4=max cooling.
@@ -129,6 +173,43 @@
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
+    };
+  };
+
+  # ⚡ Apply AC/battery power limits once at boot; react to AC changes via udev.
+  systemd.services.apply-ac-power = {
+    description = "Apply AC/battery tuned power limits (ryzenadj)";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${applyAcPower}";
+    };
+  };
+
+  # 🔵 Bluetooth: keep it on when a device is connected; on battery with nothing
+  # paired/connected, power the controller off. Comes back on when on AC.
+  systemd.services.bluetooth-ac-power = {
+    description = "Disable Bluetooth on battery when idle, enable on AC";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = ''
+        ${pkgs.bash}/bin/bash -c '
+        BTCTL="${pkgs.bluez}/bin/bluetoothctl"
+        while true; do
+          ONLINE="$(cat /sys/class/power_supply/ACAD/online 2>/dev/null || echo 0)"
+          if [ "$ONLINE" = "1" ]; then
+            "$BTCTL" power on 2>/dev/null || true
+          elif [ -z "$("$BTCTL" devices Connected 2>/dev/null)" ]; then
+            "$BTCTL" power off 2>/dev/null || true
+          fi
+          sleep 120
+        done
+        '
+      '';
     };
   };
 
