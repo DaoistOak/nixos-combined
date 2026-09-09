@@ -49,6 +49,12 @@ in
       }
       {
         _args = [
+          "TERMINAL"
+          "wezterm start"
+        ];
+      }
+      {
+        _args = [
           "HYPRCURSOR_THEME"
           "catppuccin-macchiato-light-cursors"
         ];
