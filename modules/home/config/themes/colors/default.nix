@@ -11,7 +11,7 @@ let
   # Shared theme database + resolvers (see themes.nix).
   t = import ./themes.nix { inherit lib; };
   inherit (t) themes resolve toBase16;
-  sel = t.readSelection ./selection;
+  sel = t.readSelection ./src/selection;
 
   # Build the full machine-readable themes JSON the CLI consumes.
   themesJSON = lib.mapAttrs (_: x: {

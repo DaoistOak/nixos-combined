@@ -12,14 +12,15 @@ let
       fzf
       nix-search-tv
     ];
-    text = builtins.replaceStrings
-      [
-        "NIX_SHELL_CMD='nix-shell --run $SHELL -p $(echo \"{}\" | sed \"s:nixpkgs/::g\""
-      ]
-      [
-        "NIX_SHELL_CMD='nix-shell --run zsh -p zsh $(echo \"{}\" | sed \"s:nixpkgs/::g\""
-      ]
-      (builtins.readFile "${pkgs.nix-search-tv.src}/nixpkgs.sh");
+    text =
+      builtins.replaceStrings
+        [
+          "NIX_SHELL_CMD='nix-shell --run $SHELL -p $(echo \"{}\" | sed \"s:nixpkgs/::g\""
+        ]
+        [
+          "NIX_SHELL_CMD='nix-shell --run zsh -p zsh $(echo \"{}\" | sed \"s:nixpkgs/::g\""
+        ]
+        (builtins.readFile "${pkgs.nix-search-tv.src}/nixpkgs.sh");
   };
   user-packages = with pkgs; [
     ns
@@ -234,6 +235,7 @@ let
     adwaita-icon-theme
     adi1090x-plymouth-themes
     appimage-run
+    bleachbit
     catppuccin-cursors.macchiatoLight
     catppuccin-kvantum
     catppuccin-papirus-folders

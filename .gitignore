@@ -8,3 +8,4 @@ modules/_git-clones/
 # Secrets — never commit API keys/tokens
 secrets.zsh
 *.zshrc.custom
+.github_token
