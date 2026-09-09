@@ -9,7 +9,7 @@
       ../../modules/system/nix/default.nix
       ../../modules/system/misc/default.nix
       ../../modules/system/services/default.nix
-      ../../modules/system/users/Daoist-Oak/default.nix
+      ../../modules/system/users/zeph/default.nix
       ../../modules/system/config/desktop/default.nix
       ../../modules/system/config/pkgs/default.nix
       ../../modules/system/config/themes/default.nix
@@ -27,7 +27,7 @@
     ];
   };
 
-  flake.homeConfigurations."Daoist-Oak" = inputs.home-manager.lib.homeManagerConfiguration {
+  flake.homeConfigurations."zeph" = inputs.home-manager.lib.homeManagerConfiguration {
     pkgs = import inputs.nixpkgs {
       system = "x86_64-linux";
       config.allowUnfree = true;

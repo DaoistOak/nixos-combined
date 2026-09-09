@@ -455,7 +455,7 @@ cmd_set() {
     if [[ "${SYSTEM_SWITCH:-0}" == "1" ]]; then
       echo "Switching NixOS system (console/plymouth follow)..."
       ( cd "$REPO_ROOT" \
-        && nh os switch --elevation-strategy pkexec .#nixosConfigurations.Overlord ) \
+        && nh os switch --elevation-strategy pkexec .#nixosConfigurations.Lingnao ) \
         || { echo "error: system switch failed" >&2; return 1; }
     fi
   else

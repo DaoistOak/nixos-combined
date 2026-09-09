@@ -6,7 +6,6 @@
 }:
 
 let
-  # Conservative ryzenadj power limits on battery (24W STAPM), full limits on AC.
   # `|| true` so a failed init (missing ryzen_smu / restricted /dev/mem) is not fatal.
   applyAcPower = pkgs.writeShellScript "apply-ac-power" ''
     set -u
@@ -46,15 +45,12 @@ in
   '';
 
   services = {
-
-    # 🌐 Avahi (local network discovery)
     avahi = {
       enable = true;
       nssmdns4 = true;
       nssmdns6 = true;
     };
 
-    # 🧠 Auto CPU freq
     auto-cpufreq = {
       enable = true;
       settings = {
@@ -71,55 +67,31 @@ in
       };
     };
 
-    # 🧹 Btrfs monthly scrub
     btrfs.autoScrub = {
       enable = true;
       interval = "monthly";
     };
 
-    # 💾 SSD TRIM (weekly), keeps bloated Btrfs/SSD cells fresh
     fstrim.enable = true;
-
-    # 🖐️ Fingerprint reader
     fprintd.enable = true;
-
-    # 🔧 Firmware updater
     fwupd.enable = true;
-
-    # 🖱️ General Purpose Mouse: mouse cursor in the TTY console
     gpm.enable = true;
-
-    # 🖥️ Lact (AMD GPU tuning)
-    lact = {
-      enable = true;
-    };
-
-    # ✔️ Ollama Service
-    ollama = {
-      enable = true;
-    };
-    # openssh
+    lact.enable = true;
+    ollama.enable = true;
     openssh.enable = true;
 
-    # 🔄 Syncthing (file sync daemon)
     syncthing = {
       enable = true;
-      user = "Daoist-Oak";
-      dataDir = "/home/Daoist-Oak/Sync";
-      configDir = "/home/Daoist-Oak/.config/syncthing";
+      user = "zeph";
+      dataDir = "/home/zeph/Sync";
+      configDir = "/home/zeph/.config/syncthing";
     };
 
-    # 🔌 Power Profiles (disabled)
     power-profiles-daemon.enable = false;
-
-    # 🖨️ Printing (CUPS)
     printing.enable = true;
 
-    # ⚡ preload-ng: tracks frequently-used binaries/libraries and prefetches
-    # them into RAM at idle for faster cold starts. NixOS-specific prefixes:
-    # map/exePrefix tell it to treat the immutable /nix/store as the live files
-    # (only pruned GC paths are dropped). Conservative memory/minsize cycle so it
-    # doesn't starve the zram/hibernation image reserve on this 13GiB box.
+    # NixOS-specific prefixes tell it to treat the immutable /nix/store as the live files
+    # (only pruned GC paths are dropped).
     preload-ng = {
       enable = true;
       settings = {
@@ -130,7 +102,6 @@ in
 
     resolved.enable = true;
 
-    # 🗝️ TLP tuning
     tlp = {
       enable = false;
       settings = {
@@ -147,31 +118,22 @@ in
       };
     };
 
-    # 🧩 Custom udev rules
     udev.extraRules = ''
       SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="ec:91:61:47:2d:13", NAME="wlan0"
       ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1ea7", ATTR{idProduct}=="0066", ATTR{power/control}="on"
-
-      # ⚡ USB autosuspend for the rest of the bus
       ACTION=="add", SUBSYSTEM=="usb", ATTR{authorized}=="1", ATTR{power/autosuspend}="1", ATTR{power/control}="auto"
-
-      # 🔌 Re-apply power limits when the power supply state changes
       ACTION=="change", KERNEL=="ACAD", SUBSYSTEM=="power_supply", RUN+="${applyAcPower}"
     '';
 
-    # 🎛️ Other services...
-    #    xserver.videoDrivers = [ "amdgpu" ];
     xserver.xkb = {
       layout = "us";
       variant = "";
     };
   };
 
-  # 📶 Allow WiFi NIC to enter low-power states
   networking.networkmanager.wifi.powersave = true;
 
-  # 🌀 IdeaPad fan: force "Efficient Thermal Dissipation" EC profile on boot.
-  # Not persisted by firmware; modes: 0=silent 1=standard 2=dust-cleaning 4=max cooling.
+  # Modes: 0=silent 1=standard 2=dust-cleaning 4=max cooling (not persisted by firmware).
   systemd.services.ideapad-fan-max = {
     description = "Set Lenovo IdeaPad EC fan_mode to Efficient Thermal Dissipation";
     wantedBy = [ "multi-user.target" ];
@@ -186,7 +148,6 @@ in
     };
   };
 
-  # ⚡ Apply AC/battery power limits once at boot; react to AC changes via udev.
   systemd.services.apply-ac-power = {
     description = "Apply AC/battery tuned power limits (ryzenadj)";
     wantedBy = [ "multi-user.target" ];
@@ -198,8 +159,7 @@ in
     };
   };
 
-  # 🔵 Bluetooth: keep it on when a device is connected; on battery with nothing
-  # paired/connected, power the controller off. Comes back on when on AC.
+  # Powers off BT on battery when nothing is connected; re-enables on AC.
   systemd.services.bluetooth-ac-power = {
     description = "Disable Bluetooth on battery when idle, enable on AC";
     wantedBy = [ "multi-user.target" ];

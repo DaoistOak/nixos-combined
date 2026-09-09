@@ -22,4 +22,4 @@ sed -i "s|url = \"github:hyprwm/Hyprland/[^\"]*\";|url = \"github:hyprwm/Hyprlan
 sed -i "s/# Last updated: .*/# Last updated: $NEW_DATE/" flake.nix
 
 echo "Updated flake.nix with new commit info"
-echo "Run 'sudo nixos-rebuild switch --flake .#Overlord' to apply the update"
+echo "Run 'sudo nixos-rebuild switch --flake .#Lingnao' to apply the update"

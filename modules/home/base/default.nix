@@ -36,8 +36,8 @@ in
     inputs.noctalia.homeModules.default
   ];
 
-  home.username = "Daoist-Oak";
-  home.homeDirectory = "/home/Daoist-Oak";
+  home.username = "zeph";
+  home.homeDirectory = "/home/zeph";
   gtk.enable = true;
   stylix.targets.gtk.extraCss = ''
     @import url("noctalia.css");
@@ -89,7 +89,7 @@ in
     TERMINAL = "wezterm start";
     QT_QPA_PLATFORMTHEME = lib.mkForce "qt6ct";
     QT_STYLE_OVERRIDE = lib.mkForce "kvantum";
-    FLAKE_DIR = "/home/Daoist-Oak/.config/nixos";
+    FLAKE_DIR = "/home/zeph/.config/nixos";
   };
 
   xdg.configFile.".gtkrc-2.0" = {

@@ -12,7 +12,7 @@ set -euo pipefail
 
 # --- Configuration ----------------------------------------------------------
 FLAKE_PATH="$HOME/.config/nixos"
-NIXOS_HOST="Overlord"
+NIXOS_HOST="Lingnao"
 HOME_USER="zeph"
 SUCCESS_SOUND="/run/current-system/sw/share/sounds/freedesktop/stereo/complete.oga"
 ERROR_SOUND="/run/current-system/sw/share/sounds/freedesktop/stereo/dialog-error.oga"

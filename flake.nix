@@ -1,5 +1,5 @@
 {
-  description = "Dendritic NixOS configuration for Daoist-Oak on Lingnao";
+  description = "Dendritic NixOS configuration for zeph on Lingnao";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
