@@ -47,6 +47,8 @@
       "amdgpu.dcdebugmask=0x410"
       # Reduce GPU page pinning so hibernation can migrate all RAM pages
       "amdgpu.sg_display=0"
+      # Allow NVMe to enter low-power states (1ms max wake latency)
+      "nvme_core.default_ps_max_latency_us=1000"
     ];
 
     # --- Plymouth (Boot Splash) ---

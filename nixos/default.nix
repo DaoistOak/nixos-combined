@@ -23,6 +23,7 @@
       }
       inputs.stylix.nixosModules.stylix
       inputs.nixos-hardware.nixosModules.lenovo-ideapad-slim-5
+      inputs.preload-ng.nixosModules.default
     ];
   };
 }

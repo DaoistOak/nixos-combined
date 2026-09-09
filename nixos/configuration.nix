@@ -86,23 +86,26 @@ in
   # (the Radeon 780M iGPU shares system RAM via TTM and failed under pressure).
   zramSwap = {
     enable = true;
-    memoryPercent = 50;
+    memoryPercent = 25;
     algorithm = "zstd";
     priority = 100;
   };
 
   # zram swap occupies RAM, which starves the hibernation image build
-  # ("Error -12 creating image"). Drain it to the SSD swap right before
-  # hibernating and re-enable it on resume so the Radeon 780M iGPU memory
-  # mitigation is unaffected outside of hibernation.
+  # ("Error -12 creating image" / "Cannot allocate memory"). The failure happens
+  # when swapoff /dev/zram0 must decompress zram pages back into RAM before
+  # migrating them to the SSD swap: too little free RAM -> ENOMEM. Drop page
+  # cache first to free RAM, then drain zram to the SSD swap. Re-enable zram on
+  # resume so the Radeon 780M iGPU memory mitigation is unaffected outside of
+  # hibernation.
   systemd.services = {
     "systemd-hibernate".serviceConfig = {
-      ExecStartPre = "-${pkgs.util-linux}/bin/swapoff /dev/zram0";
+      ExecStartPre = "-${pkgs.coreutils}/bin/sync; -sh -c 'echo 3 > /proc/sys/vm/drop_caches'; -${pkgs.util-linux}/bin/swapoff /dev/zram0";
       ExecStartPost = "-${pkgs.util-linux}/bin/swapon /dev/zram0";
       ExecStopPost = "-${pkgs.util-linux}/bin/swapon /dev/zram0";
     };
     "systemd-suspend-then-hibernate".serviceConfig = {
-      ExecStartPre = "-${pkgs.util-linux}/bin/swapoff /dev/zram0";
+      ExecStartPre = "-${pkgs.coreutils}/bin/sync; -sh -c 'echo 3 > /proc/sys/vm/drop_caches'; -${pkgs.util-linux}/bin/swapoff /dev/zram0";
       ExecStartPost = "-${pkgs.util-linux}/bin/swapon /dev/zram0";
       ExecStopPost = "-${pkgs.util-linux}/bin/swapon /dev/zram0";
     };
