@@ -85,10 +85,10 @@
     hl.bind(mod .. " + ALT + P", hl.dsp.exec_cmd("~/bin/colorpicker"))
 
     -- 9. APPLICATION LAUNCHERS
-    hl.bind(mod .. " + RETURN", hl.dsp.exec_cmd("kitty tmux"))
-    hl.bind(mod .. " + F", hl.dsp.exec_cmd("kitty yazi"))
-    hl.bind(mod .. " + H", hl.dsp.exec_cmd("kitty htop"))
-    hl.bind(mod .. " + ALT + H", hl.dsp.exec_cmd("kitty btop"))
+    hl.bind(mod .. " + RETURN", hl.dsp.exec_cmd("wezterm start tmux"))
+    hl.bind(mod .. " + F", hl.dsp.exec_cmd("wezterm start yazi"))
+    hl.bind(mod .. " + H", hl.dsp.exec_cmd("wezterm start htop"))
+    hl.bind(mod .. " + ALT + H", hl.dsp.exec_cmd("wezterm start btop"))
     hl.bind(mod .. " + ALT + RETURN", hl.dsp.exec_cmd("alacritty"))
     hl.bind(mod .. " + W", hl.dsp.exec_cmd("zen"))
     hl.bind(mod .. " + CONTROL + W", hl.dsp.exec_cmd("firefox -P minimalfox"))
@@ -145,7 +145,7 @@
     -- 12. SCRATCHPAD (special workspace)
     hl.bind(mod .. " + SHIFT + SPACE", hl.dsp.window.move({ workspace = "special:scratchpad" }))
     hl.bind(mod .. " + SPACE", hl.dsp.workspace.toggle_special("scratchpad"))
-    hl.bind(mod .. " + SHIFT + RETURN", hl.dsp.exec_cmd("[workspace special:scratchpad] kitty tmux"))
+    hl.bind(mod .. " + SHIFT + RETURN", hl.dsp.exec_cmd("[workspace special:scratchpad] wezterm start tmux"))
 
     -- Workspace navigation
     for i = 1, 9 do

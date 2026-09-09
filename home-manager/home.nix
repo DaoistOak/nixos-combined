@@ -93,6 +93,7 @@ in
   home.sessionVariables = {
     EDITOR = "nvim";
     BROWSER = "firefox";
+    TERMINAL = "wezterm start";
     QT_QPA_PLATFORMTHEME = lib.mkForce "qt6ct";
     QT_STYLE_OVERRIDE = lib.mkForce "kvantum";
     FLAKE_DIR = "/home/zeph/.config/nixos";

@@ -91,16 +91,32 @@ in
     priority = 100;
   };
 
-  # Enable hibernation
+  # zram swap occupies RAM, which starves the hibernation image build
+  # ("Error -12 creating image"). Drain it to the SSD swap right before
+  # hibernating and re-enable it on resume so the Radeon 780M iGPU memory
+  # mitigation is unaffected outside of hibernation.
+  systemd.services = {
+    "systemd-hibernate".serviceConfig = {
+      ExecStartPre = "-${pkgs.util-linux}/bin/swapoff /dev/zram0";
+      ExecStartPost = "-${pkgs.util-linux}/bin/swapon /dev/zram0";
+      ExecStopPost = "-${pkgs.util-linux}/bin/swapon /dev/zram0";
+    };
+    "systemd-suspend-then-hibernate".serviceConfig = {
+      ExecStartPre = "-${pkgs.util-linux}/bin/swapoff /dev/zram0";
+      ExecStartPost = "-${pkgs.util-linux}/bin/swapon /dev/zram0";
+      ExecStopPost = "-${pkgs.util-linux}/bin/swapon /dev/zram0";
+    };
+  };
+
+  # Enable hibernation: on battery, close the lid -> hibernate immediately
+  # (zero battery drain, full state restored). On AC -> suspend (fast wake).
   services.logind = {
     settings.Login = {
       HandlePowerKey = "hibernate";
       HandlePowerKeyLongPress = "poweroff";
-      HandleLidSwitch = "suspend-then-hibernate";
+      HandleLidSwitch = "hibernate";
+      HandleLidSwitchExternalPower = "suspend";
     };
-  };
-  systemd.sleep.settings.Sleep = {
-    HibernateDelaySec = "30m";
   };
 
   # System settings

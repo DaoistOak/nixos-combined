@@ -50,7 +50,7 @@
     force = true;
   };
 
-  # super+f launcher: open herdr inside kitty and start yazi in a fresh
+  # super+f launcher: open herdr inside wezterm and start yazi in a fresh
   # focused workspace, so an already-running agent pane never gets the input.
   xdg.configFile."herdr/scripts/launch-yazi.sh" = {
     executable = true;
@@ -61,7 +61,7 @@
       herdr=${pkgs.herdr}/bin/herdr
       jq=${pkgs.jq}/bin/jq
 
-      kitty -e "$herdr" &
+      wezterm start "$herdr" &
       herdr_pid=$!
 
       ready=0
