@@ -1,8 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  # Define user accounts
-  users.users.zeph = {
+  users.users.Daoist-Oak = {
     shell = pkgs.zsh;
     isNormalUser = true;
     description = "SD";
@@ -35,15 +34,14 @@
     ];
   };
 
-  # User-specific environment variables
   environment.variables = {
     EDITOR = "nvim";
     VISUAL = "nvim";
-    ZDOTDIR = "/home/zeph/.config/zsh";
-    XDG_CONFIG_HOME = "/home/zeph/.config";
-    XDG_DATA_HOME = "/home/zeph/.local/share";
-    XDG_CACHE_HOME = "/home/zeph/.cache";
-    XDG_STATE_HOME = "/home/zeph/.local/state";
+    ZDOTDIR = "/home/Daoist-Oak/.config/zsh";
+    XDG_CONFIG_HOME = "/home/Daoist-Oak/.config";
+    XDG_DATA_HOME = "/home/Daoist-Oak/.local/share";
+    XDG_CACHE_HOME = "/home/Daoist-Oak/.cache";
+    XDG_STATE_HOME = "/home/Daoist-Oak/.local/state";
     ANDROID_USER_HOME = "$XDG_DATA_HOME/android";
     CARGO_HOME = "$XDG_DATA_HOME/cargo";
     GTK2_RC_FILES = "$XDG_CONFIG_HOME/gtk-2.0/gtkrc";
@@ -54,9 +52,8 @@
     PSQL_HISTORY = "$XDG_STATE_HOME/psql_history";
     WAKATIME_HOME = "$XDG_CONFIG_HOME/wakatime";
     WINEPREFIX = "$XDG_DATA_HOME/wine";
-    # XAUTHORITY = "$XDG_RUNTIME_DIR/Xauthority";
     XCOMPOSECACHE = "$XDG_CACHE_HOME/X11/xcompose";
-    PYTHONSTARTUP = "/home/zeph/python/pythonrc";
+    PYTHONSTARTUP = "/home/Daoist-Oak/python/pythonrc";
     GRADLE_USER_HOME = "$XDG_DATA_HOME/gradle";
     CODEX_HOME = "$XDG_CONFIG_HOME/codex";
     DOTNET_CLI_HOME = "$XDG_DATA_HOME/dotnet";
@@ -67,7 +64,6 @@
     _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=$XDG_CONFIG_HOME/java";
     WGETRC = "$XDG_CONFIG_HOME/wget/wgetrc";
   };
-  # Enable Zsh
   programs.zsh.enable = true;
   programs.direnv.enableZshIntegration = true;
 

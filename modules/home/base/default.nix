@@ -7,9 +7,8 @@
 }:
 
 let
-  user-packages = (import ../pkgs/default.nix { inherit pkgs inputs; }).user-packages;
-  themeMod = import ../modules/config/colors/themes.nix { inherit lib; };
-  themeSel = themeMod.readSelection ../modules/config/colors/selection;
+  themeMod = import ../config/themes/colors/themes.nix { inherit lib; };
+  themeSel = themeMod.readSelection ../config/themes/colors/src/selection;
   catppuccinAccent =
     if themeMod.themes.catppuccin.flavors.macchiato.accents ? ${themeSel.accentName} then
       themeSel.accentName
@@ -18,23 +17,27 @@ let
 in
 {
   imports = [
-    ../modules/config/hypr/hyprland.nix
-    ../modules/config/herdr
-    ../modules/config/crush
-    ../modules/config/yazi
-    ../modules/config/superfile
-    ../modules/config/kitty
-    ../modules/config/alacritty
-    ../modules/config/wezterm
-    ../modules/config/tmux
-    ../modules/config/colors
-    ../modules/config/themeswitcher
-    ../modules/config/theme
-    ../modules/config/zsh
+    ../config/modules/hypr/hyprland
+    ../config/modules/hypr/hypridle
+    ../config/modules/hypr/hyprlock
+    ../config/modules/herdr
+    ../config/modules/crush
+    ../config/modules/yazi
+    ../config/modules/superfile
+    ../config/modules/kitty
+    ../config/modules/alacritty
+    ../config/modules/wezterm
+    ../config/modules/tmux
+    ../config/themes/colors
+    ../config/themes/themer
+    ../config/themes/theme
+    ../config/modules/zsh
+    ../config/pkgs
     inputs.noctalia.homeModules.default
   ];
-  home.username = "zeph";
-  home.homeDirectory = "/home/zeph";
+
+  home.username = "Daoist-Oak";
+  home.homeDirectory = "/home/Daoist-Oak";
   gtk.enable = true;
   stylix.targets.gtk.extraCss = ''
     @import url("noctalia.css");
@@ -43,6 +46,7 @@ in
   home.stateVersion = "26.05";
   home.pointerCursor.enable = true;
   wayland.windowManager.hyprland.configType = "lua";
+
   catppuccin = {
     enable = themeSel.themeName == "catppuccin";
     autoEnable = true;
@@ -52,14 +56,12 @@ in
       else
         "macchiato";
     accent = catppuccinAccent;
-    # These terminals are owned by modules/config/{kitty,alacritty,wezterm,tmux}
-    # which draw from the centralized colors.active palette; keep the catppuccin
-    # module from also theming them.
     kitty.enable = false;
     alacritty.enable = false;
     wezterm.enable = false;
     tmux.enable = false;
   };
+
   xdg.configFile."gtk-3.0/gtk.css".force = true;
   xdg.configFile."hypr/hyprlock.conf".force = true;
   xdg.configFile."gtk-4.0/gtk.css".force = true;
@@ -71,18 +73,9 @@ in
       "application/pdf" = "org.kde.okular.desktop";
     };
   };
-  home.packages =
-    with pkgs;
-    [
-    ]
-    ++ user-packages;
 
   programs.noctalia = {
     enable = true;
-    # The noctalia homeModule defaults to custom_palette = "stylix"; override so
-    # config.toml points at the runtime themeswapper palette written by
-    # scripts/theme (gen_noctalia_palette) — that's what makes live theme
-    # switches recolour the shell immediately.
     settings.theme = lib.mkForce {
       source = "custom";
       custom_palette = "themeswapper";
@@ -96,7 +89,7 @@ in
     TERMINAL = "wezterm start";
     QT_QPA_PLATFORMTHEME = lib.mkForce "qt6ct";
     QT_STYLE_OVERRIDE = lib.mkForce "kvantum";
-    FLAKE_DIR = "/home/zeph/.config/nixos";
+    FLAKE_DIR = "/home/Daoist-Oak/.config/nixos";
   };
 
   xdg.configFile.".gtkrc-2.0" = {
@@ -104,16 +97,11 @@ in
     text = "# Default GTK RC-2.0 Configuration\n";
   };
 
-  # Keep dotfiles out of $HOME per XDG.
-  # Relocate .Xresources to $XDG_CONFIG_HOME/X11/xresources (xrdb -merge still wired up).
   xresources.path = "${config.xdg.configHome}/X11/xresources";
-  # ~/.icons would otherwise be created for backwards compat; instead rely on
-  # $XDG_DATA_HOME/icons + XCURSOR_PATH (already set by home-manager).
   home.pointerCursor.dotIcons.enable = false;
 
   programs.home-manager.enable = true;
 
-  # devenv shell integration: auto-activates devenv.nix dev environments on cd.
   programs.devenv = {
     enable = true;
     enableZshIntegration = true;
@@ -125,27 +113,4 @@ in
       hsts-file = ${config.home.homeDirectory}/.local/share/wget-hsts
     '';
   };
-
-  # programs.caelestia = {
-  #   enable = true;
-  #   systemd = {
-  #     enable = false; # if you prefer starting from your compositor
-  #     target = "graphical-session.target";
-  #     environment = [ ];
-  #   };
-  #   settings = {
-  #     bar.status = {
-  #       showBattery = true;
-  #     };
-  #     paths.wallpaperDir = "~/Wallpaper/Catppuccin-Macchiato";
-  #   };
-  #   cli = {
-  #     enable = true; # Also add caelestia-cli to path
-  #     settings = {
-  #       theme.enableGtk = true;
-  #     };
-  #   };
-  # };
-
-  # Include the keyboard LED control module
 }

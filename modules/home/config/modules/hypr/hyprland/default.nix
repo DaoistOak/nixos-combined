@@ -17,8 +17,6 @@
     ./settings/misc.nix
     ./settings/startup.nix
     ./settings/windowrules.nix
-    ./hyprlock.nix
-    ./hypridle.nix
     ./scripts/hyprlock.nix
     ./scripts/media-idle.nix
     ./scripts/performance.nix

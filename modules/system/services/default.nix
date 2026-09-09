@@ -24,6 +24,16 @@ let
 in
 {
   powerManagement.powertop.enable = true;
+  systemd.services.powertop.wantedBy = lib.mkForce [ ];
+  systemd.services.powertop-bg = {
+    description = "Apply powertop auto-tune (non-blocking)";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.bash}/bin/bash -c '${pkgs.powertop}/bin/powertop --auto-tune &'";
+    };
+  };
 
   security.pam.services.passwd.text = ''
     auth [success=1 default=ignore] pam_fprintd.so
@@ -94,9 +104,9 @@ in
     # 🔄 Syncthing (file sync daemon)
     syncthing = {
       enable = true;
-      user = "zeph";
-      dataDir = "/home/zeph/Sync";
-      configDir = "/home/zeph/.config/syncthing";
+      user = "Daoist-Oak";
+      dataDir = "/home/Daoist-Oak/Sync";
+      configDir = "/home/Daoist-Oak/.config/syncthing";
     };
 
     # 🔌 Power Profiles (disabled)
@@ -213,5 +223,5 @@ in
     };
   };
 
-  systemd.services.NetworkManager-wait-online.enable = true;
+  systemd.services.NetworkManager-wait-online.enable = false;
 }

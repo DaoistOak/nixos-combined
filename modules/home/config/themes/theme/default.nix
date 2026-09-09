@@ -13,7 +13,7 @@ in
   stylix = {
     enable = true;
     polarity = sel.r.polarity;
-    image = ./wallpaper;
+    image = ./src/wallpaper;
     # Derived from the active theme selection (modules/config/colors/selection,
     # updated by scripts/theme), so switching theme/accent and rebuilding makes
     # Stylix' GTK/KDE/Qt outputs follow. base0D carries the selected accent.
