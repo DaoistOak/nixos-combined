@@ -1,7 +1,8 @@
 { config, pkgs, ... }:
 
 {
-  users.users.Daoist-Oak = {
+  users.users.zeph = {
+    uid = 1000;
     shell = pkgs.zsh;
     isNormalUser = true;
     description = "SD";
@@ -37,11 +38,11 @@
   environment.variables = {
     EDITOR = "nvim";
     VISUAL = "nvim";
-    ZDOTDIR = "/home/Daoist-Oak/.config/zsh";
-    XDG_CONFIG_HOME = "/home/Daoist-Oak/.config";
-    XDG_DATA_HOME = "/home/Daoist-Oak/.local/share";
-    XDG_CACHE_HOME = "/home/Daoist-Oak/.cache";
-    XDG_STATE_HOME = "/home/Daoist-Oak/.local/state";
+    ZDOTDIR = "/home/zeph/.config/zsh";
+    XDG_CONFIG_HOME = "/home/zeph/.config";
+    XDG_DATA_HOME = "/home/zeph/.local/share";
+    XDG_CACHE_HOME = "/home/zeph/.cache";
+    XDG_STATE_HOME = "/home/zeph/.local/state";
     ANDROID_USER_HOME = "$XDG_DATA_HOME/android";
     CARGO_HOME = "$XDG_DATA_HOME/cargo";
     GTK2_RC_FILES = "$XDG_CONFIG_HOME/gtk-2.0/gtkrc";
@@ -53,7 +54,7 @@
     WAKATIME_HOME = "$XDG_CONFIG_HOME/wakatime";
     WINEPREFIX = "$XDG_DATA_HOME/wine";
     XCOMPOSECACHE = "$XDG_CACHE_HOME/X11/xcompose";
-    PYTHONSTARTUP = "/home/Daoist-Oak/python/pythonrc";
+    PYTHONSTARTUP = "/home/zeph/python/pythonrc";
     GRADLE_USER_HOME = "$XDG_DATA_HOME/gradle";
     CODEX_HOME = "$XDG_CONFIG_HOME/codex";
     DOTNET_CLI_HOME = "$XDG_DATA_HOME/dotnet";
