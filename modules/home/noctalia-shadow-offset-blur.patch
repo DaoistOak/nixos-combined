@@ -1,0 +1,299 @@
+diff --git a/src/config/config_types.h b/src/config/config_types.h
+index 70b2dce..ae93515 100644
+--- a/src/config/config_types.h
++++ b/src/config/config_types.h
+@@ -155,6 +155,7 @@ struct BarConfig {
+   std::int32_t padding = 14;           // main-axis padding from bar edges to start/end sections
+   std::int32_t widgetSpacing = 6;      // gap between widgets within a section
+   bool shadow = true;                  // use the global shell shadow
++  std::int32_t shadowBlur = 0;         // override the shell shadow blur for this bar (0 = inherit)
+   bool contactShadow = false;          // dark gradient between attached panel and bar
+   // Logical px the attached panel overlaps the bar edge so their seam is hidden. The ideal value depends on the
+   // compositor and the output's fractional scale (physical-pixel rounding), so it is exposed for per-bar/per-monitor
+@@ -958,6 +959,19 @@ struct ShellConfig {
+   struct ShadowConfig {
+     ShadowDirection direction = ShadowDirection::Down;
+     float alpha = 0.55F;
++    // Explicit pixel offsets override the compass-direction mapping so the
++    // shell can mirror compositor shadow offsets (e.g. Hyprland offset "4, 4").
++    std::int32_t offsetX = 0;
++    std::int32_t offsetY = 0;
++    // Shadow blur radius in px; 0 selects the built-in kBlurRadius.
++    std::int32_t blur = 0;
++
++    [[nodiscard]] constexpr ShadowDirectionOffset shadowOffset() const noexcept {
++      if (offsetX != 0 || offsetY != 0) {
++        return {offsetX, offsetY};
++      }
++      return shadowDirectionOffset(direction);
++    }
+ 
+     bool operator==(const ShadowConfig&) const = default;
+   };
+diff --git a/src/config/schema/config_schema.cpp b/src/config/schema/config_schema.cpp
+index d5e35ca..5723560 100644
+--- a/src/config/schema/config_schema.cpp
++++ b/src/config/schema/config_schema.cpp
+@@ -1264,6 +1264,9 @@ namespace noctalia::config::schema {
+       static const Schema<ShellConfig::ShadowConfig> s = {
+           enumField(&ShellConfig::ShadowConfig::direction, "direction", kShadowDirections),
+           field(&ShellConfig::ShadowConfig::alpha, "alpha", kUnitRange),
++          field(&ShellConfig::ShadowConfig::offsetX, "offset_x", Range<std::int64_t>{-64, 64}),
++          field(&ShellConfig::ShadowConfig::offsetY, "offset_y", Range<std::int64_t>{-64, 64}),
++          field(&ShellConfig::ShadowConfig::blur, "blur", Range<std::int64_t>{0, 64}),
+       };
+       return s;
+     }
+@@ -2230,6 +2233,7 @@ namespace noctalia::config::schema {
+         field(&BarConfig::padding, "padding"),
+         field(&BarConfig::widgetSpacing, "widget_spacing"),
+         field(&BarConfig::shadow, "shadow"),
++        field(&BarConfig::shadowBlur, "shadow_blur", Range<std::int64_t>{0, 64}),
+         field(&BarConfig::contactShadow, "contact_shadow"),
+         field(&BarConfig::panelOverlap, "panel_overlap", kBarPanelOverlapRange),
+         field(&BarConfig::capsuleThickness, "capsule_thickness", kBarCapsuleThicknessRange),
+diff --git a/src/shell/bar/bar.cpp b/src/shell/bar/bar.cpp
+index 5fe61b9..104ba50 100644
+--- a/src/shell/bar/bar.cpp
++++ b/src/shell/bar/bar.cpp
+@@ -891,9 +891,20 @@ namespace {
+     return {-(contentRight + k), 0.0F};
+   }
+ 
++  ShellConfig::ShadowConfig barShadow(
++      const ShellConfig::ShadowConfig& shadow, const BarConfig& bar
++  ) {
++    ShellConfig::ShadowConfig merged = shadow;
++    if (bar.shadowBlur > 0) {
++      merged.blur = bar.shadowBlur;
++    }
++    return merged;
++  }
++
+   void applyBarShadowStyle(
+-      BarInstance& instance, const ShellConfig::ShadowConfig& shadowConfig, float surfaceWidth, float surfaceHeight
++      BarInstance& instance, const ShellConfig::ShadowConfig& baseShadow, float surfaceWidth, float surfaceHeight
+   ) {
++    const auto shadowConfig = barShadow(baseShadow, instance.barConfig);
+     if (instance.shadow == nullptr) {
+       return;
+     }
+@@ -908,7 +919,7 @@ namespace {
+     const float barAreaW = barVisual.width + concave.logicalInset.left + concave.logicalInset.right;
+     const float barAreaH = barVisual.height + concave.logicalInset.top + concave.logicalInset.bottom;
+     const float bgOpacity = std::clamp(instance.barConfig.backgroundOpacity, 0.0F, 1.0F);
+-    const auto shadowOff = shadowDirectionOffset(shadowConfig.direction);
++    const auto shadowOff = shadowConfig.shadowOffset();
+     const float shadowX = barVisual.x - concave.logicalInset.left + static_cast<float>(shadowOff.x);
+     const float shadowY = barVisual.y - concave.logicalInset.top + static_cast<float>(shadowOff.y);
+     RoundedRectStyle shadowStyle = shell::surface_shadow::style(
+@@ -1978,7 +1989,7 @@ void Bar::syncBarExclusiveZone(BarInstance& instance) {
+     return;
+   }
+   const std::int32_t zone = shouldReserveExclusiveZone(instance)
+-      ? reservedBarExclusiveZone(instance.barConfig, m_config->config().shell.shadow)
++      ? reservedBarExclusiveZone(instance.barConfig, barShadow(m_config->config().shell.shadow, instance.barConfig))
+       : 0;
+   instance.surface->setExclusiveZone(zone);
+ }
+@@ -2383,7 +2394,7 @@ void Bar::createInstance(const WaylandOutput& output, std::size_t barIndex, cons
+   instance->barIndex = barIndex;
+ 
+   const auto anchor = positionToAnchor(barConfig.position);
+-  const auto surfaceSpec = computeBarSurfaceSpec(barConfig, m_config->config().shell.shadow);
++  const auto surfaceSpec = computeBarSurfaceSpec(barConfig, barShadow(m_config->config().shell.shadow, barConfig));
+ 
+   kLog.info(
+       "creating #{} \"{}\" on {} ({}), thickness={} position={} reserve_space={} exclusive_zone={}", barIndex,
+@@ -3102,7 +3113,7 @@ void Bar::syncBarAutoHideInputRegion(BarInstance& instance) const {
+     return;
+   }
+   instance.surface->setInputRegion(
+-      {barContentInputRegion(instance.barConfig, m_config->config().shell.shadow, surfW, surfH)}
++      {barContentInputRegion(instance.barConfig, barShadow(m_config->config().shell.shadow, instance.barConfig), surfW, surfH)}
+   );
+ }
+ 
+@@ -3238,10 +3249,10 @@ void Bar::buildScene(BarInstance& instance, std::uint32_t width, std::uint32_t h
+   const auto h = static_cast<float>(height);
+   const auto padding = static_cast<float>(instance.barConfig.padding);
+   const auto widgetSpacing = static_cast<float>(instance.barConfig.widgetSpacing);
+-  const auto& shadowConfig = m_config->config().shell.shadow;
+-  const auto shadowOffset = shadowDirectionOffset(shadowConfig.direction);
++  const auto shadowConfig = barShadow(m_config->config().shell.shadow, instance.barConfig);
++  const auto shadowOffset = shadowConfig.shadowOffset();
+   const float shadowSize = shell::surface_shadow::enabled(instance.barConfig.shadow, shadowConfig)
+-      ? static_cast<float>(shell::surface_shadow::kBlurRadius)
++      ? static_cast<float>(shell::surface_shadow::blurRadius(shadowConfig))
+       : 0.0F;
+   const auto shadowOffsetX = static_cast<float>(shadowOffset.x);
+   const auto shadowOffsetY = static_cast<float>(shadowOffset.y);
+@@ -3445,7 +3456,7 @@ void Bar::updateWidgets(BarInstance& instance) {
+   const auto h = static_cast<float>(instance.surface->height());
+   const auto padding = static_cast<float>(instance.barConfig.padding);
+   const bool isVertical = (instance.barConfig.position == "left" || instance.barConfig.position == "right");
+-  const auto& shadowConfig = m_config->config().shell.shadow;
++  const auto shadowConfig = barShadow(m_config->config().shell.shadow, instance.barConfig);
+   const float innerSurfaceExtension = barInnerSurfaceExtension(instance.barConfig, shadowConfig, w, h);
+   const auto barVisual = computeBarVisualGeometry(instance.barConfig, shadowConfig, w, h, innerSurfaceExtension);
+   const float barAreaW = barVisual.width;
+@@ -3489,7 +3500,7 @@ void Bar::prepareFrame(BarInstance& instance, bool needsUpdate, bool needsLayout
+   const auto h = static_cast<float>(instance.surface->height());
+   const auto padding = static_cast<float>(instance.barConfig.padding);
+   const bool isVertical = (instance.barConfig.position == "left" || instance.barConfig.position == "right");
+-  const auto& shadowConfig = m_config->config().shell.shadow;
++  const auto shadowConfig = barShadow(m_config->config().shell.shadow, instance.barConfig);
+   const float innerSurfaceExtension = barInnerSurfaceExtension(instance.barConfig, shadowConfig, w, h);
+   const auto barVisual = computeBarVisualGeometry(instance.barConfig, shadowConfig, w, h, innerSurfaceExtension);
+   const float barAreaW = barVisual.width;
+@@ -3977,7 +3988,7 @@ std::string Bar::setBarAutoHideIpc(std::string_view args) {
+       if (inst.surface == nullptr) {
+         return;
+       }
+-      const auto spec = computeBarSurfaceSpec(inst.barConfig, m_config->config().shell.shadow);
++      const auto spec = computeBarSurfaceSpec(inst.barConfig, barShadow(m_config->config().shell.shadow, inst.barConfig));
+       inst.surface->setMargins(spec.marginTop, spec.marginRight, spec.marginBottom, spec.marginLeft);
+       inst.surface->requestSize(spec.surfaceWidth, spec.surfaceHeight);
+     };
+diff --git a/src/shell/dock/dock_geometry.cpp b/src/shell/dock/dock_geometry.cpp
+index 7245e48..6c64f79 100644
+--- a/src/shell/dock/dock_geometry.cpp
++++ b/src/shell/dock/dock_geometry.cpp
+@@ -337,7 +337,7 @@ namespace shell::dock {
+     float contentRight = panel.panelX + panel.panelW;
+     float contentBottom = panel.panelY + panel.panelH;
+     if (shell::surface_shadow::enabled(cfg.shadow, shadow)) {
+-      const auto offset = shadowDirectionOffset(shadow.direction);
++      const auto offset = shadow.shadowOffset();
+       const float sx = panel.panelX + static_cast<float>(offset.x);
+       const float sy = panel.panelY + static_cast<float>(offset.y);
+       contentLeft = std::min(contentLeft, sx);
+diff --git a/src/shell/dock/dock_instance.cpp b/src/shell/dock/dock_instance.cpp
+index cf6e8ea..66f652f 100644
+--- a/src/shell/dock/dock_instance.cpp
++++ b/src/shell/dock/dock_instance.cpp
+@@ -291,7 +291,7 @@ namespace shell::dock {
+ 
+     // Shadow follows the same shape as the background
+     if (instance.shadow != nullptr) {
+-      const auto shadowOff = shadowDirectionOffset(shadowConfig.direction);
++      const auto shadowOff = shadowConfig.shadowOffset();
+       const auto shadowOffsetX = static_cast<float>(shadowOff.x);
+       const auto shadowOffsetY = static_cast<float>(shadowOff.y);
+       const RoundedRectStyle shadowStyle = shell::surface_shadow::style(
+diff --git a/src/shell/panel/panel_manager.cpp b/src/shell/panel/panel_manager.cpp
+index 72c65b8..58780bd 100644
+--- a/src/shell/panel/panel_manager.cpp
++++ b/src/shell/panel/panel_manager.cpp
+@@ -2600,7 +2600,7 @@ void PanelManager::buildScene(std::uint32_t width, std::uint32_t height) {
+     const bool panelShadow =
+         m_config->config().shell.panel.shadow && shell::surface_shadow::enabled(true, shadowConfig);
+     m_panelShadowNode->setVisible(panelShadow);
+-    const auto shadowOff = shadowDirectionOffset(shadowConfig.direction);
++    const auto shadowOff = shadowConfig.shadowOffset();
+     const auto shadowOffsetX = static_cast<float>(shadowOff.x);
+     const auto shadowOffsetY = static_cast<float>(shadowOff.y);
+     m_panelShadowNode->setPosition(bgX + shadowOffsetX, bgY + shadowOffsetY);
+diff --git a/src/shell/panel/persistent_panel_host.cpp b/src/shell/panel/persistent_panel_host.cpp
+index 56106fe..47e3d62 100644
+--- a/src/shell/panel/persistent_panel_host.cpp
++++ b/src/shell/panel/persistent_panel_host.cpp
+@@ -414,7 +414,7 @@ void PersistentPanelHost::layoutScene(Instance& instance, std::uint32_t width, s
+     const bool panelShadow =
+         m_config->config().shell.panel.shadow && shell::surface_shadow::enabled(true, shadowConfig);
+     instance.shadowNode->setVisible(panelShadow);
+-    const auto shadowOff = shadowDirectionOffset(shadowConfig.direction);
++    const auto shadowOff = shadowConfig.shadowOffset();
+     instance.shadowNode->setPosition(
+         panelX + static_cast<float>(shadowOff.x), panelY + static_cast<float>(shadowOff.y)
+     );
+diff --git a/src/shell/surface/shadow.cpp b/src/shell/surface/shadow.cpp
+index 7870243..1833928 100644
+--- a/src/shell/surface/shadow.cpp
++++ b/src/shell/surface/shadow.cpp
+@@ -12,18 +12,19 @@ namespace shell::surface_shadow {
+     if (!enabled(componentShadow, shadow)) {
+       return {};
+     }
+-    const auto offset = shadowDirectionOffset(shadow.direction);
++    const auto offset = shadow.shadowOffset();
++    const auto radius = blurRadius(shadow);
+     return {
+-        .left = kBlurRadius + std::max(0, -offset.x),
+-        .right = kBlurRadius + std::max(0, offset.x),
+-        .up = kBlurRadius + std::max(0, -offset.y),
+-        .down = kBlurRadius + std::max(0, offset.y),
++        .left = radius + std::max(0, -offset.x),
++        .right = radius + std::max(0, offset.x),
++        .up = radius + std::max(0, -offset.y),
++        .down = radius + std::max(0, offset.y),
+     };
+   }
+ 
+   RoundedRectStyle
+   style(const ShellConfig::ShadowConfig& shadow, float backgroundOpacity, const Shape& shape) noexcept {
+-    const auto offset = shadowDirectionOffset(shadow.direction);
++    const auto offset = shadow.shadowOffset();
+     const float shadowAlpha = std::clamp(shadow.alpha, 0.0F, 1.0F) * std::clamp(backgroundOpacity, 0.0F, 1.0F);
+     return RoundedRectStyle{
+         .fill = rgba(0.0F, 0.0F, 0.0F, shadowAlpha),
+@@ -32,7 +33,7 @@ namespace shell::surface_shadow {
+         .corners = shape.corners,
+         .logicalInset = shape.logicalInset,
+         .radius = shape.radius,
+-        .softness = static_cast<float>(kBlurRadius),
++        .softness = static_cast<float>(blurRadius(shadow)),
+         .borderWidth = 0.0F,
+         .outerShadow = true,
+         .shadowCutoutOffsetX = static_cast<float>(offset.x),
+@@ -41,7 +42,8 @@ namespace shell::surface_shadow {
+   }
+ 
+   bool sameSurfaceMetrics(const ShellConfig::ShadowConfig& previous, const ShellConfig::ShadowConfig& next) noexcept {
+-    return previous.direction == next.direction;
++    return previous.direction == next.direction && previous.offsetX == next.offsetX
++        && previous.offsetY == next.offsetY && previous.blur == next.blur;
+   }
+ 
+ } // namespace shell::surface_shadow
+diff --git a/src/shell/surface/shadow.h b/src/shell/surface/shadow.h
+index dba1dfd..481dc5a 100644
+--- a/src/shell/surface/shadow.h
++++ b/src/shell/surface/shadow.h
+@@ -9,6 +9,10 @@ namespace shell::surface_shadow {
+ 
+   constexpr std::int32_t kBlurRadius = 12;
+ 
++  [[nodiscard]] constexpr std::int32_t blurRadius(const ShellConfig::ShadowConfig& shadow) noexcept {
++    return shadow.blur > 0 ? shadow.blur : kBlurRadius;
++  }
++
+   struct Bleed {
+     std::int32_t left = 0;
+     std::int32_t right = 0;
+diff --git a/src/ui/dialogs/dialog_popup_host.cpp b/src/ui/dialogs/dialog_popup_host.cpp
+index 98f431e..778618f 100644
+--- a/src/ui/dialogs/dialog_popup_host.cpp
++++ b/src/ui/dialogs/dialog_popup_host.cpp
+@@ -504,7 +504,7 @@ void DialogPopupHost::syncSceneGeometryFromSurface() {
+   const float panelH = m_chrome.contentHeight;
+   if (m_panelShadow != nullptr && Style::popupShadowsEnabled()) {
+     const auto shadow = popupShadowConfig(m_config);
+-    const auto offset = shadowDirectionOffset(shadow.direction);
++    const auto offset = shadow.shadowOffset();
+     m_panelShadow->setPosition(panelX + static_cast<float>(offset.x), panelY + static_cast<float>(offset.y));
+     m_panelShadow->setFrameSize(panelW, panelH);
+   }
+diff --git a/src/ui/popup_chrome.cpp b/src/ui/popup_chrome.cpp
+index 8f76a59..a08512e 100644
+--- a/src/ui/popup_chrome.cpp
++++ b/src/ui/popup_chrome.cpp
+@@ -110,7 +110,7 @@ namespace popup_chrome {
+             shadow, backgroundOpacity, shell::surface_shadow::Shape{.radius = Radii{radius, radius, radius, radius}}
+         )
+     );
+-    const auto offset = shadowDirectionOffset(shadow.direction);
++    const auto offset = shadow.shadowOffset();
+     shadowNode->setPosition(
+         geometry.contentX() + static_cast<float>(offset.x), geometry.contentY() + static_cast<float>(offset.y)
+     );
