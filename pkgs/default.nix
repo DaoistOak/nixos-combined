@@ -46,6 +46,7 @@ let
     # nur.repos.mikilio.ttf-ms-fonts
     klassy
     pay-respects
+    socat
   ];
 
   system-packages = with pkgs; [
@@ -119,6 +120,7 @@ let
     busybox
     btop
     cargo
+    cava
     cpufrequtils
     curl
     jq

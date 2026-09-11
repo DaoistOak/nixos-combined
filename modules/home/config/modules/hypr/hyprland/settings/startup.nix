@@ -122,6 +122,9 @@ in
           function()
             -- Launch the shell / bar
             hl.exec_cmd("noctalia")
+            -- Follow Hyprland submaps: show the Keymap overlay bar when a
+            -- submap is active, hide it when back to default.
+            hl.exec_cmd("${config.xdg.configHome}/hypr/scripts/submap-bar.sh")
             -- GUI polkit authentication agent (KDE). Launched from Hyprland so
             -- it inherits the full graphical env (DISPLAY, WAYLAND, session bus)
             -- and can register with polkitd. The wrapper strips QT_STYLE_OVERRIDE
