@@ -23,10 +23,12 @@
     ./scripts/launch-network.nix
     ./scripts/launch-terminal.nix
     ./scripts/media-idle.nix
+    ./scripts/noctalia-restart.nix
     ./scripts/performance.nix
     ./scripts/session.nix
     ./scripts/super-tap-launcher.nix
     ./scripts/switch-default-terminal.nix
+    ./scripts/submap-bar.nix
   ];
   wayland.windowManager.hyprland = {
     enable = true;
