@@ -133,8 +133,6 @@ in
             hl.exec_cmd("${polkitAgentWrapper}/bin/polkit-kde-agent-wrapper")
             -- Launch notifications service (swaync or mako)
             hl.exec_cmd("/run/current-system/sw/bin/nm-applet")
-            -- Volume and brightness services
-            hl.exec_cmd("avizo-service")
 
             -- Idle and power management
             -- hl.exec_cmd("hypridle") -- disabled: run as systemd user unit via home-manager services.hypridle
