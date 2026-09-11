@@ -7,14 +7,14 @@
 
 let
   t = import ../colors/themes.nix { inherit lib; };
-  sel = t.readSelection ../colors/selection;
+  sel = t.readSelection ../colors/src/selection;
 in
 {
   stylix = {
     enable = true;
     polarity = sel.r.polarity;
     image = ./src/wallpaper;
-    # Derived from the active theme selection (modules/config/colors/selection,
+    # Derived from the active theme selection (modules/home/config/themes/colors/src/selection,
     # updated by scripts/theme), so switching theme/accent and rebuilding makes
     # Stylix' GTK/KDE/Qt outputs follow. base0D carries the selected accent.
     base16Scheme = t.toBase16 sel.r;
