@@ -2,7 +2,6 @@
 
 {
   users.users.zeph = {
-    uid = 1000;
     shell = pkgs.zsh;
     isNormalUser = true;
     description = "SD";

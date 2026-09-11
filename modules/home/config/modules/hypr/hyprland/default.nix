@@ -17,11 +17,16 @@
     ./settings/misc.nix
     ./settings/startup.nix
     ./settings/windowrules.nix
+    ./scripts/airplane-mode.nix
     ./scripts/hyprlock.nix
+    ./scripts/launch-bluetooth.nix
+    ./scripts/launch-network.nix
+    ./scripts/launch-terminal.nix
     ./scripts/media-idle.nix
     ./scripts/performance.nix
     ./scripts/session.nix
     ./scripts/super-tap-launcher.nix
+    ./scripts/switch-default-terminal.nix
   ];
   wayland.windowManager.hyprland = {
     enable = true;
