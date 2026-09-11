@@ -28,6 +28,7 @@
     ./scripts/super-tap-launcher.nix
     ./scripts/switch-default-terminal.nix
     ./scripts/submap-bar.nix
+    ./scripts/submap-timeout.nix
     ./scripts/volume.nix
   ];
   wayland.windowManager.hyprland = {

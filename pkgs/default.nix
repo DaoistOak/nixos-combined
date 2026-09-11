@@ -144,6 +144,9 @@ let
     swappy
     satty
     hyprpicker
+    # Wayland screen recording + ImageMagick (`magick`) for conversions
+    wl-screenrec
+    imagemagick
     hollywood
     jre
     openjfx
@@ -183,6 +186,10 @@ let
     tesseract
     # Open Sound Control command-line client
     osc
+    # Speech-to-text dictation for Hyprland
+    hyprwhspr-rs
+    # Keypress visualization (from NUR, not in nixpkgs)
+    nur.repos.milahu.keyviz
     unzip
     upower
     util-linux
