@@ -132,7 +132,6 @@ let
     ffmpeg-full
     fish
     freerdp
-    gemini-cli
     git
     gnirehtet
     gnumake
