@@ -138,6 +138,12 @@ let
     gnumake
     grim
     grimblast
+    # Screenshot/color helpers: slurp (region select for grim), swappy and
+    # satty (annotate/editor backends), hyprpicker (color picker).
+    slurp
+    swappy
+    satty
+    hyprpicker
     hollywood
     jre
     openjfx
@@ -173,6 +179,10 @@ let
     tgpt
     thermald
     tlp
+    # OCR
+    tesseract
+    # Open Sound Control command-line client
+    osc
     unzip
     upower
     util-linux
@@ -192,6 +202,8 @@ let
     cairo
     dart-sass
     gvfs
+    # Provides the gio command (used by syncthing for mime/open handling)
+    glib
     libgtop
     mangohud
     python3
