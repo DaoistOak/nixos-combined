@@ -4,10 +4,10 @@
 #
 # Terminal/tmux/noctalia/icon changes apply live (no rebuild). Stylix
 # (GTK/KDE/Qt/..) renders its colors at build time, so `theme set` also writes
-# the tracked modules/config/colors/selection file and rebuilds home-manager so
-# the desktop follows the same selection. Noctalia's config.toml (HM-managed)
-# is also updated by the rebuild. Pass --runtime to skip the rebuild and
-# --system to ALSO switch the NixOS system (console/plymouth; needs polkit).
+# the tracked modules/home/config/themes/colors/src/selection file and rebuilds
+# home-manager so the desktop follows the same selection. Noctalia's config.toml
+# (HM-managed) is also updated by the rebuild. Pass --runtime to skip the rebuild
+# and --system to ALSO switch the NixOS system (console/plymouth; needs polkit).
 #
 # Reads the generic theme DB exported by modules/config/colors and drives:
 #   * The four terminals via runtime theme files that their declarative
@@ -35,7 +35,7 @@ CFG="$HOME/.config/theme-switcher"
 
 # Tracked build-time selection (drives Stylix + build-time defaults).
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SELECTION="$REPO_ROOT/modules/config/colors/selection"
+SELECTION="$REPO_ROOT/modules/home/config/themes/colors/src/selection"
 
 PALETTES_DIR="$HOME/.config/noctalia/palettes"
 PALETTE_NAME="themeswapper"
@@ -430,7 +430,7 @@ rebuild_stylix() {
   if ( cd "$REPO_ROOT" && home-manager switch --flake .#zeph ); then
     # Persist the selection in git so future clean builds stay consistent.
     ( cd "$REPO_ROOT" \
-      && git add modules/config/colors/selection \
+      && git add modules/home/config/themes/colors/src/selection \
       && git commit -m "Theme: $label" --quiet ) || true
     echo "✓ Stylix updated to '$label'"
   else
