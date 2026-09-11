@@ -53,7 +53,6 @@ let
     # GUI Applications
     ags
     arduino-ide
-    avizo
     blender
     brave
     inputs.zen-browser.packages."x86_64-linux".default
