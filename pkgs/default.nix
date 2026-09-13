@@ -45,6 +45,7 @@ let
     kdePackages.qtstyleplugin-kvantum
     klassy
     neovide
+    oh-my-posh
     pay-respects
     quickshell
     socat
