@@ -133,8 +133,10 @@ in
             hl.exec_cmd("${polkitAgentWrapper}/bin/polkit-kde-agent-wrapper")
             -- Launch notifications service (swaync or mako)
             hl.exec_cmd("/run/current-system/sw/bin/nm-applet")
-            -- Volume and brightness OSD (avizo)
-            hl.exec_cmd("avizo-service")
+            -- Volume and brightness OSD (avizo). avizo-client needs the
+            -- avizo-service daemon; guard so repeated start handlers never
+            -- spawn a second instance.
+            hl.exec_cmd("pgrep -x avizo-service >/dev/null 2>&1 || avizo-service")
 
             -- Idle and power management
             -- hl.exec_cmd("hypridle") -- disabled: run as systemd user unit via home-manager services.hypridle

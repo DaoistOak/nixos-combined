@@ -39,7 +39,7 @@
         res=volume_high
       fi
 
-      avizo-client --image-resource "$res" --progress "$progress"
+      avizo-client --image-resource "''${res}_dark" --progress "$progress"
     '';
   };
 }

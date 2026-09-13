@@ -22,7 +22,7 @@
         res=mic_unmuted
       fi
 
-      avizo-client --image-resource "$res" --progress 0
+      avizo-client --image-resource "''${res}_dark" --progress 0
     '';
   };
 }
