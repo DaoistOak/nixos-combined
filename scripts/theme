@@ -339,7 +339,7 @@ EOF
           "style": "diamond",
           "foreground": "#$(jq -r '.named.blue' <<<"$RJSON")",
           "background": "#$(f '.surface1')",
-          "template": "\n\uf313 ",
+          "template": " \uf313 ",
           "leading_diamond": "\ue0b6",
           "trailing_diamond": "\ue0b4"
         },
@@ -352,9 +352,9 @@ EOF
           "leading_diamond": "\ue0b4",
           "trailing_diamond": "\ue0b4",
           "properties": {
-            "style": "agnoster_short",
+            "style": "agnoster_full",
             "folder_separator_symbol": "/",
-            "home_symbol": "~/"
+            "home_symbol": "~"
           }
         },
         {

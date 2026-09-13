@@ -269,7 +269,7 @@ let
                 "style": "diamond",
                 "foreground": "${a named.blue}",
                 "background": "${a r.surface1}",
-                "template": "\n\uf313 ",
+                "template": " \uf313 ",
                 "leading_diamond": "\ue0b6",
                 "trailing_diamond": "\ue0b4"
               },
@@ -282,9 +282,9 @@ let
                 "leading_diamond": "\ue0b4",
                 "trailing_diamond": "\ue0b4",
                 "properties": {
-                  "style": "agnoster_short",
+                  "style": "agnoster_full",
                   "folder_separator_symbol": "/",
-                  "home_symbol": "~/"
+                  "home_symbol": "~"
                 }
               },
               {
