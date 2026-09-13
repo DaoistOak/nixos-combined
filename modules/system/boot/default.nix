@@ -28,6 +28,10 @@ let
         acc
     ) { } (builtins.attrNames entries);
 
+  # Re-enable zram swap after hibernate; the swap header is wiped by the
+  # sleep cycle, so recreate it when swapon fails.
+  reenableZram = "-${pkgs.runtimeShell} -c '${pkgs.util-linux}/bin/swapon -p 100 /dev/zram0 2>/dev/null || { ${pkgs.util-linux}/bin/mkswap /dev/zram0 >/dev/null 2>&1 && ${pkgs.util-linux}/bin/swapon -p 100 /dev/zram0; }'";
+
   # Windows boot files for dual-boot chainload via systemd-boot.
   winBootDir = ../../../nixos/efi/windows/Boot;
   winExtraFiles = lib.mapAttrs' (k: v: {
@@ -38,6 +42,7 @@ in
 {
   boot = {
     resumeDevice = "/dev/disk/by-uuid/c90cb3d2-feba-424e-a25b-146d24f9bd0d";
+    kernelParams = [ "zswap.enabled=0" ];
     extraModulePackages = [ ];
     kernelPackages = lib.mkForce pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto;
 
@@ -60,14 +65,22 @@ in
 
   systemd.services = {
     "systemd-hibernate".serviceConfig = {
-      ExecStartPre = "-${pkgs.coreutils}/bin/sync; -sh -c 'echo 3 > /proc/sys/vm/drop_caches'; -${pkgs.util-linux}/bin/swapoff /dev/zram0";
-      ExecStartPost = "-${pkgs.util-linux}/bin/swapon /dev/zram0";
-      ExecStopPost = "-${pkgs.util-linux}/bin/swapon /dev/zram0";
+      ExecStartPre = [
+        "-${pkgs.coreutils}/bin/sync"
+        "-${pkgs.runtimeShell} -c 'echo 3 > /proc/sys/vm/drop_caches'"
+        "-${pkgs.util-linux}/bin/swapoff /dev/zram0"
+      ];
+      ExecStartPost = reenableZram;
+      ExecStopPost = reenableZram;
     };
     "systemd-suspend-then-hibernate".serviceConfig = {
-      ExecStartPre = "-${pkgs.coreutils}/bin/sync; -sh -c 'echo 3 > /proc/sys/vm/drop_caches'; -${pkgs.util-linux}/bin/swapoff /dev/zram0";
-      ExecStartPost = "-${pkgs.util-linux}/bin/swapon /dev/zram0";
-      ExecStopPost = "-${pkgs.util-linux}/bin/swapon /dev/zram0";
+      ExecStartPre = [
+        "-${pkgs.coreutils}/bin/sync"
+        "-${pkgs.runtimeShell} -c 'echo 3 > /proc/sys/vm/drop_caches'"
+        "-${pkgs.util-linux}/bin/swapoff /dev/zram0"
+      ];
+      ExecStartPost = reenableZram;
+      ExecStopPost = reenableZram;
     };
   };
 

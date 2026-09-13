@@ -22,12 +22,14 @@ in
     ../config/modules/hypr/hyprlock
     ../config/modules/herdr
     ../config/modules/crush
+    ../config/cava
     ../config/modules/yazi
     ../config/modules/superfile
     ../config/modules/kitty
     ../config/modules/alacritty
     ../config/modules/wezterm
     ../config/modules/tmux
+    ../config/modules/phone-bt-bridge
     ../config/themes/colors
     ../config/themes/themer
     ../config/themes/theme

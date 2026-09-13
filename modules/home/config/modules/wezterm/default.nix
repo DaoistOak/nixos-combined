@@ -20,6 +20,8 @@
       hide_tab_bar_if_only_one_tab = true;
       window_decorations = "RESIZE";
       default_prog = [ "zsh" ];
+      # Don't ask for confirmation when closing a window (WM/decoration close).
+      window_close_confirmation = "NeverPrompt";
       # Transparent-ish background, mirroring kitty's background_opacity.
       window_background_opacity = 0.60;
 
@@ -82,6 +84,17 @@
       end
       -- Hot-reload whenever the theme file changes.
       wezterm.add_to_config_reload_watch_list(theme_file)
+
+      -- Trim unwanted/default key bindings:
+      --  * drop SUPER+w close-tab (default, clashes with Hyprland usage)
+      --  * keep CTRL/CTRL+SHIFT+w close-tab but without the confirmation overlay
+      local keys = config.keys or {}
+      table.insert(keys, { key = 'w', mods = 'SUPER', action = wezterm.action.DisableDefaultAssignment })
+      table.insert(keys, { key = 'W', mods = 'SUPER', action = wezterm.action.DisableDefaultAssignment })
+      table.insert(keys, { key = 'w', mods = 'SHIFT|CTRL', action = wezterm.action.CloseCurrentTab { confirm = false } })
+      table.insert(keys, { key = 'W', mods = 'CTRL', action = wezterm.action.CloseCurrentTab { confirm = false } })
+      config.keys = keys
+
       return {}
     '';
   };

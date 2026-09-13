@@ -28,6 +28,13 @@
       set -g terminal-features ",*:ms"
       set -ga terminal-features ',*:sync'
 
+      # Report the active window name as the terminal title. For TUI sessions
+      # this is the running app (e.g. "herdr"), "zsh"/"bash" for plain shells.
+      # The Hyprland session-save script keys off this to restore TUI apps and
+      # skip pure tmux-only sessions.
+      set -g set-titles on
+      set -g set-titles-string "#W"
+
       # Window switching
       unbind n
       unbind p

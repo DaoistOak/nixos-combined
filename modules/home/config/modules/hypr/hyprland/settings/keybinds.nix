@@ -18,6 +18,65 @@
     end, { timeout = 600, type = "repeat" })
     spaceTapTimer:set_enabled(false)
 
+    -- Remembered window state: pseudo/floating is kept per window CLASS in a
+    -- state file and re-applied as window rules, so the state survives layout
+    -- switches, window close/reopen and restarts. Toggled from the WINDOWS
+    -- submap (P = pseudo, T = floating).
+    local windowStateFile = "${config.xdg.configHome}/hypr/window-state.conf"
+    local remRules = {}
+
+    local function remSave()
+      local lines = {}
+      for cls, e in pairs(remRules) do
+        if e.float and e.float:is_enabled() then
+          lines[#lines + 1] = "float=" .. cls
+        end
+        if e.pseudo and e.pseudo:is_enabled() then
+          lines[#lines + 1] = "pseudo=" .. cls
+        end
+      end
+      local f = io.open(windowStateFile, "w")
+      if not f then
+        return
+      end
+      f:write(table.concat(lines, "\n"), "\n")
+      f:close()
+    end
+
+    local function remLoad()
+      remRules = {}
+      local f = io.open(windowStateFile, "r")
+      if not f then
+        return
+      end
+      for line in f:lines() do
+        local kind, cls = line:match("^(float|pseudo)=(.+)$")
+        if kind then
+          remRules[cls] = remRules[cls] or {}
+          remRules[cls][kind] = hl.window_rule({ match = { class = "^" .. cls .. "$" }, [kind] = true })
+        end
+      end
+      f:close()
+    end
+
+    local function remToggle(kind)
+      local w = hl.get_active_window()
+      if not w or not w.class then
+        return
+      end
+      local cls = w.class
+      remRules[cls] = remRules[cls] or {}
+      local rule = remRules[cls][kind]
+      if rule then
+        rule:set_enabled(not rule:is_enabled())
+      else
+        remRules[cls][kind] = hl.window_rule({ match = { class = "^" .. cls .. "$" }, [kind] = true })
+      end
+      remSave()
+    end
+
+    remLoad()
+
     -- 1. MOUSE (SUPER HELD)
     hl.bind(mod .. " + mouse:272", function()
       superTap.armed = false
@@ -175,12 +234,12 @@
     hl.define_submap("terminal-apps", "reset", function()
       hl.bind("RETURN", hl.dsp.exec_cmd("wezterm start tmux"), { description = "Open terminal (T)" })
       hl.bind("B", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh btop"), { description = "btop monitor" })
-      hl.bind("C", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh cava"), { description = "cava visualizer" })
+      hl.bind("C", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh " .. scripts .. "/cava-auto.sh"), { description = "cava visualizer" })
       hl.bind("N", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh tmux new-session -A -s nvim nvim"), { description = "Neovim" })
       hl.bind("H", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh tmux new-session -A -s herdr herdr"), { description = "herdr" })
       hl.bind("D", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh"), { description = "Default terminal" })
       hl.bind("S", hl.dsp.exec_cmd(scripts .. "/switch-default-terminal.sh"), { description = "Switch default terminal" })
-      hl.bind("F", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh fastfetch"), { description = "fastfetch" })
+      hl.bind("F", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh nix run nixpkgs#fastfetch"), { description = "fastfetch (nix run)" })
       hl.bind("O", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh --cwd $HOME/.config/nixos"),
         { description = "Shell in nixos config" })
       hl.bind("A", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh --cwd $HOME opencode"),
@@ -192,8 +251,8 @@
 
     -- 14. SHELL (SUPER+S)
     hl.define_submap("shell", "reset", function()
-      hl.bind("B", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh bluetooth 1.5 " .. scripts .. "/launch-bluetooth.sh open && hyprctl dispatch submap shell-bluetooth"), { description = "Bluetooth submenu (idle: open)" })
-      hl.bind("N", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh network 1.5 " .. scripts .. "/launch-network.sh open && hyprctl dispatch submap shell-network"), { description = "Network submenu (idle: open)" })
+      hl.bind("B", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh bluetooth 2 noctalia msg panel-toggle control-center bluetooth && hyprctl dispatch \"hl.dsp.submap('shell-bluetooth')\""), { description = "Bluetooth submenu (idle: panel)" })
+      hl.bind("N", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh network 2 noctalia msg panel-toggle control-center network && hyprctl dispatch \"hl.dsp.submap('shell-network')\""), { description = "Network submenu (idle: panel)" })
       hl.bind("SHIFT + N", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center notifications"), { description = "Notifications panel" })
       hl.bind("S", hl.dsp.exec_cmd("noctalia msg panel-toggle alexander/screen-toolkit:panel"), { description = "Screen tools panel (mode S)" })
       hl.bind("SHIFT + S", hl.dsp.exec_cmd("flameshot gui"), { description = "Flameshot screenshot (mode S)" })
@@ -205,6 +264,7 @@
       hl.bind("K", hl.dsp.exec_cmd("keyviz"), { description = "Keyviz keypress visualizer (mode S)" })
       hl.bind("C", hl.dsp.exec_cmd("noctalia msg panel-toggle yuuto/calculator:panel"), { description = "Calculator panel (mode S)" })
       hl.bind("G", hl.dsp.exec_cmd("noctalia msg panel-toggle nomadcxx/gamer-mode:main"), { description = "Open gamer mode panel" })
+      hl.bind("SHIFT + V", hl.dsp.exec_cmd(scripts .. "/session-restore.sh"), { description = "Restore session (mode S)" })
       hl.bind("escape", hl.dsp.submap("reset"), { description = "Exit shell mode" })
     end)
     -- 15. SHELL > BLUETOOTH (SUPER+S, B)
@@ -212,13 +272,13 @@
       hl.bind("o", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel bluetooth && " .. scripts .. "/launch-bluetooth.sh open"), { description = "Open bluetooth panel" })
       hl.bind("c", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel bluetooth && " .. scripts .. "/launch-bluetooth.sh close"), { description = "Close bluetooth panel" })
       hl.bind("a", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel bluetooth && " .. scripts .. "/launch-bluetooth.sh auto"), { description = "Toggle bluetooth auto" })
-      hl.bind("escape", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel bluetooth && hyprctl dispatch submap reset"), { description = "Exit bluetooth mode" })
+      hl.bind("escape", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel bluetooth && hyprctl dispatch \"hl.dsp.submap('reset')\""), { description = "Exit bluetooth mode" })
     end)
     -- 16. SHELL > NETWORK (SUPER+S, N)
     hl.define_submap("shell-network", "reset", function()
       hl.bind("o", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel network && " .. scripts .. "/launch-network.sh open"), { description = "Open network panel" })
       hl.bind("c", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel network && " .. scripts .. "/launch-network.sh close"), { description = "Close network panel" })
-      hl.bind("escape", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel network && hyprctl dispatch submap reset"), { description = "Exit network mode" })
+      hl.bind("escape", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel network && hyprctl dispatch \"hl.dsp.submap('reset')\""), { description = "Exit network mode" })
     end)
 
     -- 17. APPS (SUPER+E)
@@ -228,6 +288,7 @@
       hl.bind("F", hl.dsp.submap("apps-file"), { description = "Files submenu" })
       hl.bind("M", hl.dsp.submap("apps-media"), { description = "Media submenu" })
       hl.bind("G", hl.dsp.submap("apps-games"), { description = "Games submenu" })
+      hl.bind("A", hl.dsp.submap("apps-ai"), { description = "AI assistants submenu" })
       hl.bind("P", hl.dsp.exec_cmd("keepassxc"), { description = "KeepassXC (mode E)" })
       hl.bind("escape", hl.dsp.submap("reset"), { description = "Exit apps mode" })
     end)
@@ -283,36 +344,78 @@
       hl.bind("escape", hl.dsp.submap("reset"), { description = "Exit games mode" })
     end)
 
-    -- 24. MESSAGING (SUPER+M)
+    -- 24. APPS > AI ASSISTANTS (SUPER+E, A)
+    hl.define_submap("apps-ai", "reset", function()
+      hl.bind("G", hl.dsp.exec_cmd(scripts .. "/launch-ai.sh gemini"), { description = "Gemini (mode E, A)" })
+      hl.bind("C", hl.dsp.exec_cmd(scripts .. "/launch-ai.sh chatgpt"), { description = "ChatGPT (mode E, A)" })
+      hl.bind("P", hl.dsp.exec_cmd(scripts .. "/launch-ai.sh perplexity"), { description = "Perplexity (mode E, A)" })
+      hl.bind("l", hl.dsp.exec_cmd(scripts .. "/launch-ai.sh claude"), { description = "Claude (mode E, A)" })
+      hl.bind("X", hl.dsp.exec_cmd(scripts .. "/launch-ai.sh grok"), { description = "Grok (mode E, A)" })
+      hl.bind("RETURN", hl.dsp.exec_cmd(scripts .. "/launch-ai.sh gemini"), { description = "Default AI — Gemini (mode E, A)" })
+      hl.bind("escape", hl.dsp.submap("reset"), { description = "Exit AI mode" })
+    end)
+
+    -- 25. MESSAGING (SUPER+M)
     hl.define_submap("messaging", "reset", function()
-      hl.bind("RETURN", hl.dsp.exec_cmd("viber"), { description = "Viber" })
-      hl.bind("V", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh viber 1.5 viber && hyprctl dispatch submap messaging-viber"), { description = "Viber submenu (idle: launch)" })
+      hl.bind("RETURN", hl.dsp.exec_cmd("flatpak run com.viber.Viber"), { description = "Viber" })
+      hl.bind("V", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh viber 3 flatpak run com.viber.Viber && hyprctl dispatch \"hl.dsp.submap('messaging-viber')\""), { description = "Viber submenu (idle: launch)" })
       hl.bind("T", hl.dsp.exec_cmd("telegram-desktop"), { description = "Telegram" })
       hl.bind("D", hl.dsp.exec_cmd("vesktop"), { description = "Vesktop (Discord)" })
-      hl.bind("W", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh whatsapp 1.5 zapzap && hyprctl dispatch submap messaging-whatsapp"), { description = "WhatsApp submenu (idle: launch)" })
+      hl.bind("W", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh whatsapp 3 flatpak run com.rtosta.zapzap && hyprctl dispatch \"hl.dsp.submap('messaging-whatsapp')\""), { description = "WhatsApp submenu (idle: launch)" })
       hl.bind("M", hl.dsp.exec_cmd("messenger"), { description = "Messenger" })
-      hl.bind("A", hl.dsp.exec_cmd("sh -c 'viber & vesktop & zapzap &'"), { description = "Launch all messengers" })
+      hl.bind("A", hl.dsp.exec_cmd("sh -c 'flatpak run com.viber.Viber & vesktop & flatpak run com.rtosta.zapzap &'"), { description = "Launch all messengers" })
       hl.bind("escape", hl.dsp.submap("reset"), { description = "Exit messaging mode" })
     end)
     -- 25. MESSAGING > VIBER (SUPER+M, V)
     hl.define_submap("messaging-viber", "reset", function()
       hl.bind("D", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel viber && xdg-open $HOME/Documents/ViberDownloads"), { description = "Open Viber downloads" })
-      hl.bind("escape", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel viber && hyprctl dispatch submap reset"), { description = "Exit viber mode" })
+      hl.bind("escape", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel viber && hyprctl dispatch \"hl.dsp.submap('reset')\""), { description = "Exit viber mode" })
     end)
     -- 26. MESSAGING > WHATSAPP (SUPER+M, W)
     hl.define_submap("messaging-whatsapp", "reset", function()
       hl.bind("D", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel whatsapp && xdg-open $HOME/Downloads"), { description = "Open WhatsApp downloads" })
-      hl.bind("escape", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel whatsapp && hyprctl dispatch submap reset"), { description = "Exit whatsapp mode" })
+      hl.bind("escape", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel whatsapp && hyprctl dispatch \"hl.dsp.submap('reset')\""), { description = "Exit whatsapp mode" })
     end)
 
     -- 27. WINDOWS (SUPER+W)
     hl.define_submap("windows", "reset", function()
+      -- Toggle between scrolling and monocle layouts, flashing the Keymap bar
+      -- so the switch is visible. Monocle tiles windows edge to edge, so its
+      -- gaps are disabled (restored to 8/16 when leaving it).
+      local toggLay = { "scrolling", "monocle" }
+      local function applyGaps(gapsIn, gapsOut)
+        hl.config({ general = { ["gaps_in"] = gapsIn, ["gaps_out"] = gapsOut } })
+      end
+      local function toggleLayout()
+        local ws = hl.get_active_workspace()
+        local cur = (ws and ws.tiled_layout) or toggLay[1]
+        local nextName = cur ~= toggLay[1] and toggLay[1] or toggLay[2]
+        hl.config({ general = { layout = nextName } })
+        if nextName == "monocle" then
+          applyGaps(0, 0)
+        else
+          applyGaps(8, 16)
+        end
+        hl.dispatch(hl.dsp.exec_cmd("noctalia msg bar-show Keymap"))
+        hl.timer(function()
+          hl.dispatch(hl.dsp.exec_cmd("noctalia msg bar-hide Keymap"))
+        end, { timeout = 2000, type = "oneshot" })
+      end
       hl.bind("F", hl.dsp.window.fullscreen(), { description = "Toggle fullscreen" })
-      hl.bind("T", hl.dsp.window.float({ action = "toggle" }), { description = "Toggle floating" })
+      hl.bind("T", function()
+        hl.dispatch(hl.dsp.window.float({ action = "toggle" }))
+        remToggle("float")
+      end, { description = "Toggle floating (remembered)" })
+      hl.bind("M", toggleLayout, { description = "Toggle tiling layout (mode W)" })
       hl.bind("K", hl.dsp.window.close(), { description = "Close window (mode W)" })
-      hl.bind("P", hl.dsp.window.pseudo(), { description = "Toggle pseudo" })
+      hl.bind("P", function()
+        hl.dispatch(hl.dsp.window.pseudo())
+        remToggle("pseudo")
+      end, { description = "Toggle pseudo (remembered)" })
       hl.bind("S", hl.dsp.workspace.toggle_special("scratchpad"), { description = "Toggle scratchpad" })
       hl.bind("SHIFT + S", hl.dsp.window.move({ workspace = "special:scratchpad" }), { description = "Move to scratchpad" })
+      hl.bind("V", hl.dsp.exec_cmd(scripts .. "/session-save.sh"), { description = "Save session" })
+      hl.bind("SHIFT + V", hl.dsp.exec_cmd(scripts .. "/session-restore.sh"), { description = "Restore session (mode W)" })
       hl.bind("escape", hl.dsp.submap("reset"), { description = "Exit windows mode" })
     end)
   '';

@@ -31,6 +31,10 @@
       url = "github:VirtCode/hypr-dynamic-cursors";
       inputs.hyprland.follows = "hyprland";
     };
+    hyprland-scroll-overview = {
+      url = "github:yayuuu/hyprland-scroll-overview";
+      inputs.hyprland.follows = "hyprland";
+    };
     preload-ng.url = "github:miguel-b-p/preload-ng";
   };
 

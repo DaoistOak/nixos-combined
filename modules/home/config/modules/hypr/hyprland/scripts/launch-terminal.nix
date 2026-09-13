@@ -30,11 +30,17 @@
       run_wezterm() {
         local args=()
         [[ -n "$CWD" ]] && args+=(--cwd "$CWD")
-        [[ "$HOLD" == 1 ]] && args+=(--hold)
+        # no --hold: wezterm start has no such flag; commands are wrapped in a
+        # shell below so the window always stays open.
+        # --always-new-process: without it `wezterm start` reuses the running
+        # GUI instance and silently opens a tab inside an existing window,
+        # so the bound launch appears to do nothing. Commands are wrapped in
+        # a shell so short ones (fastfetch, cava) don't close the window
+        # the moment they exit.
         if [[ $# -eq 0 ]]; then
-          wezterm start "''${args[@]}"
+          wezterm start --always-new-process "''${args[@]}"
         else
-          wezterm start "''${args[@]}" "$@"
+          wezterm start --always-new-process "''${args[@]}" -- sh -c '"$@"; exec "''${SHELL:-sh}"' sh "$@"
         fi
       }
 

@@ -14,11 +14,14 @@
     ./settings/keybinds.nix
     ./settings/plugins.nix
     ./settings/scrolling.nix
+    ./settings/scroll-overview.nix
     ./settings/misc.nix
     ./settings/startup.nix
     ./settings/windowrules.nix
     ./scripts/airplane-mode.nix
+    ./scripts/ai-webapps.nix
     ./scripts/hyprlock.nix
+    ./scripts/cava-auto.nix
     ./scripts/launch-bluetooth.nix
     ./scripts/launch-network.nix
     ./scripts/launch-terminal.nix

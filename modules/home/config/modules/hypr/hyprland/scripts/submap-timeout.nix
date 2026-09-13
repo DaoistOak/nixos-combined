@@ -16,7 +16,7 @@
       #
       # <tag> is a unique id per submap entry. The entry key should call this
       # with an action AND then enter the target submap (e.g. via
-      # `&& hyprctl dispatch submap <name>`). Any binding inside the submap
+      # `&& hyprctl dispatch "hl.dsp.submap('<name>')"`). Any binding inside the submap
       # should `submap-timeout.sh cancel <tag>` first so the delayed default
       # action is suppressed. On timeout the submap is reset and <action>
       # is launched.
@@ -52,7 +52,7 @@ pidfile="$pid_dir/''${tag}.pid"
         sleep "$seconds"
         if [[ -f "$pidfile" ]]; then
           rm -f "$pidfile"
-          hyprctl dispatch submap reset >/dev/null 2>&1 || true
+          hyprctl dispatch "hl.dsp.submap('reset')" >/dev/null 2>&1 || true
           "$@" >/dev/null 2>&1 &
         fi
       ) &

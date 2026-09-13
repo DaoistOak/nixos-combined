@@ -164,7 +164,6 @@ in
             hl.exec_cmd("qs -c themeswitcher")
             -- Launching hyprshade for window effects
             hl.exec_cmd("hyprsunset")
-            hl.exec_cmd("hyprctl dispatch submap global")
           end
         '')
       ];
