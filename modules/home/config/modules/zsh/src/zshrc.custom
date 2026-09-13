@@ -3,7 +3,7 @@
 #if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
 #  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 #fi
-# Path to your oh-my-zsh installation.
+# Path to your powerlevel10k installation.
 source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
 
 # Load private API keys from untracked secrets file (zsh syntax) if present.
@@ -37,6 +37,45 @@ export WINEPREFIX="$XDG_DATA_HOME"/wine
 # export XAUTHORITY="$XDG_RUNTIME_DIR"/Xauthority
 # export COLORTERM=truecolor
 # HISTSIZE=10000000
+# ---------------------------------------------------------------------------
+# vi-mode (manual; replaces oh-my-zsh plugins/vi-mode). Keep definitions here,
+# BEFORE powerlevel10k is sourced: p10k wraps zle-keymap-select so it can
+# refresh its vi_mode/visual indicator, and it preserves pre-existing widgets.
+# ---------------------------------------------------------------------------
+bindkey -v                                       # vi editing is the default
+KEYTIMEOUT=40                                    # ms; Esc responds instantly
+
+# Cursor shape per mode (bar=insert, block=normal, underline=visual).
+vi_cursor() {
+  case ${KEYMAP:-viins} in
+    vicmd)   print -n -- '\e[2 q' ;;
+    visual)  print -n -- '\e[4 q' ;;
+    *)       print -n -- '\e[6 q' ;;
+  esac
+}
+function zle-line-init()        { vi_cursor; }
+function zle-line-finish()      { print -n -- '\e[6 q'; }
+function zle-keymap-select()    { vi_cursor; }
+zle -N zle-line-init zle-line-init
+zle -N zle-line-finish zle-line-finish
+zle -N zle-keymap-select zle-keymap-select
+
+# sudo: prepend/remove "sudo " on the current line (Ctrl-X Ctrl-S; omz sudo plugin).
+sudo-command-line() {
+  [[ -z $BUFFER ]] && zle up-history
+  if [[ $BUFFER == "sudo "* ]]; then
+    LBUFFER="${LBUFFER#sudo }"
+  elif [[ $BUFFER == "sudo sudo "* ]]; then
+    LBUFFER="${LBUFFER#sudo }"
+  else
+    LBUFFER="sudo $LBUFFER"
+  fi
+}
+zle -N sudo-command-line
+bindkey -M emacs '^Xs' sudo-command-line
+bindkey -M viins '^Xs' sudo-command-line
+bindkey -M vicmd '^Xs' sudo-command-line
+
 # Theme (Powerlevel10k, tracked via the powerlevel10k flake input)
 source ${ZDOTDIR:-$HOME/.config/zsh}/powerlevel10k/powerlevel10k.zsh-theme
 # Source custom Powerlevel10k configuration
@@ -93,6 +132,105 @@ alias -g vi='edit_file'
 alias wget=wget --hsts-file="$XDG_DATA_HOME/wget-hsts"
 alias dosbox=dosbox -conf "$XDG_CONFIG_HOME"/dosbox/dosbox.conf
 alias tabby_start='sudo tabby serve --model DeepSeekCoder-1.3B --chat-model Qwen3-4B --device rocm'
+
+# ---------------------------------------------------------------------------
+# Git shortcuts (curated subset of the oh-my-zsh git plugin, no omz).
+# ---------------------------------------------------------------------------
+git_main_branch() {
+  command git rev-parse --git-dir >/dev/null 2>&1 \
+    && command git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@'
+}
+git_current_branch() {
+  command git symbolic-ref --quiet HEAD 2>/dev/null | sed 's@^refs/heads/@@'
+}
+alias g='git'
+alias ga='git add'
+alias gaa='git add --all'
+alias gapa='git add --patch'
+alias gb='git branch'
+alias gba='git branch -a'
+alias gbd='git branch -d'
+alias gbD='git branch -D'
+alias gbl='git blame -b -w'
+alias gc='git commit -v'
+alias gc!='git commit --amend'
+alias gca='git commit -v -a'
+alias gca!='git commit -v -a --amend'
+alias gcb='git checkout -b'
+alias gcm='git checkout "$(git_main_branch)"'
+alias gco='git checkout'
+alias gd='git diff'
+alias gdca='git diff --cached'
+alias gdw='git diff --word-diff'
+alias gf='git fetch'
+alias gfa='git fetch --all --prune'
+alias gfo='git fetch origin'
+alias gl='git pull'
+alias glg='git log --stat'
+alias glgg='git log --graph'
+alias glgga='git log --graph --decorated --all'
+alias glo='git log --oneline --decorate'
+alias glog='git log --oneline --decorate --graph'
+alias gpsup='git push --set-upstream origin "$(git_current_branch)"'
+alias gpf='git push --force-with-lease'
+alias gpoat='git push origin --all && git push origin --tags'
+alias gr='git remote'
+alias grv='git remote -v'
+alias gst='git status'
+alias gss='git status -s'
+alias gsta='git stash'
+alias gstl='git stash list'
+alias gstp='git stash pop'
+
+# ---------------------------------------------------------------------------
+# you-should-use (manual; replaces oh-my-zsh plugins/you-should-use)
+# After a command finishes, remind you if a defined alias is exactly it.
+# ---------------------------------------------------------------------------
+autoload -Uz add-zsh-hook
+you-should-use() {
+  local cmd
+  cmd=$(fc -ln -1 2>/dev/null)
+  cmd=${cmd#"${cmd%%[![:space:]]*}"}
+  [[ -z $cmd ]] && return
+  [[ $cmd == *';'* || $cmd == *'&&'* || $cmd == *'||'* ]] && return
+  [[ ${cmd%% *} == sudo ]] && return
+
+  local name
+  for name in ${(k)aliases}; do
+    if [[ $cmd == "${aliases[$name]}" ]]; then
+      print -rP "%F{yellow}You should use:%f %B${name}%b"
+      print -rP "%F{245}  you typed:%f %F{245}${cmd//\%/%%}%f"
+      return 0
+    fi
+  done
+}
+add-zsh-hook precmd you-should-use
+
+# ---------------------------------------------------------------------------
+# autonotify (manual; replaces oh-my-zsh plugins/autonotify)
+# Desktop notification via notify-send when a command finishes if it ran
+# for at least AUTONOTIFY_THRESHOLD seconds (default 60 = 1 minute).
+# ---------------------------------------------------------------------------
+zmodload -i zsh/datetime
+AUTONOTIFY_THRESHOLD=60
+_autonotify_preexec() {
+  _autonotify_start=$EPOCHREALTIME
+  _autonotify_cmd=$1
+}
+_autonotify_precmd() {
+  if [[ -n $_autonotify_start ]]; then
+    local elapsed cmd
+    elapsed=$(( EPOCHREALTIME - _autonotify_start ))
+    if (( elapsed >= AUTONOTIFY_THRESHOLD )); then
+      cmd=${_autonotify_cmd%%$'\n'*}
+      notify-send --urgency=critical --expire-time=8000 \
+        "Command finished" "${cmd} took ${elapsed%.*}s" 2>/dev/null
+    fi
+    unset _autonotify_start
+  fi
+}
+add-zsh-hook preexec _autonotify_preexec
+add-zsh-hook precmd _autonotify_precmd
 
 eval "$(zoxide init zsh)"
 # Greater prompt

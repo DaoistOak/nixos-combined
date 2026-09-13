@@ -21,16 +21,7 @@ in
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
     dotDir = zshDir;
-
-    oh-my-zsh = {
-      enable = true;
-      plugins = [
-        "git"
-        "sudo"
-        "vi-mode"
-      ];
-      theme = "robbyrussell";
-    };
+    defaultKeymap = "viins";
 
     initContent = lib.mkOrder 1000 (builtins.readFile ./src/zshrc.custom);
   };

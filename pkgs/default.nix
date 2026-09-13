@@ -123,7 +123,6 @@ let
     zellij
     zoxide
     zsh
-    oh-my-zsh
     kdePackages.kate
     kdePackages.yakuake
 
