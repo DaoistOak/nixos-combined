@@ -149,7 +149,6 @@ in
 
             -- Wallpaper and background setup
             hl.exec_cmd("swww-daemon --format xrgb")
-            hl.exec_cmd("waypaper --restore")
             -- Configured for Sylix: Enable wallpaper daemon management
             -- hl.exec_cmd("swaybg -m fill -i ~/Wallpaper/Image34.jpg")
             hl.exec_cmd("sylix --daemon")

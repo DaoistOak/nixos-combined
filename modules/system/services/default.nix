@@ -72,10 +72,12 @@ in
       interval = "monthly";
     };
 
+    flatpak.enable = true;
     fstrim.enable = true;
     fprintd.enable = true;
     fwupd.enable = true;
     gpm.enable = true;
+    gvfs.enable = true;
     lact.enable = true;
     ollama.enable = true;
     openssh.enable = true;
@@ -89,6 +91,7 @@ in
 
     power-profiles-daemon.enable = false;
     printing.enable = true;
+    upower.enable = true;
 
     # NixOS-specific prefixes tell it to treat the immutable /nix/store as the live files
     # (only pruned GC paths are dropped).

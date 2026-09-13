@@ -23,196 +23,80 @@ let
         (builtins.readFile "${pkgs.nix-search-tv.src}/nixpkgs.sh");
   };
   user-packages = with pkgs; [
-    ns
-    # Kvantum widget style engine; required so QT_STYLE_OVERRIDE=kvantum renders
-    # for regular Qt widget apps.
-    kdePackages.qtstyleplugin-kvantum
-    # KDE's QtQuick Controls style ("org.kde.desktop"). It reads the KDE color
-    # scheme (e.g. CatppuccinMacchiatoMauve), so the KDE polkit agent's
-    # QtQuick dialog matches the catppuccin theme instead of the unstyled
-    # default.
-    kdePackages.qqc2-desktop-style
-    # Flake-specific packages
-    hyprnome
-    hyprprop
-    hyprsunset
-    hyprshot
-    flameshot
+    avizo
+    awww
+    chafa
     cliphist
+    flameshot
     gpu-screen-recorder
+    hypridle
+    hyprlock
+    hyprnome
+    inputs.hyprpanel.packages."x86_64-linux".default
+    hyprpicker
+    hyprpolkitagent
+    hyprprop
+    hyprshot
+    hyprsunset
+    hyprwhspr-rs
     jrnl
     jujutsu
-    chafa
-    # nur.repos.mikilio.ttf-ms-fonts
+    kdePackages.qqc2-desktop-style
+    kdePackages.qtstyleplugin-kvantum
     klassy
     pay-respects
+    quickshell
     socat
   ];
 
   system-packages = with pkgs; [
-    # GUI Applications
+    # --- Desktop Environment & Wayland Compositor ---
     ags
-    arduino-ide
-    avizo
-    blender
+    swayidle
+    (catppuccin-sddm.override {
+      flavor = "macchiato";
+      accent = "mauve";
+      font = "JetBrains Mono";
+      fontSize = "9";
+      background = "${./../modules/system/config/sddm/src/wallpaper}";
+      loginBackground = true;
+    })
+
+    # --- Web Browsers & Communication ---
     brave
-    inputs.zen-browser.packages."x86_64-linux".default
-    copyq
-    drawy
     ferdium
     firefox
-    heroic
-    goverlay
-    hyprlock
-    inputs.hyprpanel.packages."x86_64-linux".default
-    hyprpolkitagent
-    hydralauncher
-    kdePackages.bluedevil
-    kdePackages.bluez-qt
-    kdePackages.dragon
-    kdePackages.flatpak-kcm
-    kdePackages.kate
-    kdePackages.kpmcore
-    kdePackages.okular
-    kdePackages.plasma-nm
-    kdePackages.plasma-pa
-    kdePackages.plymouth-kcm
-    kdePackages.sddm-kcm
-    kdePackages.yakuake
-    kdePackages.kde-cli-tools
-    kdePackages.plasma-desktop
-    kdePackages.plasma-workspace
-    kdePackages.plasma5support
-    kdePackages.kwin
-    kdePackages.kglobalaccel
-    kdePackages.libplasma
+    inputs.zen-browser.packages."x86_64-linux".default
     kdePackages.kdeconnect-kde
-    keepassxc
-    kicad-small
-    lact
-    qalculate-qt
-    networkmanagerapplet
-    pcmanfm
-
-    proton-vpn
-    qbittorrent
     qutebrowser
-    rofi
-    rpi-imager
     thunderbird
     ungoogled-chromium
     vesktop
-    virt-manager
-    vscode-fhs
-    waybar
-    waypaper
-    winboat
     # webcord-vencord
-    wpsoffice
-    zathura
 
-    # TUI Applications
-    alsa-utils
-    amdgpu_top
-    auto-cpufreq
-    bat
-    brightnessctl
-    busybox
-    btop
+    # --- Development Tools & Compilers ---
+    automake
+    binutils
+    bintools
     cargo
-    cava
-    cpufrequtils
-    curl
-    jq
-    direnv
+    cmake
     devenv
-    distrobox
-    docker-compose
-    podman
-    eza
-    ffmpeg-full
-    fish
-    freerdp
+    direnv
+    gcc
+    gdb
     git
-    gnirehtet
     gnumake
-    grim
-    grimblast
-    # Screenshot/color helpers: slurp (region select for grim), swappy and
-    # satty (annotate/editor backends), hyprpicker (color picker).
-    slurp
-    swappy
-    satty
-    hyprpicker
-    # Wayland screen recording + ImageMagick (`magick`) for conversions
-    wl-screenrec
-    imagemagick
-    hollywood
-    jre
-    openjfx
-    kbd
-    killall
-    lazydocker
+    jq
     lazygit
-    lm_sensors
-    lutris
-    mesa-demos
-    mpv
-    neovim
-    networkmanager
-    networkmanager_dmenu
+    luarocks
+    nil
     ninja
     nodejs
-    ntfs3g
-    oh-my-zsh
-    ollama
+    nixfmt
+    nixfmt-tree
     opencode
-    p7zip
-    pciutils
-    picocom
-    playerctl
-    quickshell
-    powertop
-    ryzenadj
-    screen
-    spotube
-    awww
-    swayidle
-    syncthing
-    tgpt
-    thermald
-    tlp
-    # OCR
-    tesseract
-    # Open Sound Control command-line client
-    osc
-    # Speech-to-text dictation for Hyprland
-    hyprwhspr-rs
-    # Keypress visualization (from NUR, not in nixpkgs)
-    nur.repos.milahu.keyviz
-    unzip
-    upower
-    util-linux
-    vim
-    wget
-    wl-clipboard
-    xclip
-    superfile
-    yazi
-    zellij
-    zoxide
-    zsh
-
-    # Dependencies
-    bluez
-    bluez-tools
-    cairo
-    dart-sass
-    gvfs
-    # Provides the gio command (used by syncthing for mime/open handling)
-    glib
-    libgtop
-    mangohud
+    patchelf
+    pkg-config
     python3
     # python3Packages.pip
     # python311Packages.opencv4
@@ -222,120 +106,156 @@ let
     # pyserial
     # ]
     # ))
-    qt5.qtbase
-    qt6.qtwayland
-    libxcb
-    libx11
-    libxext
-    libxau
-    libxdmcp
-    libxcursor
-    libxrandr
-    libxinerama
-    libxi
-    gtk3
-    gdk-pixbuf
-    libjpeg
-    libpng
-    gst_all_1.gstreamer
-    gst_all_1.gst-plugins-base
-    gst_all_1.gst-plugins-good
-    gst_all_1.gst-plugins-bad
-    gst_all_1.gst-plugins-ugly
+    vscode-fhs
+
+    # --- Text Editors & Terminal Utilities ---
+    bat
+    copyq
+    eza
+    fish
+    klassy
+    neovim
+    pcmanfm
+    superfile
+    vim
+    yazi
+    zellij
+    zoxide
+    zsh
+    oh-my-zsh
+    kdePackages.kate
+    kdePackages.yakuake
+
+    # --- System Administration, Monitoring & Power ---
+    amdgpu_top
+    auto-cpufreq
+    brightnessctl
+    btop
+    cpufrequtils
+    kdePackages.kpmcore
+    lact
+    lm_sensors
+    networkmanager_dmenu
+    networkmanagerapplet
+    nh
+    nix-ld
+    nix-output-monitor
+    nix-search-tv
+    nvd
+    pciutils
+    powertop
+    radeontop
+    ryzenadj
+    appimage-run
+
+    # --- Virtualization & Containers ---
+    distrobox
+    lazydocker
+    spice
+    spice-gtk
+    virt-manager
+
+    # --- Gaming & Compatibility ---
+    gamescope
+    goverlay
+    hydralauncher
+    heroic
+    lutris
+    mangohud
+    vkd3d
+    vkd3d-proton
+    winboat
     wineWow64Packages.stable
 
-    # Utilities
-    adwaita-icon-theme
+    # --- Media, Graphics & CAD ---
+    blender
+    cava
+    drawy
+    ffmpeg-full
+    grim
+    grimblast
+    # Screenshot/color helpers: slurp (region select for grim), swappy and
+    # satty (annotate/editor backends). hyprpicker lives in user-packages.
+    slurp
+    swappy
+    satty
+    # Wayland screen recording + ImageMagick (`magick`) for conversions
+    wl-screenrec
+    imagemagick
+    kdePackages.dragon
+    kicad-small
+    mpv
+    # Keypress visualization (from NUR, not in nixpkgs)
+    nur.repos.milahu.keyviz
+    playerctl
+    spotube
+
+    # --- Network & Connectivity ---
+    bluez-tools
+    curl
+    dnsmasq
+    freerdp
+    gnirehtet
+    picocom
+    proton-vpn
+    qbittorrent
+    screen
+    wget
+
+    # --- Security, Storage & Document Viewers ---
+    busybox
+    fuse3
+    keepassxc
+    kdePackages.okular
+    ntfs3g
+    p7zip
+    rpi-imager
+    # OCR
+    tesseract
+    unzip
+    wpsoffice
+    zathura
+
+    # --- AI, CLI Toys & Novelty ---
+    hollywood
+    jrnl
+    jujutsu
+    ollama
+    tgpt
+
+    # --- Graphics Drivers, Codecs & Display Libraries ---
+    dxvk
+    mesa-demos
+    vulkan-hdr-layer-kwin6
+    vulkan-tools
+    vulkan-validation-layers
+
+    # --- System Libraries, Themes & Fonts ---
     adi1090x-plymouth-themes
-    appimage-run
+    adwaita-icon-theme
+    alsa-utils
     bleachbit
     catppuccin-cursors.macchiatoLight
     catppuccin-kvantum
     catppuccin-papirus-folders
     code-cursor-fhs
-    gamescope
-    hypridle
+    dart-sass
+    # Provides the gio command (used by syncthing for mime/open handling); the
+    # gvfs daemons themselves come via services.gvfs.enable.
+    glib
+    jre
+    killall
+    libnotify
+    lohit-fonts.devanagari
+    openjfx
+    # Open Sound Control command-line client
+    osc
     papirus-folders
+    qalculate-qt
     terminus_font
     times-newer-roman
-
-    # Libraries & System Dependencies
-    (catppuccin-sddm.override {
-      flavor = "macchiato";
-      accent = "mauve";
-      font = "JetBrains Mono";
-      fontSize = "9";
-      background = "${./../modules/system/config/sddm/src/wallpaper}";
-      loginBackground = true;
-    })
-    fuse3
-    automake
-    cmake
-    gcc
-    gdb
-    binutils
-    bintools
-    patchelf
-    coreutils-full
-    dxvk
-    glibc
-    glibc.dev
-    icu
-    libgcc
-    libgccjit
-    libvirt
-    libxkbcommon
-    luarocks
-    eglexternalplatform
-    egl-wayland
-    libGL
-    libGLU
-    libva
-    libvdpau
-    libvdpau-va-gl
-    libtheora
-    speex
-    libgudev
-    # Proprietary / nonfree media codecs
-    lame
-    x264
-    x265
-    fdk_aac
-    libde265
-    openh264
-    nil
-    pkg-config
-    radeontop
-    virglrenderer
-    virtiofsd
-    vkd3d
-    vkd3d-proton
-    vulkan-loader
-    vulkan-tools
-    vulkan-validation-layers
-    vulkan-hdr-layer-kwin6
-    zlib
-    arduino-cli
-    dbus
-    dnsmasq
-    flatpak
-    fprintd
-    libnotify
-    pulseaudio
-    spice
-    spice-gtk
-    spice-vdagent
-    speechd
-    nh
-    nix-output-monitor
-    nix-search-tv
-    nixfmt
-    nixfmt-tree
-    lohit-fonts.devanagari
-    nix-ld
-    stdenv.cc.cc.lib
-    libglvnd
-    nvd
+    wl-clipboard
+    xclip
   ];
 in
 {

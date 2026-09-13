@@ -188,13 +188,6 @@
           };
           float = true;
         }
-        {
-          match = {
-            class = "^(waypaper)$";
-            title = "^(Waypaper)$";
-          };
-          float = true;
-        }
 
         # Browser dialogs (Save/Open file)
         {

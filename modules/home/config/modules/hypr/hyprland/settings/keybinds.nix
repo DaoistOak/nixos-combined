@@ -362,7 +362,7 @@
       hl.bind("T", hl.dsp.exec_cmd("telegram-desktop"), { description = "Telegram" })
       hl.bind("D", hl.dsp.exec_cmd("vesktop"), { description = "Vesktop (Discord)" })
       hl.bind("W", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh whatsapp 3 flatpak run com.rtosta.zapzap && hyprctl dispatch \"hl.dsp.submap('messaging-whatsapp')\""), { description = "WhatsApp submenu (idle: launch)" })
-      hl.bind("M", hl.dsp.exec_cmd("messenger"), { description = "Messenger" })
+      hl.bind("M", hl.dsp.exec_cmd("ferdium"), { description = "Ferdium" })
       hl.bind("A", hl.dsp.exec_cmd("sh -c 'flatpak run com.viber.Viber & vesktop & flatpak run com.rtosta.zapzap &'"), { description = "Launch all messengers" })
       hl.bind("escape", hl.dsp.submap("reset"), { description = "Exit messaging mode" })
     end)
