@@ -50,7 +50,7 @@ in
       {
         _args = [
           "TERMINAL"
-          "wezterm start"
+          "ghostty"
         ];
       }
       {
@@ -165,6 +165,8 @@ in
             hl.exec_cmd("qs -c overview")
             -- Quickshell theme switcher (floating capsule, super+t)
             hl.exec_cmd("qs -c themeswitcher")
+            -- Quickshell terminal switcher (floating capsule, super+t, s)
+            hl.exec_cmd("qs -c terminal-switcher")
             -- Launching hyprshade for window effects
             hl.exec_cmd("hyprsunset")
           end

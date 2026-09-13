@@ -24,6 +24,14 @@
       window_close_confirmation = "NeverPrompt";
       window_background_opacity = 1.0;
 
+      # Uniform 3-cell padding on all sides (matches kitty/alacritty/ghostty).
+      window_padding = {
+        left = "3";
+        right = "3";
+        top = "3";
+        bottom = "3";
+      };
+
       # --- Animations: synced to the Hyprland animation profile ---
       # Display refresh is 1920x1200@60 (modules/config/hypr/settings/displays.nix);
       # cap render + animation FPS to that so terminal redraws match compositor

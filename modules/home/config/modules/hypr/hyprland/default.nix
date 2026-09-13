@@ -31,7 +31,7 @@
     ./scripts/noctalia-restart.nix
     ./scripts/session.nix
     ./scripts/super-tap-launcher.nix
-    ./scripts/switch-default-terminal.nix
+    ./scripts/terminal-switcher
     ./scripts/submap-bar.nix
     ./scripts/submap-timeout.nix
     ./scripts/volume.nix

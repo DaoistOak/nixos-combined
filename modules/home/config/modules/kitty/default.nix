@@ -34,8 +34,13 @@
       open_url_with = "default";
       copy_on_select = true;
 
-      # Window
-      window_padding_width = 2.65;
+      # Window: uniform 3-cell padding on all sides — the same interior
+      # spacing as alacritty (3px), wezterm (3 cells) and ghostty (3) so the
+      # cell grid lines up identically in every terminal.
+      window_padding_left = 3;
+      window_padding_right = 3;
+      window_padding_top = 3;
+      window_padding_bottom = 3;
       hide_window_decorations = false;
       confirm_os_window_close = 0;
 

@@ -6,8 +6,8 @@ import Quickshell.Hyprland
 
 import "."
 
-// Runtime theme switcher as a CLI-style fuzzy finder, styled after Noctalia.
-// Three levels walked by Enter: Scheme -> Flavour -> Accent -> apply.
+// Default-terminal switcher as a CLI-style fuzzy finder, mirrored from the
+// themeswitcher utility. Single level: type to filter, Enter applies.
 // Presented as a compact, centered floating window (no fullscreen dim, no
 // exclusive keyboard grab).
 Item {
@@ -15,94 +15,28 @@ Item {
 
     property bool open: false
 
-    readonly property string lvlScheme: "scheme"
-    readonly property string lvlFlavour: "flavour"
-    readonly property string lvlAccent: "accent"
-
-    property string level: lvlScheme
     property string query: ""
     property int selIndex: 0
     property var filtered: []
 
-    property var themeObj: null
-    property var variantObj: null
-
     function matches(item, q) {
         const needle = q.trim().toLowerCase();
         if (!needle) return true;
-        const hay = ((item.title ?? "") + " " + (item.key ?? "") + " " + (item.hex ?? "")).toLowerCase();
+        const hay = ((item.title ?? "") + " " + (item.key ?? "") + " " + (item.desc ?? "")).toLowerCase();
         return hay.includes(needle);
     }
 
-    function isHex(v) { return /^#?[0-9a-f]{6}$/i.test(v.trim()); }
-    function normHex(v) {
-        let s = v.trim();
-        if (s.charAt(0) === "#") s = s.slice(1);
-        return "#" + s.toLowerCase();
-    }
-
-    function accentItems() {
-        const list = ThemeDb.accentsOf(themeObj?.key ?? "", variantObj?.key ?? "");
-        list.push({
-            key: "__custom__",
-            title: isHex(query) ? `Custom: ${normHex(query)}` : "Custom hex…",
-            hex: isHex(query) ? normHex(query) : "",
-            custom: true
-        });
-        return list;
-    }
-
-    function baseList() {
-        if (level === lvlScheme) return ThemeDb.themes;
-        if (level === lvlFlavour) return themeObj?.variants ?? [];
-        if (level === lvlAccent) return accentItems();
-        return [];
-    }
-
     function pick(item) {
-        if (level === lvlScheme) {
-            themeObj = item; level = lvlFlavour; query = ""; refresh();
-        } else if (level === lvlFlavour) {
-            variantObj = item; level = lvlAccent; query = ""; refresh();
-        } else if (level === lvlAccent) {
-            root.applySelected(item);
-        }
-    }
-
-    function applySelected(item) {
-        if (!item) item = filtered[selIndex];
         if (!item) return;
-        const t = themeObj?.key ?? "";
-        const v = variantObj?.key ?? "";
-        if (!t || !v) return;
-        if (item.custom) {
-            if (!isHex(query)) { root.open = false; return; }
-            ThemeDb.apply(t, v, normHex(query).slice(1));
-        } else {
-            ThemeDb.apply(t, v, item.key);
-        }
+        TermDb.apply(item.key);
         root.open = false;
     }
 
-    function goBack() {
-        if (level === lvlAccent) {
-            level = lvlFlavour; variantObj = null; query = ""; refresh();
-        } else if (level === lvlFlavour) {
-            level = lvlScheme; themeObj = null; query = ""; refresh();
-        } else {
-            root.open = false;
-        }
-    }
-
     function refresh() {
-        const list = baseList().filter(i => root.matches(i, root.query));
+        const list = TermDb.terminals.filter(i => root.matches(i, root.query));
         filtered = list;
         root.selIndex = Math.min(root.selIndex, list.length - 1);
         if (root.selIndex < 0) root.selIndex = list.length ? 0 : -1;
-        if (level === lvlAccent && root.isHex(root.query)) {
-            const ci = list.findIndex(i => i.custom);
-            if (ci >= 0) root.selIndex = ci;
-        }
     }
 
     function moveSel(delta) {
@@ -112,20 +46,13 @@ Item {
     }
 
     function isSelected(item) {
-        if (level === lvlScheme)
-            return (item.key ?? "").toLowerCase() === ThemeDb.currentTheme.toLowerCase();
-        if (level === lvlFlavour)
-            return item === ThemeDb.variantByKey(themeObj?.key ?? "", ThemeDb.currentVariant);
-        if (level === lvlAccent)
-            return item.custom ? false : item.key.toLowerCase() === ThemeDb.currentAccent.toLowerCase();
-        return false;
+        return (item.key ?? "").toLowerCase() === TermDb.current.toLowerCase();
     }
 
     function syncCurrent() {
-        root.themeObj = ThemeDb.themeByKey(ThemeDb.currentTheme);
-        root.variantObj = ThemeDb.variantByKey(ThemeDb.currentTheme, ThemeDb.currentVariant);
-        root.level = lvlScheme;
-        root.query = "";
+        const idx = TermDb.terminals.findIndex(t =>
+            (t.key ?? "").toLowerCase() === TermDb.current.toLowerCase());
+        root.selIndex = Math.max(0, idx);
         root.refresh();
     }
 
@@ -139,22 +66,16 @@ Item {
             return true;
         }
         if (event.key === Qt.Key_Backspace && root.query === "") {
-            root.goBack(); return true;
+            root.open = false; return true;
         }
         return false;
-    }
-
-    function labelTitle() {
-        if (level === lvlScheme) return "Scheme";
-        if (level === lvlFlavour) return "Flavour";
-        return "Accent";
     }
 
     FloatingWindow {
         id: win
         visible: root.open
         color: "transparent"
-        title: "Theme"
+        title: "Terminal"
 
         width: 640
         height: Math.min(560, panelBody.implicitHeight + 32)
@@ -197,7 +118,7 @@ Item {
                     Layout.fillWidth: true
                     spacing: 8
                     Text {
-                        text: "Theme"
+                        text: "Terminal"
                         font.family: ThemePalette.fontFamily
                         font.pixelSize: ThemePalette.fontLarger
                         font.bold: true
@@ -205,8 +126,8 @@ Item {
                     }
                     Item { Layout.fillWidth: true }
                     Text {
-                        text: ThemeDb.loaded
-                            ? `${cap(ThemeDb.currentTheme)}${ThemeDb.currentVariant ? " · " + cap(ThemeDb.currentVariant) : ""}${ThemeDb.currentAccent ? " · " + ThemeDb.currentAccent : ""}`
+                        text: TermDb.loaded
+                            ? "current · " + cap(TermDb.current)
                             : ""
                         font.family: ThemePalette.fontFamily
                         font.pixelSize: ThemePalette.fontSmaller
@@ -235,7 +156,7 @@ Item {
                         spacing: 8
 
                         Text {
-                            text: root.labelTitle().toUpperCase() + " >"
+                            text: "TERMINAL >"
                             font.family: ThemePalette.fontFamily
                             font.pixelSize: ThemePalette.fontSmall
                             font.bold: true
@@ -269,7 +190,7 @@ Item {
                         }
 
                         Text {
-                            text: ThemeDb.applying ? "…" : ""
+                            text: TermDb.applying ? "…" : ""
                             font.family: ThemePalette.fontFamily
                             font.pixelSize: ThemePalette.fontSmall
                             color: ThemePalette.colPrimary
@@ -279,16 +200,14 @@ Item {
 
                 // ---- Result list ----
                 Rectangle {
-                    id: listFrame
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.minimumHeight: 300
+                    Layout.minimumHeight: 240
                     color: ThemePalette.colLayer2
                     radius: ThemePalette.roundingSmall
                     clip: true
 
                     ListView {
-                        id: flic
                         anchors.fill: parent
                         anchors.margins: 12
                         clip: true
@@ -301,12 +220,10 @@ Item {
                         delegate: ListRow {
                             required property var modelData
                             required property int index
-                            title: modelData?.custom
-                                ? modelData.title
-                                : (root.level === root.lvlFlavour ? "☾ " + modelData.title : modelData.title)
-                            sub: modelData?.polarity === "light" ? "󰃞" : ""
-                            hex: modelData?.hex ?? ""
-                            custom: modelData?.custom ?? false
+                            title: modelData.title
+                            sub: ""
+                            hex: ""
+                            custom: false
                             selected: root.isSelected(modelData)
                             active: index === root.selIndex
                             onClicked: {
@@ -321,9 +238,9 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         visible: root.filtered.length === 0
-                        text: !ThemeDb.loaded
-                            ? "Loading themes…"
-                            : `No ${root.labelTitle().toLowerCase()} match "${root.query}"`
+                        text: !TermDb.loaded
+                            ? "Loading terminals…"
+                            : `No terminal matches "${root.query}"`
                         font.family: ThemePalette.fontFamily
                         font.pixelSize: ThemePalette.fontSmall
                         color: ThemePalette.colOnLayer1
@@ -335,7 +252,7 @@ Item {
                     Layout.fillWidth: true
                     spacing: 12
                     Text {
-                        text: "↑↓ select   ⏎ " + (root.level === root.lvlAccent ? "apply" : "next") + "   ⌫ back   esc close"
+                        text: "↑↓ select   ⏎ apply   esc close"
                         font.family: ThemePalette.fontFamily
                         font.pixelSize: ThemePalette.fontSmaller
                         color: ThemePalette.colOnLayer2
@@ -343,7 +260,7 @@ Item {
                     }
                     Item { Layout.fillWidth: true }
                     Text {
-                        text: root.level === root.lvlAccent ? "type hex for custom" : ""
+                        text: "applies on next launch"
                         font.family: ThemePalette.fontFamily
                         font.pixelSize: ThemePalette.fontSmaller
                         color: ThemePalette.colPrimary
@@ -358,15 +275,14 @@ Item {
         function onOpenChanged() {
             if (root.open) {
                 root.syncCurrent();
-                ThemePalette.reload();
-                ThemeDb.reload();
+                TermDb.reload();
                 input.forceActiveFocus();
             }
         }
     }
 
     Connections {
-        target: ThemeDb
+        target: TermDb
         function onLoadedChanged() {
             if (root.open) {
                 root.syncCurrent();
@@ -378,8 +294,7 @@ Item {
     Component.onCompleted: {
         if (root.open) {
             root.syncCurrent();
-            ThemePalette.reload();
-            ThemeDb.reload();
+            TermDb.reload();
             input.forceActiveFocus();
         }
     }
@@ -390,7 +305,7 @@ Item {
     }
 
     IpcHandler {
-        target: "themeswitcher"
+        target: "terminal-switcher"
         function toggle() { root.open = !root.open; }
         function open() { root.open = true; }
         function close() { root.open = false; }

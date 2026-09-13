@@ -1,0 +1,4 @@
+singleton ThemePalette 1.0 ThemePalette.qml
+singleton TermDb 1.0 TermDb.qml
+TerminalSwitcher 1.0 TerminalSwitcher.qml
+ListRow 1.0 ListRow.qml

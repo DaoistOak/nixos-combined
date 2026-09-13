@@ -36,6 +36,12 @@
       # Fully opaque in-app; Hyprland applies the uniform 0.90 transparency.
       window.opacity = 1.0;
 
+      # Uniform 3-cell padding on all sides (matches kitty/wezterm/ghostty).
+      window.padding = {
+        x = 3;
+        y = 3;
+      };
+
       # Runtime-swappable colors (scripts/theme rewrites the imported file).
       general.import = [
         "~/.config/theme-switcher/alacritty-theme.toml"

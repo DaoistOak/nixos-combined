@@ -22,6 +22,7 @@ let
   #       <variant> = {
   #         title    = "Human readable variant name";
   #         polarity = "dark" | "light";
+  #         ghostty  = "built-in ghostty theme name"; # optional (explicit palette)
   #         roles    = { ... };   # normalized role colors (raw hex, no '#')
   #         accents  = { <accent> = "hex"; ... };
   #         ansi     = [ 16 colors ];
@@ -50,6 +51,7 @@ let
         latte = {
           title = "Latte";
           polarity = "light";
+          ghostty = "Catppuccin Latte";
           base = "eff1f5";
           mantle = "e6e9ef";
           crust = "dce0e8";
@@ -102,6 +104,7 @@ let
         frappe = {
           title = "Frappe";
           polarity = "dark";
+          ghostty = "Catppuccin Frappe";
           base = "303446";
           mantle = "292c3c";
           crust = "232634";
@@ -152,6 +155,7 @@ let
         macchiato = {
           title = "Macchiato";
           polarity = "dark";
+          ghostty = "Catppuccin Macchiato";
           base = "24273a";
           mantle = "1e2030";
           crust = "181926";
@@ -202,6 +206,7 @@ let
         mocha = {
           title = "Mocha";
           polarity = "dark";
+          ghostty = "Catppuccin Mocha";
           base = "1e1e2e";
           mantle = "181825";
           crust = "11111b";
@@ -260,6 +265,7 @@ let
         dark = {
           title = "Dark";
           polarity = "dark";
+          ghostty = "Dracula";
           # Dracula canonical palette mapped onto normalized roles.
           base = "282a36"; # background
           mantle = "21222c"; # darker variant

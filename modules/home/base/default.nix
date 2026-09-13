@@ -28,6 +28,7 @@ in
     ../config/modules/kitty
     ../config/modules/alacritty
     ../config/modules/wezterm
+    ../config/modules/ghostty
     ../config/modules/tmux
     ../config/modules/phone-bt-bridge
     ../config/themes/colors
@@ -61,6 +62,7 @@ in
     kitty.enable = false;
     alacritty.enable = false;
     wezterm.enable = false;
+    ghostty.enable = false;
     tmux.enable = false;
   };
 
@@ -106,7 +108,7 @@ in
   home.sessionVariables = {
     EDITOR = "nvim";
     BROWSER = "firefox";
-    TERMINAL = "wezterm start";
+    TERMINAL = "ghostty";
     QT_QPA_PLATFORMTHEME = lib.mkForce "qt6ct";
     QT_STYLE_OVERRIDE = lib.mkForce "kvantum";
     FLAKE_DIR = "/home/zeph/.config/nixos";

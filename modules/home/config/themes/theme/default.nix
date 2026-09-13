@@ -54,6 +54,7 @@ in
     targets.kitty.enable = false;
     targets.alacritty.enable = false;
     targets.wezterm.enable = false;
+    targets.ghostty.enable = false;
     targets.tmux.enable = false;
     # Stylix's gtksourceview overlay (applied via nixpkgs.overlays in HM)
     # changes gtksourceview's hash, forcing inkscape and catppuccin-cursors

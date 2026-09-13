@@ -8,13 +8,13 @@
     executable = true;
     text = ''
       #!/usr/bin/env bash
-      # Launch a command in the selected default terminal (see
-      # switch-default-terminal.sh). Defaults to wezterm when unset.
+      # Launch a command in the selected default terminal (see the
+      # terminal-switcher quickshell utility). Defaults to ghostty when unset.
       # Usage: launch-terminal.sh [--cwd DIR] [--hold] [--] [COMMAND]
       set -euo pipefail
 
       STATE_FILE="''${XDG_CONFIG_HOME:-$HOME/.config}/hypr/.default-terminal"
-      DEFAULT_TERMINAL="$(cat "$STATE_FILE" 2>/dev/null || echo wezterm)"
+      DEFAULT_TERMINAL="$(cat "$STATE_FILE" 2>/dev/null || echo ghostty)"
 
       CWD=""
       HOLD=0
@@ -66,10 +66,21 @@
         fi
       }
 
+      run_ghostty() {
+        local args=()
+        [[ -n "$CWD" ]] && args+=(--working-directory="$CWD")
+        if [[ $# -eq 0 ]]; then
+          ghostty "''${args[@]}"
+        else
+          ghostty "''${args[@]}" -e "$@"
+        fi
+      }
+
       case "$DEFAULT_TERMINAL" in
         alacritty) run_alacritty "$@" ;;
         kitty) run_kitty "$@" ;;
-        *) run_wezterm "$@" ;;
+        wezterm) run_wezterm "$@" ;;
+        *) run_ghostty "$@" ;;
       esac
     '';
   };
