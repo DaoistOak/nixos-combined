@@ -68,6 +68,21 @@ in
   xdg.configFile."hypr/hyprlock.conf".force = true;
   xdg.configFile."gtk-4.0/gtk.css".force = true;
   xdg.configFile."mimeapps.list".force = true;
+
+  # stylix writes ~/.local/share/flatpak/overrides/global for flatpak theming;
+  # a real file already exists there (Wayland/sockets+DRI override), so merge
+  # both into the managed file instead of clobbering it.
+  xdg.dataFile."flatpak/overrides/global".text = lib.mkForce ''
+    [Context]
+    sockets=inherit-wayland-socket;system-bus;session-bus;wayland
+    devices=all;dri
+    features=per-app-dev-shm;bluetooth
+    filesystems=${config.home.homeDirectory}/.themes/adw-gtk3:ro
+
+    [Environment]
+    GTK_THEME=adw-gtk3
+  '';
+  xdg.dataFile."flatpak/overrides/global".force = true;
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
