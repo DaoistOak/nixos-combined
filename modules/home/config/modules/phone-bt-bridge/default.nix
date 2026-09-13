@@ -16,6 +16,11 @@ let
     set -uo pipefail
 
     PW=${pkgs.pipewire}/bin/pw-link
+    WP=${pkgs.wireplumber}/bin/wpctl
+
+    # Phone playback is boosted to this node volume (2.0 = 200%) so the phone
+    # doesn't play much quieter than laptop-local media on the same earbuds.
+    PHONE_VOL="2.0"
 
     # Output ports of phone bluetooth audio captures: bluez_input.<mac> nodes
     # that carry stereo output (output_FL/output_FR). The WOLF SLEEK's own mic
@@ -39,6 +44,35 @@ let
       '
     }
 
+    # Node ids of the phone's A2DP capture streams: remote source endpoints show
+    # up as bluez_input nodes with media.class "Stream/Output/Audio" (the WOLF
+    # SLEEK's own mic is Audio/Source and its internal capture is
+    # Stream/Input/Audio, so neither matches).
+    phone_nodes() {
+      "$PW" ls Node 2>/dev/null | awk '
+        /^[[:space:]]*id [0-9]+,/ {
+          if (id != "" && nm ~ /bluez_input\./ && cls ~ /Stream\/Output\/Audio/) print id
+          id = $2; sub(/,/, "", id); nm = ""; cls = ""
+          next
+        }
+        /node.name =/ { nm = $0; next }
+        /media.class =/ { cls = $0; next }
+        END { if (id != "" && nm ~ /bluez_input\./ && cls ~ /Stream\/Output\/Audio/) print id }
+      '
+    }
+
+    boost_phone() {
+      local id cur
+      for id in $(phone_nodes); do
+        cur="$("$WP" get-volume "$id" 2>/dev/null | sed -n 's/^Volume: //p')"
+        [ -n "$cur" ] || continue
+        if awk -v c="$cur" -v t="$PHONE_VOL" 'BEGIN{exit !(c == t)}'; then
+          continue
+        fi
+        "$WP" set-volume "$id" "$PHONE_VOL" 2>/dev/null
+      done
+    }
+
     get_target() {
       "$PW" -o 2>/dev/null | awk -v p="$1" '
         $0 == p {getline; if ($0 ~ /\|->/) {sub(/^[[:space:]]*\|->[[:space:]]*/, ""); print}}
@@ -60,6 +94,7 @@ let
             "$PW" "$port" "$tgt" 2>/dev/null && echo "linked $port -> $tgt"
           fi
         done
+        boost_phone
       else
         # No earbuds: drop any existing forwarding so phone audio stays silent.
         for port in $(phone_ports); do

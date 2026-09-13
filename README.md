@@ -1,13 +1,16 @@
-# 🐧 NixOS Combined Configuration
+# 🐧 NixOS Config (Lingnao)
 
-A comprehensive, declarative NixOS and home-manager setup for seamless system and user environment management.
+Dendritic flake-based NixOS (`host = Lingnao`, `user = zeph`) + home-manager, x86_64-linux only.
+Built on the dendritic pattern: `flake-parts` + `import-tree` for auto-discovery.
 
 ## ✨ Features
 
 - **Flake-Powered**: Declarative NixOS and home-manager configs in one flake
-- **Hyprland Ecosystem**: Modern Wayland WM with custom plugins, themes, and KDE integration
+- **Dendritic Layout**: `flake-parts` + `import-tree` auto-discovery of modules
+- **Hyprland Ecosystem**: Modern Wayland WM with plugins (`hypr-dynamic-cursors`, `hyprland-scroll-overview`), noctalia shell, hyprpanel, and KDE/Plasma coexistence
+- **Theming**: Stylix + Catppuccin with a custom themer (QML script) and tmux/kitty/zsh integration
 - **Gaming & Development**: Steam, Lutris, Neovim, VSCode, and full dev toolchain
-- **Modular & Secure**: Organized modules with age-encrypted secrets and best practices
+- **Modular & Secure**: Organized modules; no secrets are stored in the repo
 
 ## 🚀 Quick Start
 
@@ -19,26 +22,41 @@ A comprehensive, declarative NixOS and home-manager setup for seamless system an
 ### Installation
 1. Clone this repo:
    ```bash
-   git clone https://github.com/DaoistOak/nixos-combined.git ~/.config/nixos
+   git clone git@github.com:DaoistOak/nixos-combined.git ~/.config/nixos
    cd ~/.config/nixos
    ```
 
 2. Build and switch:
    ```bash
    # Full system rebuild
-   nh os switch .#Overlord
+   nh os switch .#nixosConfigurations.Lingnao
 
    # Home-manager only
-   nh home switch .#zeph
+   home-manager switch --flake .#zeph
    ```
 
 ## 🛠️ Commands
 
-- ***Update & rebuild all***: `./scripts/updt`
-- **Rebuild system**: `nh os switch .#Overlord`
-- **Rebuild home**: `nh home switch .#zeph`
+- **Update & rebuild all** (interactive): `./scripts/updt`
+  - Options: `1` all, `2` flake update, `3` system, `4` home, `5` flatpak, `6` push, `7` exit (comma lists and ranges supported)
+- **Build without switching**:
+  - System: `nh os build .#nixosConfigurations.Lingnao`
+  - Home: `home-manager build --flake .#zeph`
+- **Rebuild system**: `nh os switch .#nixosConfigurations.Lingnao`
+- **Rebuild home**: `home-manager switch --flake .#zeph`
 - **Format code**: `nixfmt .`
 - **Validate**: `nix flake check`
+
+## 🗂️ Layout
+
+- `flake.nix` — entry point; `import-tree ./flake-parts` + host composition
+- `modules/hosts/Lingnao.nix` — thin host composition (NixOS + home-manager)
+- `modules/system/` — NixOS modules (boot, network, desktop, themes, pkgs, users, services, misc)
+- `modules/home/` — home-manager modules (`base/` entry point, `config/modules/`, `config/themes/`)
+- `flake-parts/` — auto-discovered flake-parts modules
+- `overlays/` — package overlays (additions, modifications, NUR)
+- `pkgs/` — package definitions (reachable only through `overlays/`)
+- `scripts/` — `updt` update helper
 
 ## 🤝 Contributing
 

@@ -189,9 +189,9 @@
 
     -- 8. MEDIA & HARDWARE KEYS
     hl.bind("XF86PowerOff", hl.dsp.exec_cmd("noctalia msg panel-toggle session"), { locked = true, description = "Power menu" })
-    hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(scripts .. "/volume.sh up"), { locked = true, repeating = true, description = "Volume up (wpctl, up to 150%)" })
-    hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(scripts .. "/volume.sh down"), { locked = true, repeating = true, description = "Volume down" })
-    hl.bind("XF86AudioMute", hl.dsp.exec_cmd(scripts .. "/volume.sh mute"), { locked = true, repeating = true, description = "Toggle mute" })
+    hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(scripts .. "/volume.sh up"), { locked = true, repeating = true, submap_universal = true, description = "Volume up (wpctl, up to 150%)" })
+    hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(scripts .. "/volume.sh down"), { locked = true, repeating = true, submap_universal = true, description = "Volume down" })
+    hl.bind("XF86AudioMute", hl.dsp.exec_cmd(scripts .. "/volume.sh mute"), { locked = true, repeating = true, submap_universal = true, description = "Toggle mute" })
     hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("noctalia msg mic-mute"), { locked = true, repeating = true, description = "Toggle mic mute" })
     hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("noctalia msg brightness-up 5"), { locked = true, repeating = true, description = "Brightness up" })
     hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("noctalia msg brightness-down 5"), { locked = true, repeating = true, description = "Brightness down" })

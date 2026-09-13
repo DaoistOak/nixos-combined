@@ -47,7 +47,7 @@
         hl.plugin.scrolloverview.gesture({ fingers = 4, direction = "vertical" })
 
         -- Toggle the overview on all monitors (niri's toggle-overview)
-        hl.bind("SUPER + g", function()
+        hl.bind("SUPER + q", function()
           hl.plugin.scrolloverview.overview("toggle all")
         end, { description = "Toggle workspace overview" })
 
@@ -61,7 +61,7 @@
           hl.bind("down",   hl.plugin.scrolloverview.navigate("down"),   { description = "Overview: focus down" })
           hl.bind("return", hl.plugin.scrolloverview.overview("select"), { description = "Overview: select" })
           hl.bind("escape", hl.plugin.scrolloverview.overview("off"),    { description = "Overview: close" })
-          hl.bind("SUPER + g", hl.plugin.scrolloverview.overview("toggle all"), { description = "Overview: toggle" })
+          hl.bind("SUPER + q", hl.plugin.scrolloverview.overview("toggle all"), { description = "Overview: toggle" })
           hl.bind("mouse:272", function()
             hl.plugin.scrolloverview.overview("select")
             hl.plugin.scrolloverview.window("select")
