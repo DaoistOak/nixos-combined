@@ -53,6 +53,7 @@ let
     # GUI Applications
     ags
     arduino-ide
+    avizo
     blender
     brave
     inputs.zen-browser.packages."x86_64-linux".default
@@ -105,8 +106,8 @@ let
     vscode-fhs
     waybar
     waypaper
-    # webcord-vencord
     winboat
+    # webcord-vencord
     wpsoffice
     zathura
 
@@ -264,7 +265,7 @@ let
       accent = "mauve";
       font = "JetBrains Mono";
       fontSize = "9";
-      background = "${./../nixos/sddm/wallpaper}";
+      background = "${./../modules/system/config/sddm/src/wallpaper}";
       loginBackground = true;
     })
     fuse3

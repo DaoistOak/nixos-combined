@@ -46,7 +46,7 @@
         (import-tree ./flake-parts)
       ]
       ++ [
-        ./modules/hosts/Lingnao.nix
+        ./modules/system/hosts/Lingnao.nix
       ];
     };
 }

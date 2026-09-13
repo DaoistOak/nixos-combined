@@ -20,12 +20,14 @@
     ./settings/windowrules.nix
     ./scripts/airplane-mode.nix
     ./scripts/ai-webapps.nix
+    ./scripts/brightness.nix
     ./scripts/hyprlock.nix
     ./scripts/cava-auto.nix
     ./scripts/launch-bluetooth.nix
     ./scripts/launch-network.nix
     ./scripts/launch-terminal.nix
     ./scripts/media-idle.nix
+    ./scripts/mic-mute.nix
     ./scripts/noctalia-restart.nix
     ./scripts/session.nix
     ./scripts/super-tap-launcher.nix

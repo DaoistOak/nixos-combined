@@ -47,10 +47,36 @@ Built on the dendritic pattern: `flake-parts` + `import-tree` for auto-discovery
 - **Format code**: `nixfmt .`
 - **Validate**: `nix flake check`
 
+## ⌨️ Essential Keybinds
+
+`SUPER` = Windows/Super key.
+
+| Keybind | Action |
+| --- | --- |
+| `SUPER` (tap) | Run launcher |
+| `SUPER` + `K` | List keybinds (cheatsheet) |
+| `SUPER` + `RETURN` | Terminal (wezterm + tmux) |
+| `SUPER` + `SPACE` ×3 / `SUPER` + `SHIFT` + `SPACE` | Window switcher |
+| `SUPER` + `Q` | Toggle workspace overview |
+| `SUPER` + `D` | Control center |
+| `SUPER` + `V` | Clipboard menu |
+| `SUPER` + `C` | Close window |
+| `SUPER` + `X` | Session menu |
+| `SUPER` + `1`–`0` | Switch workspace |
+| `SUPER` + `SHIFT` + `1`–`0` | Move window to workspace |
+| `SUPER` + `T` | Terminal apps menu |
+| `SUPER` + `S` | Shell menu |
+| `SUPER` + `E` | Apps menu |
+| `SUPER` + `M` | Messaging menu |
+| `SUPER` + `W` | Windows menu |
+| `XF86AudioRaiseVolume` / `LowerVolume` / `Mute` | Volume up / down / mute |
+| `XF86AudioMicMute` | Mic mute |
+| `XF86MonBrightnessUp` / `Down` | Screen brightness up / down |
+
 ## 🗂️ Layout
 
 - `flake.nix` — entry point; `import-tree ./flake-parts` + host composition
-- `modules/hosts/Lingnao.nix` — thin host composition (NixOS + home-manager)
+- `modules/system/hosts/Lingnao.nix` — thin host composition (NixOS + home-manager)
 - `modules/system/` — NixOS modules (boot, network, desktop, themes, pkgs, users, services, misc)
 - `modules/home/` — home-manager modules (`base/` entry point, `config/modules/`, `config/themes/`)
 - `flake-parts/` — auto-discovered flake-parts modules

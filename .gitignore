@@ -4,6 +4,8 @@ AGENTS.md
 GEMINI.md
 problems/
 modules/_git-clones/
+.crush/
+pkgs/logs/
 
 # Secrets — never commit API keys/tokens
 secrets.zsh
