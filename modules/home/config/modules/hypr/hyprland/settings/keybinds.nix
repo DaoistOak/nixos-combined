@@ -75,7 +75,45 @@
       remSave()
     end
 
-    remLoad()
+remLoad()
+
+    -- All-window transparency: the whitelist below renders at 0.90 via a
+    -- single runtime window rule. SUPER+W,T in the windows mode flips every
+    -- window to fully opaque; the choice persists in a state file so it
+    -- survives reboots and home-manager switches (config reload re-reads it).
+    local transStateFile = "${config.xdg.configHome}/hypr/transparency-state.conf"
+    local transRule = hl.window_rule({
+      match = {
+        class = "^(wezterm|[Kk]itty|[Aa]lacritty|Code|Codium|Visual Studio Code|[Cc]ursor|neovide|[Kk]ate|dolphin|org\\.kde\\.dolphin|[Pp]cmanfm(-qt)?|[Tt]hunar|[Ff]erdium|[Vv]esktop|[Dd]iscord|com\\.rtosta\\.zapzap|com\\.viber\\.Viber|keepassxc|org\\.kde\\.kdeconnect|[Ll]utris|com\\.usebottles\\.bottles|org\\.kde\\.elisa|[Ee]lisa|[Cc]antata|AI-(gemini|chatgpt|perplexity|grok|claude))$",
+      },
+      opacity = "0.9 override 0.9 override",
+    })
+
+    local function transReadMode()
+      -- true = transparent (.90 for the whitelist); false = fully opaque.
+      local f = io.open(transStateFile, "r")
+      if not f then
+        return true
+      end
+      local mode = f:read("l")
+      f:close()
+      return mode ~= "0"
+    end
+
+    local function transApply(transparent)
+      transRule:set_enabled(transparent)
+    end
+
+    local function transSet(transparent)
+      transApply(transparent)
+      local f = io.open(transStateFile, "w")
+      if f then
+        f:write(transparent and "1\n" or "0\n")
+        f:close()
+      end
+    end
+
+    transApply(transReadMode())
 
     -- 1. MOUSE (SUPER HELD)
     hl.bind(mod .. " + mouse:272", function()
@@ -402,10 +440,18 @@
         end, { timeout = 2000, type = "oneshot" })
       end
       hl.bind("F", hl.dsp.window.fullscreen(), { description = "Toggle fullscreen" })
-      hl.bind("T", function()
+      hl.bind("ALT + F", function()
         hl.dispatch(hl.dsp.window.float({ action = "toggle" }))
         remToggle("float")
       end, { description = "Toggle floating (remembered)" })
+      hl.bind("T", function()
+        local nextMode = not transReadMode()
+        transSet(nextMode)
+        hl.dispatch(hl.dsp.exec_cmd("noctalia msg bar-show Keymap"))
+        hl.timer(function()
+          hl.dispatch(hl.dsp.exec_cmd("noctalia msg bar-hide Keymap"))
+        end, { timeout = 2000, type = "oneshot" })
+      end, { description = "Toggle all-window transparency" })
       hl.bind("M", toggleLayout, { description = "Toggle tiling layout (mode W)" })
       hl.bind("K", hl.dsp.window.close(), { description = "Close window (mode W)" })
       hl.bind("P", function()

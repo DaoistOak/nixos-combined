@@ -71,6 +71,16 @@
           workspace = 9;
         }
 
+        # Keep browsers fully opaque: transparent web UI hurts readability.
+        # Covers everything launched from SUPER+E,W (firefox, zen, brave,
+        # qutebrowser) plus librewolf.
+        {
+          match = {
+            class = "^(zen|org\\.zen-browser\\.[Zz]en|[Ff]irefox|[Bb]rave(-[Bb]rowser)?|[Qq]utebrowser|[Ll]ibrewolf)$";
+          };
+          opacity = "1 override 1 override";
+        }
+
         # Floating windows
         {
           match = {

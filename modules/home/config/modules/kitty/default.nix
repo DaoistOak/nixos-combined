@@ -46,9 +46,10 @@
       tab_powerline_style = "slanted";
       tab_title_template = "{title}{' :{}:'.format(num_windows) if num_windows > 1 else ''}";
 
-      # Background (transparent-ish)
-      background_opacity = 0.60;
-      dynamic_background_opacity = true;
+      # Background: fully opaque in-app; let Hyprland handle the 0.90
+      # transparency so it stays uniform across terminals.
+      background_opacity = 1.0;
+      dynamic_background_opacity = false;
 
       # Shell / term
       shell = ".";
@@ -61,8 +62,6 @@
       "ctrl++" = "change_font_size all +1.0";
       "ctrl+-" = "change_font_size all -1.0";
       "f11" = "toggle_fullscreen";
-      "kitty_mod++" = "set_background_opacity +0.1";
-      "kitty_mod+-" = "set_background_opacity -0.1";
       "ctrl+l" = "combine : clear_terminal scroll active : send_text normal,application \\x0c";
     };
 

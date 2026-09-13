@@ -51,6 +51,14 @@ in
     '';
   };
 
+  xdg.dataFile = {
+    "icons/hicolor/scalable/apps/ai-gemini.svg".source = ./src/icons/gemini.svg;
+    "icons/hicolor/scalable/apps/ai-chatgpt.svg".source = ./src/icons/chatgpt.svg;
+    "icons/hicolor/scalable/apps/ai-perplexity.svg".source = ./src/icons/perplexity.svg;
+    "icons/hicolor/scalable/apps/ai-grok.svg".source = ./src/icons/grok.svg;
+    "icons/hicolor/scalable/apps/ai-claude.svg".source = ./src/icons/claude.svg;
+  };
+
   xdg.desktopEntries = {
     gemini = {
       name = "Gemini";
@@ -58,6 +66,7 @@ in
       terminal = false;
       categories = [ "Network" ];
       comment = "Google Gemini (AI web app)";
+      icon = "ai-gemini";
     };
     chatgpt = {
       name = "ChatGPT";
@@ -65,6 +74,7 @@ in
       terminal = false;
       categories = [ "Network" ];
       comment = "OpenAI ChatGPT (AI web app)";
+      icon = "ai-chatgpt";
     };
     perplexity = {
       name = "Perplexity";
@@ -72,6 +82,7 @@ in
       terminal = false;
       categories = [ "Network" ];
       comment = "Perplexity AI (AI web app)";
+      icon = "ai-perplexity";
     };
     grok = {
       name = "Grok";
@@ -79,6 +90,7 @@ in
       terminal = false;
       categories = [ "Network" ];
       comment = "xAI Grok (AI web app)";
+      icon = "ai-grok";
     };
     claude = {
       name = "Claude";
@@ -86,6 +98,7 @@ in
       terminal = false;
       categories = [ "Network" ];
       comment = "Anthropic Claude (AI web app)";
+      icon = "ai-claude";
     };
   };
 }

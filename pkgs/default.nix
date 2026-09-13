@@ -44,6 +44,7 @@ let
     kdePackages.qqc2-desktop-style
     kdePackages.qtstyleplugin-kvantum
     klassy
+    neovide
     pay-respects
     quickshell
     socat

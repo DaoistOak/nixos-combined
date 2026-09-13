@@ -33,8 +33,8 @@
         builtin_box_drawing = true;
       };
 
-      # Transparent-ish background window, mirroring kitty's background_opacity.
-      window.opacity = 0.60;
+      # Fully opaque in-app; Hyprland applies the uniform 0.90 transparency.
+      window.opacity = 1.0;
 
       # Runtime-swappable colors (scripts/theme rewrites the imported file).
       general.import = [

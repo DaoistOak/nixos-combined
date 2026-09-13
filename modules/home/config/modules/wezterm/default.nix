@@ -88,6 +88,7 @@
       --  * drop SUPER+w close-tab (default, clashes with Hyprland usage)
       --  * keep CTRL/CTRL+SHIFT+w close-tab but without the confirmation overlay
       local keys = config.keys or {}
+      table.insert(keys, { key = 'Return', mods = 'ALT', action = wezterm.action.DisableDefaultAssignment })
       table.insert(keys, { key = 'w', mods = 'SUPER', action = wezterm.action.DisableDefaultAssignment })
       table.insert(keys, { key = 'W', mods = 'SUPER', action = wezterm.action.DisableDefaultAssignment })
       table.insert(keys, { key = 'w', mods = 'SHIFT|CTRL', action = wezterm.action.CloseCurrentTab { confirm = false } })
