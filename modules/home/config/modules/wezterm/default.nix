@@ -22,7 +22,7 @@
       default_prog = [ "zsh" ];
       # Don't ask for confirmation when closing a window (WM/decoration close).
       window_close_confirmation = "NeverPrompt";
-      window_background_opacity = 0.85;
+      window_background_opacity = 1.0;
 
       # --- Animations: synced to the Hyprland animation profile ---
       # Display refresh is 1920x1200@60 (modules/config/hypr/settings/displays.nix);
