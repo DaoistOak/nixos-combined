@@ -41,6 +41,7 @@
     ./scripts/submap-bar.nix
     ./scripts/submap-timeout.nix
     ./scripts/volume.nix
+    ./scripts/widget-toggle.nix
   ];
   wayland.windowManager.hyprland = {
     enable = true;

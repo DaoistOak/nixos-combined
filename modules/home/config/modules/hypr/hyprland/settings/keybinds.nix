@@ -321,6 +321,7 @@
           hl.bind("C", hl.dsp.exec_cmd("noctalia msg panel-toggle yuuto/calculator:panel"), { description = "Calculator panel (mode S)" })
           hl.bind("G", hl.dsp.exec_cmd(scripts .. "/performance-mode.sh"), { description = "Toggle performance mode (gaps/corners/transparency/border rotate)" })
           hl.bind("SHIFT + V", hl.dsp.exec_cmd(scripts .. "/session-restore.sh"), { description = "Restore session (mode S)" })
+          hl.bind("D", hl.dsp.submap("shell-widgets"), { description = "Widget toggles submenu" })
           hl.bind("escape", hl.dsp.submap("reset"), { description = "Exit shell mode" })
         end)
         -- 15. SHELL > BLUETOOTH (SUPER+S, B)
@@ -336,8 +337,14 @@
           hl.bind("c", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel network && " .. scripts .. "/launch-network.sh close"), { description = "Close network panel" })
           hl.bind("escape", hl.dsp.exec_cmd(scripts .. "/submap-timeout.sh cancel network && hyprctl dispatch \"hl.dsp.submap('reset')\""), { description = "Exit network mode" })
         end)
+        -- 17. SHELL > WIDGETS (SUPER+S, D) — desktop widget toggles
+        hl.define_submap("shell-widgets", "reset", function()
+          hl.bind("M", hl.dsp.exec_cmd(scripts .. "/widget-toggle.sh widget-metro nix run github:5c0/metropolis"), { description = "Toggle metropolis widget" })
+          hl.bind("C", hl.dsp.exec_cmd(scripts .. "/widget-toggle.sh widget-cava " .. scripts .. "/cava-auto.sh"), { description = "Toggle cava widget" })
+          hl.bind("escape", hl.dsp.submap("reset"), { description = "Exit widgets mode" })
+        end)
 
-        -- 17. APPS (SUPER+E)
+        -- 18. APPS (SUPER+E)
         hl.define_submap("apps", "reset", function()
           hl.bind("W", hl.dsp.submap("apps-web"), { description = "Web browsers submenu" })
           hl.bind("E", hl.dsp.submap("apps-editor"), { description = "Editors submenu" })

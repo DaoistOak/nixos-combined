@@ -20,6 +20,26 @@
         size_y = 97,
       })
 
+      -- Desktop widgets (metropolis, cava): fullscreen transparent terminals
+      -- rendered as live wallpaper backgrounds. Toggled from SUPER+S, D submap
+      -- (widget-toggle.sh launches the terminal with each class).
+      hl.plugin.hyprwinwrap.window({
+        class = "widget-metro",
+        layer = 0,
+        pos_x = 0,
+        pos_y = 0,
+        size_x = 100,
+        size_y = 97,
+      })
+      hl.plugin.hyprwinwrap.window({
+        class = "widget-cava",
+        layer = 0,
+        pos_x = 0,
+        pos_y = 0,
+        size_x = 100,
+        size_y = 97,
+      })
+
       -- Toggle focus/editing on the background window (SUPER + B)
       hl.bind("SUPER + B", function()
         hl.plugin.hyprwinwrap.focus("window-bg")
