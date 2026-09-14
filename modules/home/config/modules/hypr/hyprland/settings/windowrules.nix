@@ -166,11 +166,39 @@
           };
           float = true;
         }
+        # Polkit auth dialog (KDE agent): behave like a layer surface — float
+        # centered on top, no shadow or decorations, pinned above everything.
+        # No existing polkit agent renders as a true wlr-layer surface, so
+        # window rules are the closest approximation.
         {
           match = {
             class = "^(org.kde.polkit-kde-authentication-agent-1)$";
           };
           float = true;
+        }
+        {
+          match = {
+            class = "^(org.kde.polkit-kde-authentication-agent-1)$";
+          };
+          center = true;
+        }
+        {
+          match = {
+            class = "^(org.kde.polkit-kde-authentication-agent-1)$";
+          };
+          pin = true;
+        }
+        {
+          match = {
+            class = "^(org.kde.polkit-kde-authentication-agent-1)$";
+          };
+          decorate = false;
+        }
+        {
+          match = {
+            class = "^(org.kde.polkit-kde-authentication-agent-1)$";
+          };
+          no_shadow = true;
         }
         {
           match = {

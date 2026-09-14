@@ -120,17 +120,17 @@ in
         "hyprland.start"
         (lib.generators.mkLuaInline ''
           function()
-            -- Launch the shell / bar
+-- Launch the shell / bar
             hl.exec_cmd("noctalia")
             -- Follow Hyprland submaps: show the Keymap overlay bar when a
-            -- submap is active, hide it when back to default.
-            hl.exec_cmd("${config.xdg.configHome}/hypr/scripts/submap-bar.sh")
-            -- GUI polkit authentication agent (KDE). Launched from Hyprland so
-            -- it inherits the full graphical env (DISPLAY, WAYLAND, session bus)
-            -- and can register with polkitd. The wrapper strips QT_STYLE_OVERRIDE
-            -- (Kvantum QtQuick QML would crash the dialog) and sets the
-            -- "org.kde.desktop" QtQuick style so it matches catppuccin.
-            hl.exec_cmd("${polkitAgentWrapper}/bin/polkit-kde-agent-wrapper")
+              -- submap is active, hide it back to default.
+              hl.exec_cmd("${config.xdg.configHome}/hypr/scripts/submap-bar.sh")
+              -- GUI polkit authentication agent (KDE). Launched from Hyprland so
+              -- it inherits the full graphical env (DISPLAY, WAYLAND, session bus)
+              -- and can register with polkitd. The wrapper strips QT_STYLE_OVERRIDE
+              -- (Kvantum QtQuick QML would crash the dialog) and sets the
+              -- "org.kde.desktop" QtQuick style so it matches catppuccin.
+              hl.exec_cmd("${polkitAgentWrapper}/bin/polkit-kde-agent-wrapper")
             -- Launch notifications service (swaync or mako)
             hl.exec_cmd("/run/current-system/sw/bin/nm-applet")
             -- Volume and brightness OSD (avizo). avizo-client needs the

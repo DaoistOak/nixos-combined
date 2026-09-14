@@ -8,7 +8,7 @@ import "."
 
 // Default-terminal switcher as a CLI-style fuzzy finder, mirrored from the
 // themeswitcher utility. Single level: type to filter, Enter applies.
-// Presented as a compact, centered floating window (no fullscreen dim, no
+// Presented as a compact, centered layer-shell capsule (above windows, no
 // exclusive keyboard grab).
 Item {
     id: root
@@ -71,28 +71,17 @@ Item {
         return false;
     }
 
-    FloatingWindow {
+    PanelWindow {
         id: win
         visible: root.open
         color: "transparent"
-        title: "Terminal"
+        // No anchors -> wlr-layer-shell centers the surface on its output.
+        screen: Hyprland.focusedMonitor?.screen ?? null
+        exclusiveZone: 0
+        focusable: true
 
-        width: 640
-        height: Math.min(560, panelBody.implicitHeight + 32)
-
-        function centerOnFocusedScreen() {
-            const s = Hyprland.focusedMonitor?.screen
-                ?? (Quickshell.screens?.length ? Quickshell.screens[0] : null);
-            if (!s) return;
-            win.screen = s;
-            win.x = Math.round(s.x + (s.width - win.width) / 2);
-            win.y = Math.round(s.y + (s.height - win.height) / 2);
-        }
-        Component.onCompleted: win.centerOnFocusedScreen()
-        Connections {
-            target: Hyprland
-            function onFocusedMonitorChanged() { win.centerOnFocusedScreen() }
-        }
+        implicitWidth: 640
+        implicitHeight: Math.min(560, panelBody.implicitHeight + 32)
 
         Rectangle {
             id: panel

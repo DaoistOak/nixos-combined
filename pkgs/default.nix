@@ -45,10 +45,12 @@ let
     kdePackages.qqc2-desktop-style
     kdePackages.qtstyleplugin-kvantum
     klassy
+    mew
     neovide
     pay-respects
     quickshell
     socat
+    # topowall
   ];
 
   system-packages = with pkgs; [
