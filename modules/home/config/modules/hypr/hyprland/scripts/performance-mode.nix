@@ -61,9 +61,9 @@
         local tmp
         tmp="$(mktemp)"
         ${pkgs.gawk}/bin/awk '
-          /^\[/ {
+          /^\s*\[/ {
             section = $0
-            gsub(/^\[|\]$/, "", section)
+            gsub(/^\s*\[|\]$/, "", section)
             in_corners = (section == "shell.screen_corners")
             in_opacity = (section == "dock" || section ~ /^bar\./ ||
                           section == "notification" || section == "osd")
