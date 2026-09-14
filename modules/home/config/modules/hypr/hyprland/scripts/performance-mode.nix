@@ -61,26 +61,65 @@
         local tmp
         tmp="$(mktemp)"
         ${pkgs.gawk}/bin/awk '
-          /^\s*\[/ {
-            section = $0
-            gsub(/^\s*\[|\]$/, "", section)
-            in_corners = (section == "shell.screen_corners")
-            in_opacity = (section == "dock" || section ~ /^bar\./ ||
-                          section == "notification" || section == "osd")
-            print
-            if (section == "dock") {
-              print "concave_edge_corners = false"
-              print "radius = 0"
-              print "radius_top_left = 0"
-              print "radius_top_right = 0"
-              print "radius_bottom_left = 0"
-              print "radius_bottom_right = 0"
+          function emit_section(    sec, target, in_opacity_sec, has_rc, has_radius, has_tl, has_tr, has_bl, has_br, line, i) {
+            if (header == "")
+              return
+            sec = current_sec
+            target = (sec == "dock" || sec ~ /^bar\./)
+            in_opacity_sec = target || sec == "notification" || sec == "osd"
+            has_rc = 0; has_radius = 0; has_tl = 0; has_tr = 0; has_bl = 0; has_br = 0
+            for (i = 1; i <= nb; i++) {
+              line = body[i]
+              if (line ~ /^[ \t]*concave_edge_corners[ \t]*=/) has_rc = 1
+              if (line ~ /^[ \t]*radius[ \t]*=/) has_radius = 1
+              if (line ~ /^[ \t]*radius_top_left[ \t]*=/) has_tl = 1
+              if (line ~ /^[ \t]*radius_top_right[ \t]*=/) has_tr = 1
+              if (line ~ /^[ \t]*radius_bottom_left[ \t]*=/) has_bl = 1
+              if (line ~ /^[ \t]*radius_bottom_right[ \t]*=/) has_br = 1
             }
+            print header
+            if (target) {
+              if (!has_rc) print "concave_edge_corners = false"
+              if (!has_radius) print "radius = 0"
+              if (!has_tl) print "radius_top_left = 0"
+              if (!has_tr) print "radius_top_right = 0"
+              if (!has_bl) print "radius_bottom_left = 0"
+              if (!has_br) print "radius_bottom_right = 0"
+            }
+            for (i = 1; i <= nb; i++) {
+              line = body[i]
+              if (sec == "shell.screen_corners" && line ~ /^[ \t]*enabled[ \t]*=/) {
+                sub(/=.*/, "= false", line)
+                print line
+                continue
+              }
+              if (target && line ~ /^[ \t]*(radius|radius_top_left|radius_top_right|radius_bottom_left|radius_bottom_right|concave_edge_corners)[ \t]*=/) {
+                if (line ~ /concave_edge_corners/)
+                  sub(/=.*/, "= false", line)
+                else
+                  sub(/=.*/, "= 0", line)
+                print line
+                continue
+              }
+              if (in_opacity_sec && line ~ /^[ \t]*background_opacity[ \t]*=/) {
+                sub(/=.*/, "= 1.0", line)
+                print line
+                continue
+              }
+              print line
+            }
+          }
+          /^\s*\[/ {
+            emit_section()
+            header = $0
+            current_sec = header
+            gsub(/^\s*\[|\]$/, "", current_sec)
+            nb = 0
+            delete body
             next
           }
-          in_corners && $1 == "enabled" { sub(/=.*/, "= false"); print; next }
-          in_opacity && $1 == "background_opacity" { sub(/=.*/, "= 1.0"); print; next }
-          { print }
+          { body[++nb] = $0 }
+          END { emit_section() }
         ' "$NOCTALIA_SETTINGS" > "$tmp"
         cp "$tmp" "$NOCTALIA_SETTINGS"
         rm -f "$tmp"
