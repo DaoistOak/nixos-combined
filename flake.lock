@@ -388,16 +388,17 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1788508268,
-        "narHash": "sha256-v+7e4T412K3Hi/qb+v7sZh2/2k1jFB9AY4AusVXr58I=",
+        "lastModified": 1784620401,
+        "narHash": "sha256-HKzJtEkafkWjTx35spDp6pm1oClN7vIipJ2wwU4ocNY=",
         "owner": "VirtCode",
         "repo": "hypr-dynamic-cursors",
-        "rev": "b9739b1db4a48616d66af29239ab0fe2756d28f6",
+        "rev": "f5ba36c7622098b53bf62ddb8ddf03b914abbdf8",
         "type": "github"
       },
       "original": {
         "owner": "VirtCode",
         "repo": "hypr-dynamic-cursors",
+        "rev": "f5ba36c7622098b53bf62ddb8ddf03b914abbdf8",
         "type": "github"
       }
     },
@@ -748,6 +749,23 @@
       "original": {
         "owner": "hyprwm",
         "repo": "hyprwayland-scanner",
+        "type": "github"
+      }
+    },
+    "hyprwinwrap": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785031189,
+        "narHash": "sha256-9MdwossojhQccorcZcPxi+xaNOYGESZ0B3N6T/tNnzI=",
+        "owner": "gen3vra",
+        "repo": "hyprwinwrap",
+        "rev": "a72d3eeecfb0eaab64092c23410662ec907ca671",
+        "type": "github"
+      },
+      "original": {
+        "owner": "gen3vra",
+        "repo": "hyprwinwrap",
+        "rev": "a72d3eeecfb0eaab64092c23410662ec907ca671",
         "type": "github"
       }
     },
@@ -1135,6 +1153,7 @@
         "hyprland": "hyprland",
         "hyprland-scroll-overview": "hyprland-scroll-overview",
         "hyprpanel": "hyprpanel",
+        "hyprwinwrap": "hyprwinwrap",
         "import-tree": "import-tree",
         "nix-cachyos-kernel": "nix-cachyos-kernel",
         "nixos-hardware": "nixos-hardware",

@@ -10,7 +10,9 @@
     ./settings/colors.nix
     ./settings/decorations.nix
     ./settings/displays.nix
+    ./settings/dynamic-cursors.nix
     ./settings/edgehover.nix
+    ./settings/hyprwinwrap.nix
     ./settings/input.nix
     ./settings/keybinds.nix
     ./settings/plugins.nix

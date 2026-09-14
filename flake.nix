@@ -28,12 +28,21 @@
     };
     hyprpanel.url = "github:Jas-SinghFSU/HyprPanel";
     hypr-dynamic-cursors = {
-      url = "github:VirtCode/hypr-dynamic-cursors";
+      # f5ba36c is the rev the plugin pins for v0.56.1 (5c9377c...) per its
+      # hyprpm.toml commit_pins; newer main targets v0.56.2+ and won't build.
+      url = "github:VirtCode/hypr-dynamic-cursors/f5ba36c7622098b53bf62ddb8ddf03b914abbdf8";
       inputs.hyprland.follows = "hyprland";
     };
     hyprland-scroll-overview = {
       url = "github:yayuuu/hyprland-scroll-overview";
       inputs.hyprland.follows = "hyprland";
+    };
+    # No flake upstream; plain source, packaged manually in pkgs/hyprwinwrap.nix
+    hyprwinwrap = {
+      # a72d3ee is the rev pinned for v0.56.0 in hyprwinwrap's hyprpm.toml
+      # commit_pins (highest pin; v0.56.1 is a patch on the same ABI line).
+      url = "github:gen3vra/hyprwinwrap/a72d3eeecfb0eaab64092c23410662ec907ca671";
+      flake = false;
     };
     # No flake in this repo; plain source, packaged manually in pkgs/hypr-edgehover.nix
     hypr-edgehover = {
