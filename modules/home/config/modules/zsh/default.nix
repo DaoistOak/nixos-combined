@@ -33,5 +33,6 @@ in
   catppuccin.fzf.enable = true;
 
   home.file."${zshDir}/powerlevel10k".source = powerlevel10k;
+  home.file."${zshDir}/zsh-vi-mode".source = pkgs.zsh-vi-mode;
   home.file."${zshDir}/.p10k.zsh".source = ./src/p10k.zsh;
 }

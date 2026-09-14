@@ -169,6 +169,9 @@ in
             hl.exec_cmd("qs -c terminal-switcher")
             -- Launching hyprshade for window effects
             hl.exec_cmd("hyprsunset")
+            -- Rotate the active window's gradient border toward the cursor
+            -- (border-angle daemon for the primary -> secondary border).
+            hl.exec_cmd("pgrep -f border-angle.sh >/dev/null 2>&1 || ${config.xdg.configHome}/hypr/scripts/border-angle.sh")
           end
         '')
       ];

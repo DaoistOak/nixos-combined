@@ -36,29 +36,39 @@ export WAKATIME_HOME="$XDG_CONFIG_HOME"/wakatime
 export WINEPREFIX="$XDG_DATA_HOME"/wine
 # export XAUTHORITY="$XDG_RUNTIME_DIR"/Xauthority
 # export COLORTERM=truecolor
-# HISTSIZE=10000000
+HISTSIZE=10000000
+SAVEHIST=10000000
 # ---------------------------------------------------------------------------
-# vi-mode (manual; replaces oh-my-zsh plugins/vi-mode). Keep definitions here,
-# BEFORE powerlevel10k is sourced: p10k wraps zle-keymap-select so it can
-# refresh its vi_mode/visual indicator, and it preserves pre-existing widgets.
+# Tab-completion menu: mirror oh-my-zsh's lib/completion.zsh so the first Tab
+# lists candidates, a second Tab enters the picker, and Enter accepts the
+# highlighted match (e.g. `cd .config/nixo<Tab><Tab>` then Enter goes into
+# nixos/). `special-dirs` also offers `..` and `.` entries in `cd`.
 # ---------------------------------------------------------------------------
-bindkey -v                                       # vi editing is the default
-KEYTIMEOUT=40                                    # ms; Esc responds instantly
-
-# Cursor shape per mode (bar=insert, block=normal, underline=visual).
-vi_cursor() {
-  case ${KEYMAP:-viins} in
-    vicmd)   print -n -- '\e[2 q' ;;
-    visual)  print -n -- '\e[4 q' ;;
-    *)       print -n -- '\e[6 q' ;;
-  esac
+unsetopt menu_complete      # do not auto-select the first completion entry
+setopt auto_menu            # show the completion menu on successive Tab
+setopt complete_in_word
+setopt always_to_end
+zstyle ':completion:*:*:*:*:*' menu select
+zstyle ':completion:*' special-dirs true
+zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
+# ---------------------------------------------------------------------------
+# vi-mode: zsh-vi-mode (zvm plugin) replaces the manual bindkey -v + cursor
+# block. Keep BEFORE powerlevel10k is sourced: p10k wraps zle-keymap-select
+# and preserves pre-existing widgets. zvm handles vi editing, cursor shapes
+# and text objects. The package is symlinked into ${ZDOTDIR}/zsh-vi-mode by
+# modules/home/config/modules/zsh/default.nix (like powerlevel10k).
+# ---------------------------------------------------------------------------
+zvm_config() {
+  ZVM_READKEY_ENGINE=zle              # zle engine (NEX is still beta)
+  ZVM_KEYTIMEOUT=0.4                  # -> KEYTIMEOUT=40ms, matches the old value
+  ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT # start each new line in insert mode
 }
-function zle-line-init()        { vi_cursor; }
-function zle-line-finish()      { print -n -- '\e[6 q'; }
-function zle-keymap-select()    { vi_cursor; }
-zle -N zle-line-init zle-line-init
-zle -N zle-line-finish zle-line-finish
-zle -N zle-keymap-select zle-keymap-select
+source ${ZDOTDIR:-$HOME/.config/zsh}/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+# zvm re-binds keys during init (including ^R), so re-run atuin init right after
+# it so Ctrl-R stays atuin search (official zvm + atuin integration).
+zvm_after_init_commands+=(
+  'eval "$(atuin init zsh)"'
+)
 
 # sudo: prepend/remove "sudo " on the current line (Ctrl-X Ctrl-S; omz sudo plugin).
 sudo-command-line() {
@@ -116,7 +126,7 @@ alias -g instl='sudo nixos-rebuild switch --show-trace --impure --flake /etc/nix
 alias -g clean='sudo nix-env --delete-generations old && sudo nix-collect-garbage -d'
 # alias -g vi='nvim'
 alias -g cat='bat'
-alias -g emacs='emacsclient -c -a 'emacs''
+alias emacs='emacsclient -c -a "emacs"'
 alias -g rr='curl -s -L https://raw.githubusercontent.com/keroserene/rickrollrc/master/roll.sh | bash'
 alias -g parrot='curl parrot.live'
 alias -g portainer='sudo docker start Portainer'

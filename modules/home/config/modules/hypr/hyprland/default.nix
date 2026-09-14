@@ -21,8 +21,8 @@
     ./settings/windowrules.nix
     ./scripts/airplane-mode.nix
     ./scripts/ai-webapps.nix
+    ./scripts/border-angle.nix
     ./scripts/brightness.nix
-    ./scripts/gamer-mode.nix
     ./scripts/hyprlock.nix
     ./scripts/cava-auto.nix
     ./scripts/launch-bluetooth.nix
@@ -31,6 +31,7 @@
     ./scripts/media-idle.nix
     ./scripts/mic-mute.nix
     ./scripts/noctalia-restart.nix
+    ./scripts/performance-mode.nix
     ./scripts/session.nix
     ./scripts/super-tap-launcher.nix
     ./scripts/terminal-switcher

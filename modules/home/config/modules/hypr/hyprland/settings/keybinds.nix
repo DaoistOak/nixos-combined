@@ -115,7 +115,7 @@
 
         transApply(transReadMode())
 
-        -- Runtime handle shared with scripts (gamer-mode.sh): exposes the
+        -- Runtime handle shared with scripts (performance-mode.sh): exposes the
         -- whitelist transparency rule so they can force it opaque/restore the
         -- saved SUPER+W,T preference without touching the persistence file.
         hyprTrans = {
@@ -309,7 +309,7 @@
           hl.bind("P", hl.dsp.exec_cmd("~/bin/colorpicker"), { description = "Color picker (mode S)" })
           hl.bind("K", hl.dsp.exec_cmd("keyviz"), { description = "Keyviz keypress visualizer (mode S)" })
           hl.bind("C", hl.dsp.exec_cmd("noctalia msg panel-toggle yuuto/calculator:panel"), { description = "Calculator panel (mode S)" })
-          hl.bind("G", hl.dsp.exec_cmd(scripts .. "/gamer-mode.sh"), { description = "Toggle gamer mode (performance profile)" })
+          hl.bind("G", hl.dsp.exec_cmd(scripts .. "/performance-mode.sh"), { description = "Toggle performance mode (gaps/corners/transparency)" })
           hl.bind("SHIFT + V", hl.dsp.exec_cmd(scripts .. "/session-restore.sh"), { description = "Restore session (mode S)" })
           hl.bind("escape", hl.dsp.submap("reset"), { description = "Exit shell mode" })
         end)
@@ -463,6 +463,11 @@
           hl.bind("M", toggleLayout, { description = "Toggle tiling layout (mode W)" })
           hl.bind("K", hl.dsp.window.close(), { description = "Close window (mode W)" })
           hl.bind("P", function()
+            hl.dispatch(hl.dsp.window.float({ action = "toggle" }))
+            hl.dispatch(hl.dsp.window.pin())
+            remToggle("float")
+          end, { description = "Pin to all workspaces (floating)" })
+          hl.bind("ALT + P", function()
             hl.dispatch(hl.dsp.window.pseudo())
             remToggle("pseudo")
           end, { description = "Toggle pseudo (remembered)" })
