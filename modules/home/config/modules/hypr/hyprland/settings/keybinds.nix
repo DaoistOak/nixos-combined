@@ -115,6 +115,14 @@
 
         transApply(transReadMode())
 
+        -- Runtime handle shared with scripts (gamer-mode.sh): exposes the
+        -- whitelist transparency rule so they can force it opaque/restore the
+        -- saved SUPER+W,T preference without touching the persistence file.
+        hyprTrans = {
+          get = transReadMode,
+          force = transApply,
+        }
+
         -- 1. MOUSE (SUPER HELD)
         hl.bind(mod .. " + mouse:272", function()
           superTap.armed = false
@@ -301,7 +309,7 @@
           hl.bind("P", hl.dsp.exec_cmd("~/bin/colorpicker"), { description = "Color picker (mode S)" })
           hl.bind("K", hl.dsp.exec_cmd("keyviz"), { description = "Keyviz keypress visualizer (mode S)" })
           hl.bind("C", hl.dsp.exec_cmd("noctalia msg panel-toggle yuuto/calculator:panel"), { description = "Calculator panel (mode S)" })
-          hl.bind("G", hl.dsp.exec_cmd("noctalia msg panel-toggle nomadcxx/gamer-mode:main"), { description = "Open gamer mode panel" })
+          hl.bind("G", hl.dsp.exec_cmd(scripts .. "/gamer-mode.sh"), { description = "Toggle gamer mode (performance profile)" })
           hl.bind("SHIFT + V", hl.dsp.exec_cmd(scripts .. "/session-restore.sh"), { description = "Restore session (mode S)" })
           hl.bind("escape", hl.dsp.submap("reset"), { description = "Exit shell mode" })
         end)

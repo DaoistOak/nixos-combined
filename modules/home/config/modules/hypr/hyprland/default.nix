@@ -10,6 +10,7 @@
     ./settings/colors.nix
     ./settings/decorations.nix
     ./settings/displays.nix
+    ./settings/edgehover.nix
     ./settings/input.nix
     ./settings/keybinds.nix
     ./settings/plugins.nix
@@ -21,6 +22,7 @@
     ./scripts/airplane-mode.nix
     ./scripts/ai-webapps.nix
     ./scripts/brightness.nix
+    ./scripts/gamer-mode.nix
     ./scripts/hyprlock.nix
     ./scripts/cava-auto.nix
     ./scripts/launch-bluetooth.nix

@@ -232,6 +232,13 @@ _autonotify_precmd() {
 add-zsh-hook preexec _autonotify_preexec
 add-zsh-hook precmd _autonotify_precmd
 
+# ---------------------------------------------------------------------------
+# atuin (cross-shell history; replaces zsh-history-substring-search)
+# Ctrl-R opens the search UI. Runs before zoxide so both history systems see
+# recorded commands.
+# ---------------------------------------------------------------------------
+eval "$(atuin init zsh)"
+
 eval "$(zoxide init zsh)"
 # Greater prompt
 greet

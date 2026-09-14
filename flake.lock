@@ -401,6 +401,23 @@
         "type": "github"
       }
     },
+    "hypr-edgehover": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784557802,
+        "narHash": "sha256-4yDKWc4fFKxsEk9T9SLhiX3nCWzxG3P1VjznemKu440=",
+        "owner": "gfhdhytghd",
+        "repo": "hypr-edgehover",
+        "rev": "77b5e1445361b3a1f7b6f03bb4bee15e91229c94",
+        "type": "github"
+      },
+      "original": {
+        "owner": "gfhdhytghd",
+        "ref": "main",
+        "repo": "hypr-edgehover",
+        "type": "github"
+      }
+    },
     "hyprcursor": {
       "inputs": {
         "hyprlang": [
@@ -1114,6 +1131,7 @@
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
         "hypr-dynamic-cursors": "hypr-dynamic-cursors",
+        "hypr-edgehover": "hypr-edgehover",
         "hyprland": "hyprland",
         "hyprland-scroll-overview": "hyprland-scroll-overview",
         "hyprpanel": "hyprpanel",

@@ -35,6 +35,13 @@
       url = "github:yayuuu/hyprland-scroll-overview";
       inputs.hyprland.follows = "hyprland";
     };
+    # No flake in this repo; plain source, packaged manually in pkgs/hypr-edgehover.nix
+    hypr-edgehover = {
+      # Main (77b5e14): "adapt to Hyprland v0.56" — builds against v0.56.1
+      # headers (pre-#15779: desktop/view/Window.hpp still present).
+      url = "github:gfhdhytghd/hypr-edgehover/main";
+      flake = false;
+    };
     preload-ng.url = "github:miguel-b-p/preload-ng";
   };
 
