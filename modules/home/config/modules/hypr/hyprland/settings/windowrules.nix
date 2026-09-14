@@ -244,10 +244,56 @@
         # { match = { class = "^(steam_app)$" }; immediate = true; }
       ];
 
-      # Layer rules (ignore certain overlays)
-      # layer_rule = [
-      #   { match = { namespace = "^(swaync-control-center)$" }; ignore_alpha = 0; }
-      # ];
+      # Layer rules — bars, panels, OSD, notifications, wallpaper, widgets
+      # Valid effects for hl.layer_rule in Hyprland v0.56: no_anim, blur,
+      # blur_popups, ignore_alpha, dim_around, xray, animation, order,
+      # above_lock, no_screen_share.
+      layer_rule = [
+        # Noctalia bars, dock, panels, notifications, desktop widgets: blur
+        # whatever scrolls behind them and sample alpha for correct blending.
+        {
+          match = {
+            namespace = "^noctalia-(bar-|dock|panel|attached-panel|notification|desktop-widget-)";
+          };
+          blur = true;
+          ignore_alpha = 0.5;
+        }
+
+        # Quickshell floating capsules (overview, themeswitcher, terminal-switcher).
+        {
+          match = {
+            namespace = "^quickshell$";
+          };
+          blur = true;
+          ignore_alpha = 0.5;
+        }
+
+        # Noctalia screen corners and hot corners: invisible hitboxes, xray so
+        # they don't occlude the blur/cursor-over interactions underneath.
+        {
+          match = {
+            namespace = "^(noctalia-screen-corner|hot_corner_)";
+          };
+          xray = true;
+        }
+
+        # OSDs (noctalia + avizo) should stay sharp: blur defaults off anyway,
+        # set it explicitly so nothing re-enables it.
+        {
+          match = {
+            namespace = "^(noctalia-osd|avizo)$";
+          };
+          blur = false;
+        }
+
+        # Wallpaper layers (hyprpaper, swww, sylix): pure backdrops, never blur.
+        {
+          match = {
+            namespace = "^(hyprpaper|swww|sylix)$";
+          };
+          blur = false;
+        }
+      ];
     };
   };
 }

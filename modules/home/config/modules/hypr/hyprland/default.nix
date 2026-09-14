@@ -22,6 +22,7 @@
     ./scripts/airplane-mode.nix
     ./scripts/ai-webapps.nix
     ./scripts/border-angle.nix
+    ./scripts/border-rotate.nix
     ./scripts/brightness.nix
     ./scripts/hyprlock.nix
     ./scripts/cava-auto.nix

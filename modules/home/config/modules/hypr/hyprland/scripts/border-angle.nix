@@ -2,7 +2,8 @@
   config,
   pkgs,
   ...
-}: {
+}:
+{
   xdg.configFile."hypr/scripts/border-angle.sh" = {
     executable = true;
     text = ''
@@ -11,13 +12,14 @@
       # points at the cursor (end-4's dots style). Background daemon launched
       # from hyprland.start; it lives for the whole session.
       #
-      # The active border is a 2-colour gradient (theme primary -> secondary)
+      # The active border is a 2-colour gradient (theme secondary -> primary)
       # written to ~/.config/theme-switcher/hyprland-theme.lua by scripts/theme
       # and applied by colors.nix. While the cursor moves we poll it at ~20 Hz,
-      # compute the angle from the focused window's centre to the cursor, and
-      # push a new gradient angle via hl.config. The existing `border` fade
-      # animation eases each small change, so the border rotates smoothly
-      # instead of snapping.
+      # normalise its offset to the focused window's half-size (so the angle
+      # reflects the cursor's position *within* the active window rather than
+      # absolute screen pixels) and push a new gradient angle via hl.config.
+      # The existing `border` fade animation eases each small change, so the
+      # border rotates smoothly instead of snapping.
       #
       # The built-in `borderangle` animation is intentionally NOT used: with
       # `loop` the gradient never stops spinning even when the cursor is idle,
@@ -29,7 +31,7 @@
       POLL_MOVE=0.05   # seconds between polls while the cursor moves (~20 Hz)
       POLL_IDLE=0.5    # seconds between polls while the cursor is still
       EPS=4            # push only when the angle changed by more than EPS degrees
-      GEOM_EVERY=30    # re-read focused-window geometry every N move-polls (~1.5 s)
+      GEOM_EVERY=4     # re-read focused-window geometry every N move-polls (~0.2 s)
 
       THEME_FILE="''${XDG_CONFIG_HOME:-$HOME/.config}/theme-switcher/hyprland-theme.lua"
 
@@ -82,10 +84,17 @@
           fi
 
           if (( NONE == 0 )); then
-            dx=$((cx - (WX + WW / 2)))
-            dy=$((cy - (WY + WH / 2)))
-            angle=$("$AWK" -v dx="$dx" -v dy="$dy" 'BEGIN {
-              a = (dx == 0 && dy == 0) ? 0 : atan2(dy, dx) * 57.29577951308232
+            angle=$("$AWK" -v cx="$cx" -v cy="$cy" -v wx="$WX" -v wy="$WY" -v ww="$WW" -v wh="$WH" 'BEGIN {
+              # Normalise the cursor offset to the active window half-size so
+              # the angle depends on where the cursor sits *inside* the window
+              # (aspect-correct, 45 deg at the corners) rather than on absolute
+              # screen pixels.
+              hx = (ww > 0) ? ww / 2 : 1
+              hy = (wh > 0) ? wh / 2 : 1
+              ux = (cx - (wx + hx)) / hx
+              uy = (cy - (wy + hy)) / hy
+              a = (ux == 0 && uy == 0) ? 0 : atan2(uy, ux) * 57.29577951308232
+              a = a - int(a / 360) * 360
               if (a < 0) a += 360
               printf "%d", int(a + 0.5)
             }')

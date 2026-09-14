@@ -12,7 +12,8 @@
       # panel dependency. When enabled: Hyprland runs with no gaps/animations
       # and fully opaque square windows, and Noctalia stops drawing any
       # transparency or rounded corners (screen corners off, concave edge
-      # corners off, radius 0, every background_opacity forced to 1.0).
+      # corners off, radius 0, every background_opacity forced to 1.0). It also
+      # stops the cursor-tracking border rotation (border-rotate.sh off).
       # Noctalia changes go through ~/.local/state/noctalia/settings.toml,
       # which the shell watches for external edits and hot-applies.
       # Disabling restores both profiles.
@@ -134,11 +135,13 @@
       if [ ! -f "$STATE_FILE" ]; then
         apply_hyprland
         apply_noctalia
+        "${config.xdg.configHome}/hypr/scripts/border-rotate.sh" off
         touch "$STATE_FILE"
         ${pkgs.libnotify}/bin/notify-send -i security-high "Performance mode" "Transparency, gaps and corners disabled"
       else
         restore_hyprland
         restore_noctalia
+        "${config.xdg.configHome}/hypr/scripts/border-rotate.sh" on
         rm -f "$STATE_FILE"
         ${pkgs.libnotify}/bin/notify-send "Performance mode" "Desktop profile restored"
       fi
