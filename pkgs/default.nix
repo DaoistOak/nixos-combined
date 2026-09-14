@@ -23,6 +23,7 @@ let
         (builtins.readFile "${pkgs.nix-search-tv.src}/nixpkgs.sh");
   };
   user-packages = with pkgs; [
+    ns
     atuin
     avizo
     awww
