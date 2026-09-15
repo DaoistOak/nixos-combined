@@ -31,6 +31,9 @@ in
     ../config/modules/ghostty
     ../config/modules/tmux
     ../config/modules/phone-bt-bridge
+    ../config/modules/keepassxc
+    ../config/modules/rofi
+    ../config/modules/atuin
     ../config/themes/colors
     ../config/themes/themer
     ../config/themes/theme

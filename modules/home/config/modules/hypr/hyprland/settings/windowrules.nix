@@ -60,7 +60,7 @@
         }
         {
           match = {
-            class = "^(discord|WebCord)$";
+            class = "^(discord|WebCord|vesktop|viber|com\\.rtosta\\.zapzap|ferdium)$";
           };
           workspace = 7;
         }

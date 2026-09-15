@@ -15,6 +15,7 @@
         "nix-command"
         "flakes"
       ];
+      use-xdg-base-directories = true;
       max-jobs = "auto";
       min-free = 3221225472;
       max-free = 6442450944;
