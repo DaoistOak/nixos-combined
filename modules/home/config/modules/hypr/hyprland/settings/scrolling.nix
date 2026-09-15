@@ -15,7 +15,7 @@
           follow_focus = true;
           follow_min_visible = 0;
           explicit_column_widths = "0.2 ,0.4, 0.5, 0.8, 1.0";
-          wrap_focus = true;
+          wrap_focus = false;
           wrap_swapcol = true;
           direction = "right";
         };

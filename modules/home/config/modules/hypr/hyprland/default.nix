@@ -28,7 +28,6 @@
     ./scripts/brightness.nix
     ./scripts/hyprlock.nix
     ./scripts/cava-auto.nix
-    ./scripts/edge-focus.nix
     ./scripts/launch-bluetooth.nix
     ./scripts/launch-network.nix
     ./scripts/launch-terminal.nix
