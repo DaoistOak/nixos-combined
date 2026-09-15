@@ -138,7 +138,7 @@
         -- --------------------
         hl.gesture({ fingers = workspaceSwipeFingers, direction = "vertical", action = "workspace" })
         -- horizontal swipe: drag the scrolling layout tape (no-op on other layouts)
-        hl.gesture({ fingers = gestureFingers, direction = "horizontal", action = "scroll_move", scale = 2 })
+        hl.gesture({ fingers = gestureFingers, direction = "horizontal", action = "scroll_move", scale = 1.2 })
 
         -- 2. GLOBAL (SUPER)
         hl.bind(mod .. " + RETURN", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh tmux"), { description = "Terminal (default + tmux)" })
