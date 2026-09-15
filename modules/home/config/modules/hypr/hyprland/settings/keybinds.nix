@@ -138,7 +138,7 @@
         -- --------------------
         hl.gesture({ fingers = workspaceSwipeFingers, direction = "vertical", action = "workspace" })
         -- horizontal swipe: drag the scrolling layout tape (no-op on other layouts)
-        hl.gesture({ fingers = gestureFingers, direction = "horizontal", action = "scroll_move", scale = 3.5 })
+        hl.gesture({ fingers = gestureFingers, direction = "horizontal", action = "scroll_move", scale = 2 })
 
         -- 2. GLOBAL (SUPER)
         hl.bind(mod .. " + RETURN", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh tmux"), { description = "Terminal (default + tmux)" })
@@ -373,6 +373,7 @@
           hl.bind("C", hl.dsp.exec_cmd("cursor --classic"),
             { description = "Cursor editor" })
           hl.bind("K", hl.dsp.exec_cmd("kate"), { description = "Kate" })
+          hl.bind("N", hl.dsp.exec_cmd("neovide"), { description = "Neovide" })
           hl.bind("escape", hl.dsp.submap("reset"), { description = "Exit editor mode" })
         end)
         -- 20. APPS > FILES (SUPER+E, F)
