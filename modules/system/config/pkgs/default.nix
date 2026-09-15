@@ -14,6 +14,7 @@ in
       noto-fonts
       liberation_ttf
       dejavu_fonts
+      jetbrains-mono
     ];
   };
 

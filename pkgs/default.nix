@@ -58,14 +58,6 @@ let
     # --- Desktop Environment & Wayland Compositor ---
     ags
     swayidle
-    (catppuccin-sddm.override {
-      flavor = "macchiato";
-      accent = "mauve";
-      font = "JetBrains Mono";
-      fontSize = "9";
-      background = "${./../modules/system/config/sddm/src/wallpaper}";
-      loginBackground = true;
-    })
 
     # --- Web Browsers & Communication ---
     brave

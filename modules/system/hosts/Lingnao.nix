@@ -12,6 +12,7 @@
       ../users/zeph/default.nix
       ../config/desktop/default.nix
       ../config/pkgs/default.nix
+      ../config/sddm/default.nix
       ../config/themes/default.nix
       ../config/hardware
       inputs.home-manager.nixosModules.default

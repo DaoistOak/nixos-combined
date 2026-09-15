@@ -8,12 +8,6 @@
 {
   services.xserver.enable = true;
 
-  services.displayManager.sddm = {
-    enable = true;
-    wayland.enable = true;
-    theme = "catppuccin-macchiato-mauve";
-  };
-
   # Stock portal from binary cache; mask override to avoid forcing a local build.
   programs.hyprland = {
     enable = true;
@@ -28,7 +22,6 @@
 
   services.desktopManager.plasma6.enable = true;
 
-  security.pam.services.sddm.enableKwallet = true;
   security.polkit = {
     enable = true;
     enablePkexecWrapper = true;
