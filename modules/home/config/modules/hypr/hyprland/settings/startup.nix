@@ -147,11 +147,8 @@ in
             hl.exec_cmd("syncthingtray")
             hl.exec_cmd("keepassxc")
 
-            -- Wallpaper and background setup
-            hl.exec_cmd("swww-daemon --format xrgb")
-            -- Configured for Sylix: Enable wallpaper daemon management
+            -- Wallpaper is disabled (hyprwinwrap widgets provide the backdrop)
             -- hl.exec_cmd("swaybg -m fill -i ~/Wallpaper/Image34.jpg")
-            hl.exec_cmd("sylix --daemon")
 
             -- Run the custom autostart script
             -- hl.exec_cmd("~/.config/hypr/scripts/restartbar&wall.sh")

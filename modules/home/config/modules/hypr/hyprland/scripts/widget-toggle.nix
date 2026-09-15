@@ -23,10 +23,12 @@
       # --- Toggle off: close existing window by class ---
       if hyprctl clients -j 2>/dev/null \
         | jq -e --arg c "$CLASS" '.[] | select(.class == $c)' >/dev/null 2>&1; then
-        ADDR="$(hyprctl clients -j \
-          | jq -r --arg c "$CLASS" '[.[] | select(.class == $c)][0].address' 2>/dev/null)"
-        if [[ -n "$ADDR" && "$ADDR" != "null" ]]; then
-          hyprctl dispatch closewindow "$ADDR" >/dev/null 2>&1 || true
+        # Closing hidden hyprwinwrap windows via dispatch silently fails;
+        # kill the owning process (the widget terminal) instead.
+        PID="$(hyprctl clients -j \
+          | jq -r --arg c "$CLASS" '[.[] | select(.class == $c)][0].pid' 2>/dev/null)"
+        if [[ -n "$PID" && "$PID" != "null" ]]; then
+          kill "$PID" 2>/dev/null || true
         fi
         exit 0
       fi
@@ -47,7 +49,8 @@
             -- sh -c '"$@"; exec "''${SHELL:-sh}"' sh "$@"
           ;;
         *)
-          ghostty --class="$CLASS" --background-opacity=0.0 -e "$@"
+          # ghostty's class must be a valid GTK app-id (dotted)
+          ghostty --gtk-single-instance=false --class="$CLASS" --background-opacity=0.0 -e "$@"
           ;;
       esac
     '';

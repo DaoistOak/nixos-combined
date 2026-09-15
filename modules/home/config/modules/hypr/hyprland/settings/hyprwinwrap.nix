@@ -24,7 +24,7 @@
       -- rendered as live wallpaper backgrounds. Toggled from SUPER+S, D submap
       -- (widget-toggle.sh launches the terminal with each class).
       hl.plugin.hyprwinwrap.window({
-        class = "widget-metro",
+        class = "com.widget.metro",
         layer = 0,
         pos_x = 0,
         pos_y = 0,
@@ -32,7 +32,7 @@
         size_y = 97,
       })
       hl.plugin.hyprwinwrap.window({
-        class = "widget-cava",
+        class = "com.widget.cava",
         layer = 0,
         pos_x = 0,
         pos_y = 0,
