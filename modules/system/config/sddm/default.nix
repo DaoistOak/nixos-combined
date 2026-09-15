@@ -11,7 +11,7 @@ let
   themeSel = themeMod.readSelection ../../../home/config/themes/colors/src/selection;
 
   pixie = inputs.pixie-sddm.packages.${pkgs.stdenv.hostPlatform.system}.pixie-sddm.override {
-    background = "/var/lib/sddm/pixie-wallpaper";
+    background = "/var/lib/pixie-sddm/wallpaper";
     accentColor = "#${themeSel.r.accent}";
     autoColor = false;
     backgroundColor = "#${themeSel.r.base}";
@@ -46,8 +46,9 @@ in
     };
     script = ''
       cfg="/home/zeph/.config/noctalia/noctalia-config.toml"
-      dest="/var/lib/sddm/pixie-wallpaper"
+      dest="/var/lib/pixie-sddm/wallpaper"
       fallback="${./src/wallpaper}"
+      mkdir -p /var/lib/pixie-sddm
       wp=""
       if [ -r "$cfg" ]; then
         wp=$(awk '
@@ -62,9 +63,9 @@ in
         ' "$cfg")
       fi
       if [ -n "$wp" ] && [ -f "$wp" ]; then
-        install -o sddm -g sddm -m 0644 "$wp" "$dest"
+        install -m 0644 "$wp" "$dest"
       else
-        install -o sddm -g sddm -m 0644 "$fallback" "$dest"
+        install -m 0644 "$fallback" "$dest"
       fi
     '';
   };

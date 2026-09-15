@@ -22,6 +22,9 @@
 
   services.desktopManager.plasma6.enable = true;
 
+  # UWSM-managed Hyprland is the default login session.
+  services.displayManager.defaultSession = "hyprland-uwsm";
+
   security.polkit = {
     enable = true;
     enablePkexecWrapper = true;
