@@ -169,6 +169,9 @@ in
             -- Rotate the active window's gradient border toward the cursor
             -- (border-angle daemon for the primary -> secondary border).
             hl.exec_cmd("${config.xdg.configHome}/hypr/scripts/border-rotate.sh on")
+            -- Step focus between columns while hovering the active window's
+            -- left/right edge (edge-focus daemon).
+            hl.exec_cmd("${config.xdg.configHome}/hypr/scripts/edge-focus.sh")
           end
         '')
       ];
