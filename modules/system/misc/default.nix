@@ -28,6 +28,33 @@
 
   hardware.ksm.enable = true;
 
+  services.samba = {
+    enable = true;
+    openFirewall = true;
+    settings = {
+      global = {
+        "workgroup" = "WORKGROUP";
+        "server string" = "Lingnao (NixOS)";
+        "netbios name" = "LINGNAO";
+        security = "user";
+        "map to guest" = "bad user";
+        "guest account" = "nobody";
+        "hosts allow" = "127.0.0.1 192.168.122.0/24";
+        "hosts deny" = "0.0.0.0/0";
+      };
+      shared = {
+        path = "/home/zeph";
+        browseable = "yes";
+        "read only" = "no";
+        "guest ok" = "yes";
+        "force user" = "zeph";
+        "force group" = "users";
+        "create mask" = "0664";
+        "directory mask" = "0775";
+      };
+    };
+  };
+
   systemd.services.docker.wantedBy = lib.mkForce [ ];
   systemd.services.libvirtd.postStart = ''
     # Ensure the default NAT network exists (on-demand creation)
