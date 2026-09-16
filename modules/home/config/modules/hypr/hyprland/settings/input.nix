@@ -11,7 +11,7 @@
           kb_model = "";
           kb_options = "caps:escape_shifted_capslock";
           kb_rules = "";
-          follow_mouse = 1;
+          follow_mouse = 0;
 
           touchpad = {
             natural_scroll = true;
