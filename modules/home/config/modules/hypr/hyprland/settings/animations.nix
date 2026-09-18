@@ -13,6 +13,6 @@
 }:
 {
   imports = [
-    ./animations/fancy.nix
+    ./animations/smooth.nix
   ];
 }
