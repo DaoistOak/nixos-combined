@@ -135,7 +135,6 @@
       firefox=firefox
       vesktop=vesktop
       viber=viber
-      com.rtosta.zapzap=com.rtosta.zapzap
       pcmanfm=pcmanfm
       org.kde.okular=okular
       Code=code

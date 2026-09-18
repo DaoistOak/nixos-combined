@@ -47,7 +47,8 @@ in
         --app="$url" \
         --user-data-dir="$profile" \
         --class="$class" \
-        --no-first-run >/dev/null 2>&1 &
+        --no-first-run \
+        --password-store=basic >/dev/null 2>&1 &
     '';
   };
 
