@@ -1,5 +1,7 @@
 # Medium animation preset: balanced and unobtrusive, a happy middle ground
-# between fast and smooth. Modelled after MyLinuxForWork's "Standard" preset.
+# between fast and smooth. Tuned for the scrolling layout — the tape glides
+# with a soft ease-in-out while window open/close stays responsive.
+# Modelled after MyLinuxForWork's "Standard" preset.
 { config, pkgs, ... }:
 
 {
@@ -87,16 +89,16 @@
         }
         {
           _args = [
-            "linear"
+            "easeInOutCubic"
             {
               type = "bezier";
               points = [
                 [
-                  0
-                  0
+                  0.65
+                  0.05
                 ]
                 [
-                  1
+                  0.36
                   1
                 ]
               ];
@@ -131,32 +133,24 @@
 
         # Window animations
         {
-          leaf = "windows";
-          enabled = true;
-          speed = 5;
-          bezier = "emphasizedDecel";
-          style = "popin 80%";
-        }
-        {
           leaf = "windowsIn";
           enabled = true;
           speed = 5;
           bezier = "emphasizedDecel";
-          style = "popin 80%";
+          style = "popin 75%";
         }
         {
           leaf = "windowsOut";
           enabled = true;
           speed = 3;
           bezier = "emphasizedAccel";
-          style = "popin 80%";
+          style = "popin 75%";
         }
         {
           leaf = "windowsMove";
           enabled = true;
-          speed = 6;
-          bezier = "standard";
-          style = "slide";
+          speed = 4;
+          bezier = "easeInOutCubic";
         }
 
         # Workspace animations
@@ -172,7 +166,7 @@
           enabled = true;
           speed = 4;
           bezier = "emphasizedDecel";
-          style = "slidefadevert 15%";
+          style = "slidevert";
         }
 
         # Misc animations
@@ -189,10 +183,22 @@
           bezier = "standard";
         }
         {
+          leaf = "fadePopups";
+          enabled = true;
+          speed = 5;
+          bezier = "standard";
+        }
+        {
           leaf = "border";
           enabled = true;
           speed = 8;
           bezier = "emphasizedDecel";
+        }
+        {
+          leaf = "zoomFactor";
+          enabled = true;
+          speed = 4;
+          bezier = "easeOutExpo";
         }
       ];
     };

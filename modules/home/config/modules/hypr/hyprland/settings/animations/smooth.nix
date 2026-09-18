@@ -1,4 +1,6 @@
 # Smooth animation preset: fluid and organic with a subtle overshoot.
+# Tuned for the scrolling layout — the tape decelerates into each column with
+# a long, luxurious easeOut glide.
 # Based on mylinuxforwork/dotfiles "animations-smooth".
 { config, pkgs, ... }:
 
@@ -123,26 +125,13 @@
           style = "slide";
         }
         {
-          leaf = "fadeLayersIn";
+          leaf = "fadeLayers";
           enabled = true;
           speed = 5;
           bezier = "easeOutExpo";
         }
-        {
-          leaf = "fadeLayersOut";
-          enabled = true;
-          speed = 4;
-          bezier = "easeOutExpo";
-        }
 
         # Window animations
-        {
-          leaf = "windows";
-          enabled = true;
-          speed = 3;
-          bezier = "overshot";
-          style = "slide";
-        }
         {
           leaf = "windowsIn";
           enabled = true;
@@ -153,7 +142,7 @@
         {
           leaf = "windowsOut";
           enabled = true;
-          speed = 2;
+          speed = 2.5;
           bezier = "easeOutExpo";
           style = "popin 80%";
         }
@@ -161,8 +150,7 @@
           leaf = "windowsMove";
           enabled = true;
           speed = 6;
-          bezier = "easeInOutBack";
-          style = "slide";
+          bezier = "easeOutExpo";
         }
 
         # Workspace animations
@@ -195,9 +183,21 @@
           bezier = "easeOutBack";
         }
         {
-          leaf = "border";
+          leaf = "fadePopups";
           enabled = true;
           speed = 5;
+          bezier = "easeOutBack";
+        }
+        {
+          leaf = "border";
+          enabled = true;
+          speed = 6;
+          bezier = "easeOutExpo";
+        }
+        {
+          leaf = "zoomFactor";
+          enabled = true;
+          speed = 4;
           bezier = "easeOutExpo";
         }
       ];

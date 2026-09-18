@@ -1,4 +1,5 @@
 # Fast animation preset: snappy and responsive, minimal motion.
+# Tuned for the scrolling layout — quick column-by-column tape scrolling.
 # Based on mylinuxforwork/dotfiles "animations-fast".
 { config, pkgs, ... }:
 
@@ -123,26 +124,13 @@
           style = "slide";
         }
         {
-          leaf = "fadeLayersIn";
+          leaf = "fadeLayers";
           enabled = true;
           speed = 1;
-          bezier = "linear";
-        }
-        {
-          leaf = "fadeLayersOut";
-          enabled = true;
-          speed = 1;
-          bezier = "linear";
+          bezier = "md3_decel";
         }
 
         # Window animations
-        {
-          leaf = "windows";
-          enabled = true;
-          speed = 2;
-          bezier = "md3_decel";
-          style = "popin 60%";
-        }
         {
           leaf = "windowsIn";
           enabled = true;
@@ -160,7 +148,7 @@
         {
           leaf = "windowsMove";
           enabled = true;
-          speed = 2;
+          speed = 2.5;
           bezier = "md3_standard";
         }
 
@@ -194,10 +182,22 @@
           bezier = "md3_decel";
         }
         {
+          leaf = "fadePopups";
+          enabled = true;
+          speed = 1;
+          bezier = "md3_decel";
+        }
+        {
           leaf = "border";
           enabled = true;
-          speed = 10;
-          bezier = "default";
+          speed = 8;
+          bezier = "md3_decel";
+        }
+        {
+          leaf = "zoomFactor";
+          enabled = true;
+          speed = 2;
+          bezier = "md3_standard";
         }
       ];
     };

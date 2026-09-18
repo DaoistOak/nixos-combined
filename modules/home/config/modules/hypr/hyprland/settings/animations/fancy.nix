@@ -159,9 +159,21 @@
           bezier = "standard";
         }
         {
+          leaf = "fadePopups";
+          enabled = true;
+          speed = 5;
+          bezier = "standard";
+        }
+        {
           leaf = "border";
           enabled = true;
           speed = 6;
+          bezier = "standard";
+        }
+        {
+          leaf = "zoomFactor";
+          enabled = true;
+          speed = 4;
           bezier = "standard";
         }
       ];
