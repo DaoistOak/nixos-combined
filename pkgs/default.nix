@@ -31,6 +31,7 @@ let
     cliphist
     flameshot
     gpu-screen-recorder
+    inputs.hermes-agent.packages."x86_64-linux".default
     hypridle
     hyprlock
     hyprnome
