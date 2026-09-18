@@ -158,7 +158,7 @@
           enabled = true;
           speed = 3;
           bezier = "easeOutExpo";
-          style = "slide";
+          style = "slidevert";
         }
         {
           leaf = "specialWorkspace";
@@ -203,3 +203,4 @@
     };
   };
 }
+

@@ -159,7 +159,7 @@
           enabled = true;
           speed = 10;
           bezier = "easeOutExpo";
-          style = "slide";
+          style = "slidevert";
         }
         {
           leaf = "specialWorkspace";
