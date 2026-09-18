@@ -24,7 +24,7 @@
       window_close_confirmation = "NeverPrompt";
       window_background_opacity = 1.0;
 
-      # Uniform 3-cell padding on all sides (matches kitty/alacritty/ghostty).
+      # Uniform 3-cell padding across all terminals.
       window_padding = {
         left = "3";
         right = "3";
@@ -33,17 +33,14 @@
       };
 
       # --- Animations: synced to the Hyprland animation profile ---
-      # Display refresh is 1920x1200@60 (modules/config/hypr/settings/displays.nix);
-      # cap render + animation FPS to that so terminal redraws match compositor
-      # frames instead of tearing above vsync.
+      # Display refresh is 1920x1200@60; cap render + animation FPS to that so
+      # terminal redraws match compositor frames instead of tearing above vsync.
       max_fps = 60;
       animation_fps = 60;
 
       # Ease curves mirror Hyprland's beziers (animations/fancy.nix):
       #   fade-in  -> emphasizedDecel -> CubicBezier(0.05, 0.7, 0.1, 1)
       #   fade-out -> emphasizedAccel -> CubicBezier(0.3, 0, 0.8, 0.15)
-      # so the terminal's blink has the same springy falloff as window
-      # opens/closes.
       cursor_blink_rate = 600;
       cursor_blink_ease_in = {
         CubicBezier = [
@@ -56,7 +53,7 @@
       cursor_blink_ease_out = {
         CubicBezier = [
           0.3
-          0.0
+          0
           0.8
           0.15
         ];
@@ -72,7 +69,7 @@
       text_blink_ease_out = {
         CubicBezier = [
           0.3
-          0.0
+          0
           0.8
           0.15
         ];
@@ -92,9 +89,7 @@
       -- Hot-reload whenever the theme file changes.
       wezterm.add_to_config_reload_watch_list(theme_file)
 
-      -- Trim unwanted/default key bindings:
-      --  * drop SUPER+w close-tab (default, clashes with Hyprland usage)
-      --  * keep CTRL/CTRL+SHIFT+w close-tab but without the confirmation overlay
+      -- Drop SUPER+w close-tab (clashes with Hyprland); keep CTRL/CTRL+SHIFT+w.
       local keys = config.keys or {}
       table.insert(keys, { key = 'Return', mods = 'ALT', action = wezterm.action.DisableDefaultAssignment })
       table.insert(keys, { key = 'w', mods = 'SUPER', action = wezterm.action.DisableDefaultAssignment })

@@ -47,10 +47,8 @@
       set-window-option -g pane-base-index 1
       set-option -g renumber-windows on
 
-      # ------------------------------------------------------------------
       # Local status bar (theme-aware: every color is a #{@thm_*} reference
       # resolved at render time from the runtime theme file).
-      # ------------------------------------------------------------------
       set -g status-justify left
       set -g status-left ""
       set -g status-left-length 100

@@ -39,7 +39,7 @@ in
     package = null;
 
     settings = {
-      # [mgr] manager options (show_hidden etc. live under this section, not at
+      # mgr: manager options (show_hidden etc. live under this section, not at
       # the top level — yazi rejects unknown root keys as "must be 1-20
       # characters in kebab-case").
       mgr = {

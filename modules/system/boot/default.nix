@@ -15,6 +15,13 @@ let
   # image". Unset the cap so the kernel sizes the image to what is actually
   # needed (the 30G swap partition has room to spare).
   allowFullImage = "-${pkgs.runtimeShell} -c '${pkgs.coreutils}/bin/echo 0 > /sys/power/image_size'";
+  hibernatePre = [
+    allowFullImage
+    "-${pkgs.coreutils}/bin/sync"
+    "-${pkgs.runtimeShell} -c 'echo 3 > /proc/sys/vm/drop_caches'"
+    "-${pkgs.util-linux}/bin/swapoff /dev/zram0"
+  ];
+  hibernatePost = [ reenableZram ];
 in
 {
   boot = {
@@ -39,24 +46,14 @@ in
 
   systemd.services = {
     "systemd-hibernate".serviceConfig = {
-      ExecStartPre = [
-        allowFullImage
-        "-${pkgs.coreutils}/bin/sync"
-        "-${pkgs.runtimeShell} -c 'echo 3 > /proc/sys/vm/drop_caches'"
-        "-${pkgs.util-linux}/bin/swapoff /dev/zram0"
-      ];
-      ExecStartPost = reenableZram;
-      ExecStopPost = reenableZram;
+      ExecStartPre = hibernatePre;
+      ExecStartPost = hibernatePost;
+      ExecStopPost = hibernatePost;
     };
     "systemd-suspend-then-hibernate".serviceConfig = {
-      ExecStartPre = [
-        allowFullImage
-        "-${pkgs.coreutils}/bin/sync"
-        "-${pkgs.runtimeShell} -c 'echo 3 > /proc/sys/vm/drop_caches'"
-        "-${pkgs.util-linux}/bin/swapoff /dev/zram0"
-      ];
-      ExecStartPost = reenableZram;
-      ExecStopPost = reenableZram;
+      ExecStartPre = hibernatePre;
+      ExecStartPost = hibernatePost;
+      ExecStopPost = hibernatePost;
     };
   };
 

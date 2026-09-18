@@ -119,57 +119,57 @@ in
       _args = [
         "hyprland.start"
         (lib.generators.mkLuaInline ''
-          function()
--- Launch the shell / bar
-            hl.exec_cmd("noctalia")
-            -- Follow Hyprland submaps: show the Keymap overlay bar when a
-              -- submap is active, hide it back to default.
-              hl.exec_cmd("${config.xdg.configHome}/hypr/scripts/submap-bar.sh")
-              -- GUI polkit authentication agent (KDE). Launched from Hyprland so
-              -- it inherits the full graphical env (DISPLAY, WAYLAND, session bus)
-              -- and can register with polkitd. The wrapper strips QT_STYLE_OVERRIDE
-              -- (Kvantum QtQuick QML would crash the dialog) and sets the
-              -- "org.kde.desktop" QtQuick style so it matches catppuccin.
-              hl.exec_cmd("${polkitAgentWrapper}/bin/polkit-kde-agent-wrapper")
-            -- Launch notifications service (swaync or mako)
-            hl.exec_cmd("/run/current-system/sw/bin/nm-applet")
-            -- Volume and brightness OSD (avizo). avizo-client needs the
-            -- avizo-service daemon; guard so repeated start handlers never
-            -- spawn a second instance.
-            hl.exec_cmd("pgrep -x avizo-service >/dev/null 2>&1 || avizo-service")
+                    function()
+          -- Launch the shell / bar
+                      hl.exec_cmd("noctalia")
+                      -- Follow Hyprland submaps: show the Keymap overlay bar when a
+                        -- submap is active, hide it back to default.
+                        hl.exec_cmd("${config.xdg.configHome}/hypr/scripts/submap-bar.sh")
+                        -- GUI polkit authentication agent (KDE). Launched from Hyprland so
+                        -- it inherits the full graphical env (DISPLAY, WAYLAND, session bus)
+                        -- and can register with polkitd. The wrapper strips QT_STYLE_OVERRIDE
+                        -- (Kvantum QtQuick QML would crash the dialog) and sets the
+                        -- "org.kde.desktop" QtQuick style so it matches catppuccin.
+                        hl.exec_cmd("${polkitAgentWrapper}/bin/polkit-kde-agent-wrapper")
+                      -- Launch notifications service (swaync or mako)
+                      hl.exec_cmd("/run/current-system/sw/bin/nm-applet")
+                      -- Volume and brightness OSD (avizo). avizo-client needs the
+                      -- avizo-service daemon; guard so repeated start handlers never
+                      -- spawn a second instance.
+                      hl.exec_cmd("pgrep -x avizo-service >/dev/null 2>&1 || avizo-service")
 
-            -- Idle and power management
-            -- hl.exec_cmd("hypridle") -- disabled: run as systemd user unit via home-manager services.hypridle
+                      -- Idle and power management
+                      -- hl.exec_cmd("hypridle") -- disabled: run as systemd user unit via home-manager services.hypridle
 
-            -- Application autostarts
-            -- hl.exec_cmd("copyq")
-            hl.exec_cmd("wl-paste --watch cliphist store")
-            hl.exec_cmd("syncthingtray")
-            hl.exec_cmd("keepassxc")
+                      -- Application autostarts
+                      -- hl.exec_cmd("copyq")
+                      hl.exec_cmd("wl-paste --watch cliphist store")
+                      hl.exec_cmd("syncthingtray")
+                      hl.exec_cmd("keepassxc")
 
-            -- Wallpaper is disabled (hyprwinwrap widgets provide the backdrop)
-            -- hl.exec_cmd("swaybg -m fill -i ~/Wallpaper/Image34.jpg")
+                      -- Wallpaper is disabled (hyprwinwrap widgets provide the backdrop)
+                      -- hl.exec_cmd("swaybg -m fill -i ~/Wallpaper/Image34.jpg")
 
-            -- Run the custom autostart script
-            -- hl.exec_cmd("~/.config/hypr/scripts/restartbar&wall.sh")
-            hl.exec_cmd("~/bin/keyboard_led_control.sh")
-            hl.exec_cmd("~/bin/hyprland-clean")
+                      -- Run the custom autostart script
+                      -- hl.exec_cmd("~/.config/hypr/scripts/restartbar&wall.sh")
+                      hl.exec_cmd("~/bin/keyboard_led_control.sh")
+                      hl.exec_cmd("~/bin/hyprland-clean")
 
-            -- Session restore
-            hl.exec_cmd("${config.xdg.configHome}/hypr/scripts/session-restore.sh")
+                      -- Session restore
+                      hl.exec_cmd("${config.xdg.configHome}/hypr/scripts/session-restore.sh")
 
-            -- Quickshell overview
-            hl.exec_cmd("qs -c overview")
-            -- Quickshell theme switcher (floating capsule, super+t)
-            hl.exec_cmd("qs -c themeswitcher")
-            -- Quickshell terminal switcher (floating capsule, super+t, s)
-            hl.exec_cmd("qs -c terminal-switcher")
-            -- Launching hyprshade for window effects
-            hl.exec_cmd("hyprsunset")
-            -- Rotate the active window's gradient border toward the cursor
-            -- (border-angle daemon for the primary -> secondary border).
-            hl.exec_cmd("${config.xdg.configHome}/hypr/scripts/border-rotate.sh on")
-          end
+                      -- Quickshell overview
+                      hl.exec_cmd("qs -c overview")
+                      -- Quickshell theme switcher (floating capsule, super+t)
+                      hl.exec_cmd("qs -c themeswitcher")
+                      -- Quickshell terminal switcher (floating capsule, super+t, s)
+                      hl.exec_cmd("qs -c terminal-switcher")
+                      -- Launching hyprshade for window effects
+                      hl.exec_cmd("hyprsunset")
+                      -- Rotate the active window's gradient border toward the cursor
+                      -- (border-angle daemon for the primary -> secondary border).
+                      hl.exec_cmd("${config.xdg.configHome}/hypr/scripts/border-rotate.sh on")
+                    end
         '')
       ];
     };

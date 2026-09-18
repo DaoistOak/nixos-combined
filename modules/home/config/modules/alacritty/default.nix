@@ -36,7 +36,7 @@
       # Fully opaque in-app; Hyprland applies the uniform 0.90 transparency.
       window.opacity = 1.0;
 
-      # Uniform 3-cell padding on all sides (matches kitty/wezterm/ghostty).
+      # Uniform 3-cell padding across all terminals.
       window.padding = {
         x = 3;
         y = 3;

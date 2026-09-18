@@ -4,10 +4,8 @@
   pkgs,
   ...
 }:
-# Kitty: static config via home-manager programs.kitty. Colors are NOT baked in
-# here — they come from a runtime theme file (~/.config/theme-switcher/kitty-theme.conf)
-# that scripts/theme rewrites on ./theme set ... (no rebuild). Total runtime
-# hot-swap, and the same file works for any theme in the DB (Catppuccin, Dracula, ...).
+# Kitty: static config via home-manager programs.kitty. Colors are runtime-swappable
+# via ~/.config/theme-switcher/kitty-theme.conf (rewritten by scripts/theme, no rebuild).
 {
   programs.kitty = {
     enable = true;
@@ -34,9 +32,7 @@
       open_url_with = "default";
       copy_on_select = true;
 
-      # Window: uniform 3-cell padding on all sides — the same interior
-      # spacing as alacritty (3px), wezterm (3 cells) and ghostty (3) so the
-      # cell grid lines up identically in every terminal.
+      # Window: uniform 3-cell padding across all terminals.
       window_padding_left = 3;
       window_padding_right = 3;
       window_padding_top = 3;
@@ -51,8 +47,7 @@
       tab_powerline_style = "slanted";
       tab_title_template = "{title}{' :{}:'.format(num_windows) if num_windows > 1 else ''}";
 
-      # Background: fully opaque in-app; let Hyprland handle the 0.90
-      # transparency so it stays uniform across terminals.
+      # Fully opaque in-app; Hyprland applies uniform 0.90 transparency.
       background_opacity = 1.0;
       dynamic_background_opacity = false;
 
@@ -70,7 +65,7 @@
       "ctrl+l" = "combine : clear_terminal scroll active : send_text normal,application \\x0c";
     };
 
-    # Colors are runtime-swappable. kitty re-reads the include on SIGUSR1.
+    # Colors from runtime theme file; kitty re-reads on SIGUSR1.
     extraConfig = ''
       include ${config.home.homeDirectory}/.config/theme-switcher/kitty-theme.conf
     '';

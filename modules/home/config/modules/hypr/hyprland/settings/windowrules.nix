@@ -168,36 +168,14 @@
         }
         # Polkit auth dialog (KDE agent): behave like a layer surface — float
         # centered on top, no shadow or decorations, pinned above everything.
-        # No existing polkit agent renders as a true wlr-layer surface, so
-        # window rules are the closest approximation.
         {
           match = {
             class = "^(org.kde.polkit-kde-authentication-agent-1)$";
           };
           float = true;
-        }
-        {
-          match = {
-            class = "^(org.kde.polkit-kde-authentication-agent-1)$";
-          };
           center = true;
-        }
-        {
-          match = {
-            class = "^(org.kde.polkit-kde-authentication-agent-1)$";
-          };
           pin = true;
-        }
-        {
-          match = {
-            class = "^(org.kde.polkit-kde-authentication-agent-1)$";
-          };
           decorate = false;
-        }
-        {
-          match = {
-            class = "^(org.kde.polkit-kde-authentication-agent-1)$";
-          };
           no_shadow = true;
         }
         {
@@ -236,35 +214,15 @@
           float = true;
         }
 
-        # Picture-in-Picture for all browsers - keep it pinned on top as an overlay
+        # Picture-in-Picture for all browsers — pinned overlay, no decorations.
         {
           match = {
             title = "^(Picture-in-Picture|Picture in Picture)$";
           };
           float = true;
-        }
-        {
-          match = {
-            title = "^(Picture-in-Picture|Picture in Picture)$";
-          };
           pin = true;
-        }
-        {
-          match = {
-            title = "^(Picture-in-Picture|Picture in Picture)$";
-          };
           decorate = false;
-        }
-        {
-          match = {
-            title = "^(Picture-in-Picture|Picture in Picture)$";
-          };
           rounding = 0;
-        }
-        {
-          match = {
-            title = "^(Picture-in-Picture|Picture in Picture)$";
-          };
           no_shadow = true;
         }
 

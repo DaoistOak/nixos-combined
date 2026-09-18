@@ -16,7 +16,8 @@ let
   # currently tracked selection (matches what scripts/theme writes at runtime).
   t = import ../../themes/colors/themes.nix { inherit lib; };
   sel = t.readSelection ../../themes/colors/src/selection;
-  ghosttyBuiltin = t.themes.${sel.themeName}.flavors.${sel.flavorName}.ghostty or "Ghostty Default Style Dark";
+  ghosttyBuiltin =
+    t.themes.${sel.themeName}.flavors.${sel.flavorName}.ghostty or "Ghostty Default Style Dark";
 in
 {
   programs.ghostty = {

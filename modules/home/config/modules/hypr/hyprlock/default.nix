@@ -10,7 +10,6 @@
 
     # GENERAL
     general {
-      # disable_loading_bar = true
       hide_cursor = true
     }
 
@@ -27,11 +26,10 @@
     background {
       monitor =
       path = /tmp/hyprlock/screenshot.png
-     # color = rgba(25, 20, 20, 1.0)
       blur_size = 4
       blur_passes = 3 # 0 disables blurring
       noise = 0.0117
-      contrast = 1.3000 # Vibrant!!!
+      contrast = 1.3000
       brightness = 0.8000
       vibrancy = 0.2100
       vibrancy_darkness = 0.0
@@ -42,7 +40,7 @@
         text = cmd[update:1000] echo "<b><big> $(date +"%H") </big></b>"
         color = rgb(cad3f5)
         font_size = 112
-        font_family = $font 
+        font_family = $font
         shadow_passes = 3
         shadow_size = 4
 
@@ -57,7 +55,7 @@
         text = cmd[update:1000] echo "<b><big> $(date +"%M") </big></b>"
         color = rgb(cad3f5)
         font_size = 112
-        font_family = $font 
+        font_family = $font
         shadow_passes = 3
         shadow_size = 4
 
@@ -72,7 +70,7 @@
         text = cmd[update:18000000] echo "<b><big> "$(date +'%A')" </big></b>"
         color = rgb(8087a2)
         font_size = 22
-        font_family = $font 
+        font_family = $font
 
         position = 0, 80
         halign = center
@@ -93,32 +91,22 @@
         inner_color = rgb(363a4f)
         font_color = rgb(cad3f5)
         fade_on_empty = true
-        placeholder_text = <i>Password...</i> 
+        placeholder_text = <i>Password...</i>
         position = 0, 120
         halign = center
         valign = bottom
     }
-    # Degrees
+    # Feels like
     label {
         monitor =
         text = cmd[update:18000000] echo "<b>Feels like<big> $(curl -s 'wttr.in?format=%t' | tr -d '+') </big></b>"
         color = rgb(6e738d)
         font_size = 18
-        font_family = $font 
+        font_family = $font
 
         position = 0, 40
         halign = center
         valign = bottom
     }
-
-
-
-      # # USER AVATAR
-      # image {
-      #     monitor =
-      #     path = ~/.config/hypr/.face
-      #     size = 150
-      #
-      # }
   '';
 }

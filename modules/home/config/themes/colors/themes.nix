@@ -1,49 +1,15 @@
 # Shared, side-effect-free theme database + resolvers.
+# Consumed by: colors, theme (Stylix), nixos (Stylix console/plymouth),
+# home-manager home.nix (catppuccin HM module).
+# Adding a new theme = append an attrset with the same shape; the normalized
+# `roles` keep the runtime switcher theme-agnostic.
 #
-# Consumed by:
-#   modules/config/colors/default.nix  -> runtime terminal files + colors.* options
-#   modules/config/theme/default.nix   -> home-manager Stylix (GTK/KDE/Qt/..)
-#   nixos/configuration.nix            -> system Stylix (console/plymouth)
-#   home-manager/home.nix              -> the catppuccin HM module selection
-#
-# Take { lib } as the only argument so a plain `import` works from both the
-# home-manager and NixOS module trees.
+# Normalized roles (raw hex, no '#'): bg, fg, base, mantle, crust,
+# surface0..2, overlay0..2, subtext0..1, text, accent, ansi (16 colors).
 
 { lib }:
 
 let
-  # ---------------------------------------------------------------------------
-  # Generic theme database.
-  #
-  # Every theme exposes the same shape:
-  #   <theme> = {
-  #     title    = "Human readable name";
-  #     flavors  = {
-  #       <variant> = {
-  #         title    = "Human readable variant name";
-  #         polarity = "dark" | "light";
-  #         ghostty  = "built-in ghostty theme name"; # optional (explicit palette)
-  #         roles    = { ... };   # normalized role colors (raw hex, no '#')
-  #         accents  = { <accent> = "hex"; ... };
-  #         ansi     = [ 16 colors ];
-  #       };
-  #     };
-  #   }
-  #
-  # `roles` is a normalized, theme-agnostic set of colors so the runtime
-  # switcher + terminal templates don't care which theme they apply to. Adding
-  # a new theme (e.g. Dracula) is just: append an attrset + give it roles.
-  #
-  # Normalized roles (raw hex, no '#'):
-  #   bg, fg                 -> terminal background / foreground
-  #   base, mantle, crust    -> background tiers (crust = darkest)
-  #   surface0..surface2     -> elevated UI surfaces
-  #   overlay0..overlay2     -> muted/disabled surfaces
-  #   subtext0..subtext1     -> secondary text
-  #   text                   -> primary text
-  #   accent                 -> primary accent (resolved from the accent arg)
-  #   ansi                   -> 16 colors for terminals
-  # ---------------------------------------------------------------------------
   themes = {
     catppuccin = {
       title = "Catppuccin";

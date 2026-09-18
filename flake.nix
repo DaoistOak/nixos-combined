@@ -15,7 +15,10 @@
     import-tree.url = "github:denful/import-tree";
     zen-browser.url = "github:youwen5/zen-browser-flake";
     nur.url = "github:nix-community/NUR";
-    hermes-agent.url = "github:NousResearch/hermes-agent";
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
     catppuccin.url = "github:catppuccin/nix";
     stylix = {

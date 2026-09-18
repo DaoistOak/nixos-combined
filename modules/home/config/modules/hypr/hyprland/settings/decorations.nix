@@ -18,10 +18,8 @@
         decoration = {
           rounding = 14;
           # Global default: fully opaque. The 0.90 transparency for the
-          # whitelisted apps (terminals, editors, file managers, messaging,
-          # keepassxc, kdeconnect, lutris, bottles, music, AI webapps) is
-          # applied via a runtime window rule in keybinds.nix, so SUPER+W,T
-          # can flip ALL windows to opaque and persist that choice.
+          # whitelisted apps is applied via a runtime window rule in keybinds.nix,
+          # so SUPER+W,T can flip ALL windows to opaque and persist that choice.
           active_opacity = 1.0;
           inactive_opacity = 1.0;
           blur = {

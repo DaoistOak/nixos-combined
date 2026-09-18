@@ -71,7 +71,7 @@
     jack.enable = false;
     wireplumber.enable = true;
 
-    # Higher fidelity audio output: 24-bit-quality processing, best resampler.
+    # Higher fidelity audio: 24-bit processing, best resampler.
     extraConfig.pipewire."99-audio-quality" = {
       context.properties = {
         default.clock.rate = 48000;

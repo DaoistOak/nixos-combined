@@ -3,9 +3,7 @@
 { pkgs, inputs, ... }:
 
 let
-  # nix-search-tv's default "nix-shell" action uses `--run $SHELL`, but
-  # nix-shell --run overrides $SHELL to its own bash, so the interactive shell
-  # was always bash. Patch it to always provision and exec zsh.
+  # Patch nix-search-tv to always exec zsh instead of its own bash.
   ns = pkgs.writeShellApplication {
     name = "ns";
     runtimeInputs = with pkgs; [
@@ -15,10 +13,10 @@ let
     text =
       builtins.replaceStrings
         [
-          "NIX_SHELL_CMD='nix-shell --run $SHELL -p $(echo \"{}\" | sed \"s:nixpkgs/::g\""
+          "NIX_SHELL_CMD='nix-shell --run $SHELL -p $(echo \"{}\" | sed \"s:nixpkgs/::g\"\""
         ]
         [
-          "NIX_SHELL_CMD='nix-shell --run zsh -p zsh $(echo \"{}\" | sed \"s:nixpkgs/::g\""
+          "NIX_SHELL_CMD='nix-shell --run zsh -p zsh $(echo \"{}\" | sed \"s:nixpkgs/::g\"\""
         ]
         (builtins.readFile "${pkgs.nix-search-tv.src}/nixpkgs.sh");
   };
@@ -52,7 +50,6 @@ let
     pay-respects
     quickshell
     socat
-    # topowall
   ];
 
   system-packages = with pkgs; [
@@ -70,7 +67,6 @@ let
     thunderbird
     ungoogled-chromium
     vesktop
-    # webcord-vencord
 
     # --- Development Tools & Compilers ---
     automake
@@ -96,14 +92,6 @@ let
     patchelf
     pkg-config
     python3
-    # python3Packages.pip
-    # python311Packages.opencv4
-    # (pkgs.python311.withPackages (
-    # ps: with ps; [
-    # opencv4
-    # pyserial
-    # ]
-    # ))
     vscode-fhs
 
     # --- Text Editors & Terminal Utilities ---
@@ -111,7 +99,6 @@ let
     copyq
     eza
     fish
-    klassy
     neovim
     pcmanfm
     superfile
@@ -215,8 +202,6 @@ let
 
     # --- AI, CLI Toys & Novelty ---
     hollywood
-    jrnl
-    jujutsu
     ollama
     tgpt
 
