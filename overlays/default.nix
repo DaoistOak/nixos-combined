@@ -117,13 +117,13 @@
     # pkg-config). Its Requires deps come from hyprland's git-pinned ecosystem.
     # Main (77b5e14): "adapt to Hyprland v0.56" — builds against v0.56.1
     # headers (pre-#15779: desktop/view/Window.hpp still present).
-    hyprEdgehover = (import ../pkgs/hypr-edgehover.nix { inherit inputs; }).hyprEdgehover;
+    hyprEdgehover = import ../pkgs/hypr-edgehover.nix { inherit inputs; };
 
     # hyprwinwrap: display any window as a background/wallpaper in Hyprland.
     # Built against the flake Hyprland dev output (hyprland.pc via pkg-config).
     # Pinned to a72d3ee (v0.56.0 line in its hyprpm.toml; v0.56.1 is a patch on
     # the same ABI line).
-    hyprWinwrap = (import ../pkgs/hyprwinwrap.nix { inherit inputs; }).hyprWinwrap;
+    hyprWinwrap = import ../pkgs/hyprwinwrap.nix { inherit inputs; };
   };
 
   # NUR (Nix User Repository) overlay

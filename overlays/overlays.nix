@@ -11,4 +11,11 @@ in
     overlays.modifications
     overlays.nur
   ];
+
+  # Overlays for the standalone home-manager configuration
+  home = [
+    overlays.additions
+    overlays.modifications
+    overlays.nur
+  ];
 }

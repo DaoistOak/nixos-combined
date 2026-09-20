@@ -32,7 +32,7 @@
     pkgs = import inputs.nixpkgs {
       system = "x86_64-linux";
       config.allowUnfree = true;
-      overlays = [ inputs.nur.overlays.default ];
+      overlays = (import ../../../overlays/overlays.nix { inherit inputs; }).home;
     };
     extraSpecialArgs = { inherit inputs; };
     modules = [
