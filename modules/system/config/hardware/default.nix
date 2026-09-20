@@ -25,6 +25,16 @@ in
 {
   imports = [ ./hardware-configuration.nix ];
 
+  # Fix GPU soft lockups: enable runtime PM, disable recovery loop, disable unsafe MMIO
+  # The previous config had runpm=0 (GPU never sleeps) and gpu_recovery=1 (lockup→recovery→lockup loop)
+  # which caused progressive soft lockups escalating 26s→48s→74s→82s until system freeze.
+  boot.kernelParams = [
+    "amdgpu.runpm=1"
+    "amdgpu.gpu_recovery=0"
+    "amdgpu.dcdebugmask=0"
+    "kvm.allow_unsafe_mmio_access=0"
+  ];
+
   # Lenovo IdeaPad Slim 5 hardware tweaks
   #
   # Set EC fan_mode to Efficient Thermal Dissipation (4). Modes: 0=silent
