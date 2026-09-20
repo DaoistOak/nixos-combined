@@ -15,7 +15,7 @@ in
     base16Scheme = themeMod.toBase16 themeSel.r;
     image = null;
     targets.console.enable = true;
-    targets.plymouth.enable = true;
+    targets.plymouth.enable = false;
     targets.gtksourceview.enable = false;
   };
 
