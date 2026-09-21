@@ -25,6 +25,9 @@ in
 {
   imports = [ ./hardware-configuration.nix ];
 
+  # Do not power on bluetooth adapter at boot; managed by bluetooth-ac-power service.
+  hardware.bluetooth.powerOnBoot = false;
+
   # Fix GPU soft lockups: enable runtime PM, disable recovery loop, disable unsafe MMIO
   # The previous config had runpm=0 (GPU never sleeps) and gpu_recovery=1 (lockup→recovery→lockup loop)
   # which caused progressive soft lockups escalating 26s→48s→74s→82s until system freeze.

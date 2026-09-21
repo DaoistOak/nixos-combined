@@ -7,6 +7,18 @@
 
 let
   # Guard: ignore failures when ryzen_smu is missing or /dev/mem is restricted.
+  btAcPower = pkgs.writeShellScript "bluetooth-ac-power" ''
+    BTCTL="${pkgs.bluez}/bin/bluetoothctl"
+    while true; do
+      ONLINE="$(cat /sys/class/power_supply/ACAD/online 2>/dev/null || echo 0)"
+      if [ "$ONLINE" = "1" ]; then
+        "$BTCTL" power on 2>/dev/null || true
+      elif [ -z "$("$BTCTL" devices Connected 2>/dev/null)" ]; then
+        "$BTCTL" power off 2>/dev/null || true
+      fi
+      sleep 120
+    done
+  '';
 in
 {
   powerManagement.powertop.enable = true;
@@ -120,23 +132,10 @@ in
   systemd.services.bluetooth-ac-power = {
     description = "Disable Bluetooth on battery when idle, enable on AC";
     wantedBy = [ "multi-user.target" ];
-    after = [ "multi-user.target" ];
+    after = [ "multi-user.target" "bluetooth.service" ];
     serviceConfig = {
       Type = "simple";
-      ExecStart = ''
-        ${pkgs.bash}/bin/bash -c '
-        BTCTL="${pkgs.bluez}/bin/bluetoothctl"
-        while true; do
-          ONLINE="$(cat /sys/class/power_supply/ACAD/online 2>/dev/null || echo 0)"
-          if [ "$ONLINE" = "1" ]; then
-            "$BTCTL" power on 2>/dev/null || true
-          elif [ -z "$("$BTCTL" devices Connected 2>/dev/null)" ]; then
-            "$BTCTL" power off 2>/dev/null || true
-          fi
-          sleep 120
-        done
-        '
-      '';
+      ExecStart = "${btAcPower}";
     };
   };
 
