@@ -26,7 +26,7 @@ in
 {
   boot = {
     resumeDevice = "/dev/disk/by-uuid/c90cb3d2-feba-424e-a25b-146d24f9bd0d";
-    kernelParams = [ "zswap.enabled=0" ];
+    kernelParams = lib.mkForce [ "zswap.enabled=0" "amdgpu.sg_display=0" ];
     extraModulePackages = [ ];
     kernelPackages = lib.mkForce pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto;
 
@@ -48,12 +48,10 @@ in
     "systemd-hibernate".serviceConfig = {
       ExecStartPre = hibernatePre;
       ExecStartPost = hibernatePost;
-      ExecStopPost = hibernatePost;
     };
     "systemd-suspend-then-hibernate".serviceConfig = {
       ExecStartPre = hibernatePre;
       ExecStartPost = hibernatePost;
-      ExecStopPost = hibernatePost;
     };
   };
 

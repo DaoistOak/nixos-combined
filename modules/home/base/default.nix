@@ -23,6 +23,7 @@ in
     ../config/modules/herdr
     ../config/modules/crush
     ../config/cava
+    ../config/modules/nvim
     ../config/modules/yazi
     ../config/modules/superfile
     ../config/modules/kitty

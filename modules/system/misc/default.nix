@@ -24,7 +24,6 @@
 
   boot.kernelParams = [
     "kvm.ignore_msrs=1"
-    "kvm.allow_unsafe_mmio_access=1"
   ];
 
   hardware.ksm.enable = true;
