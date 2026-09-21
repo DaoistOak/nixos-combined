@@ -4,22 +4,6 @@
   lib,
   ...
 }:
-
-let
-  # Guard: ignore failures when ryzen_smu is missing or /dev/mem is restricted.
-  btAcPower = pkgs.writeShellScript "bluetooth-ac-power" ''
-    BTCTL="${pkgs.bluez}/bin/bluetoothctl"
-    while true; do
-      ONLINE="$(cat /sys/class/power_supply/ACAD/online 2>/dev/null || echo 0)"
-      if [ "$ONLINE" = "1" ]; then
-        "$BTCTL" power on 2>/dev/null || true
-      elif [ -z "$("$BTCTL" devices Connected 2>/dev/null)" ]; then
-        "$BTCTL" power off 2>/dev/null || true
-      fi
-      sleep 120
-    done
-  '';
-in
 {
   powerManagement.powertop.enable = true;
   systemd.services.powertop.wantedBy = lib.mkForce [ ];
@@ -116,7 +100,7 @@ in
         WIFI_PWR_ON_BAT = "on";
         RUNTIME_PM_ON_BAT = "auto";
         DEVICES_TO_DISABLE_ON_BAT_NOT_IN_USE = "bluetooth wifi wwan";
-        DEVICES_TO_ENABLE_ON_AC = "bluetooth wifi wwan";
+        DEVICES_TO_ENABLE_ON_AC = "wifi wwan";
       };
     };
 
@@ -127,17 +111,6 @@ in
   };
 
   networking.networkmanager.wifi.powersave = true;
-
-  # Powers off BT on battery when nothing is connected; re-enables on AC.
-  systemd.services.bluetooth-ac-power = {
-    description = "Disable Bluetooth on battery when idle, enable on AC";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "multi-user.target" "bluetooth.service" ];
-    serviceConfig = {
-      Type = "simple";
-      ExecStart = "${btAcPower}";
-    };
-  };
 
   systemd.services.NetworkManager-wait-online.enable = false;
 }

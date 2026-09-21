@@ -25,7 +25,7 @@ in
 {
   imports = [ ./hardware-configuration.nix ];
 
-  # Do not power on bluetooth adapter at boot; managed by bluetooth-ac-power service.
+  # Do not power on bluetooth adapter at boot; user toggles it manually via keybind.
   hardware.bluetooth.powerOnBoot = false;
 
   # Fix GPU soft lockups: enable runtime PM, disable recovery loop, disable unsafe MMIO
