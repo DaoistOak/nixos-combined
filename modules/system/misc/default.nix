@@ -15,7 +15,7 @@
       '';
       qemu = {
         package = pkgs.qemu_kvm;
-        runAsRoot = true;
+        runAsRoot = false;
         swtpm.enable = true;
         vhostUserPackages = [ pkgs.virtiofsd ];
       };
