@@ -226,6 +226,14 @@
           no_shadow = true;
         }
 
+        # Legacy Launcher (T-Launcher) — float, centered, fixed size.
+        {
+          match = {
+            class = "^(org-springframework-boot-loader-PropertiesLauncher)$";
+          };
+          float = true;
+        }
+
         # Steam overlay or apps (if needed)
         # { match = { class = "^(steam_app)$" }; immediate = true; }
       ];
