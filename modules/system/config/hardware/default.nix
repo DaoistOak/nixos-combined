@@ -1,26 +1,26 @@
 {
-  config,
-  pkgs,
-  lib,
-  ...
+   config,
+   pkgs,
+   lib,
+   ...
 }:
 let
-  # Guard: ignore failures when ryzen_smu is missing or /dev/mem is restricted.
-  applyAcPower = pkgs.writeShellScript "apply-ac-power" ''
-    set -u
-    ONLINE="$(cat /sys/class/power_supply/ACAD/online 2>/dev/null || echo 0)"
-    if [ "$ONLINE" = "1" ]; then
-      ${pkgs.ryzenadj}/bin/ryzenadj \
-        --stapm-limit=54000 --fast-limit=60000 --slow-limit=54000 --tctl-temp=95 \
-        2>/dev/null || true
-      echo $((65535 * 60 / 100)) > /sys/class/backlight/amdgpu_bl1/brightness 2>/dev/null || true
-    else
-      ${pkgs.ryzenadj}/bin/ryzenadj \
-        --stapm-limit=25000 --fast-limit=30000 --slow-limit=25000 --tctl-temp=90 \
-        2>/dev/null || true
-      echo $((65535 * 30 / 100)) > /sys/class/backlight/amdgpu_bl1/brightness 2>/dev/null || true
-    fi
-  '';
+   # Guard: ignore failures when ryzen_smu is missing or /dev/mem is restricted.
+   applyAcPower = pkgs.writeShellScript "apply-ac-power" ''
+     set -u
+     ONLINE="$(cat /sys/class/power_supply/ACAD/online 2>/dev/null || echo 0)"
+     if [ "$ONLINE" = "1" ]; then
+       ${pkgs.ryzenadj}/bin/ryzenadj \
+         --stapm-limit=54000 --fast-limit=60000 --slow-limit=54000 --tctl-temp=95 \
+         2>/dev/null || true
+       echo $((65535 * 60 / 100)) > /sys/class/backlight/amdgpu_bl1/brightness 2>/dev/null || true
+     else
+       ${pkgs.ryzenadj}/bin/ryzenadj \
+         --stapm-limit=25000 --fast-limit=30000 --slow-limit=25000 --tctl-temp=90 \
+         2>/dev/null || true
+       echo $((65535 * 30 / 100)) > /sys/class/backlight/amdgpu_bl1/brightness 2>/dev/null || true
+     fi
+   '';
 in
 {
   imports = [ ./hardware-configuration.nix ];

@@ -146,6 +146,7 @@ let
     heroic
     lutris
     mangohud
+    scrcpy
     vkd3d
     vkd3d-proton
     winboat
