@@ -50,6 +50,7 @@ let
     pay-respects
     quickshell
     socat
+    (pkgs.writeShellScript "phone-idle-inhibitor" (builtins.readFile ./scripts/phone-idle-inhibitor))
   ];
 
   system-packages = with pkgs; [

@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+ACTION="${1:-on}"
+ADB="${ANDROID_ADB:-$(command -v adb 2>/dev/null || echo adb)}"
+case "$ACTION" in
+  on)
+    $ADB shell dumpsys battery set usb 1 2>/dev/null
+    $ADB shell dumpsys battery set ac 1 2>/dev/null
+    $ADB shell settings put global stay_on_while_plugged_in 3 2>/dev/null
+    $ADB shell settings put system screen_off_timeout 2147483647 2>/dev/null
+    $ADB shell settings put global power_saving_enabled 0 2>/dev/null
+    $ADB shell settings put global low_power 0 2>/dev/null
+    $ADB shell settings put global doze_enabled 0 2>/dev/null
+    $ADB shell settings put global wireless_doze_enabled 0 2>/dev/null
+    $ADB shell settings put global window_animation_scale 0 2>/dev/null
+    $ADB shell settings put global transition_animation_scale 0 2>/dev/null
+    $ADB shell settings put global animator_duration_scale 0 2>/dev/null
+    $ADB shell settings put secure debug_gamemode_value 1 2>/dev/null
+    $ADB shell settings put secure oplus_games_game_assistant_switch_key 1 2>/dev/null
+    $ADB shell settings put system screen_brightness 255 2>/dev/null
+    $ADB shell settings put system screen_brightness_mode 0 2>/dev/null
+    $ADB shell settings put global nfc_enabled 0 2>/dev/null
+    $ADB shell settings put global auto_time 0 2>/dev/null
+    echo "[IDLE-INHIBITOR] Activated."
+    ;;
+  off)
+    $ADB shell dumpsys battery set usb 0 2>/dev/null
+    $ADB shell dumpsys battery set ac 0 2>/dev/null
+    $ADB shell settings put global stay_on_while_plugged_in 0 2>/dev/null
+    $ADB shell settings put system screen_off_timeout 1800000 2>/dev/null
+    $ADB shell settings put global power_saving_enabled 1 2>/dev/null
+    $ADB shell settings put global low_power 0 2>/dev/null
+    $ADB shell settings put global doze_enabled 1 2>/dev/null
+    $ADB shell settings put global wireless_doze_enabled 1 2>/dev/null
+    $ADB shell settings put global window_animation_scale 1 2>/dev/null
+    $ADB shell settings put global transition_animation_scale 1 2>/dev/null
+    $ADB shell settings put global animator_duration_scale 1 2>/dev/null
+    $ADB shell settings put secure debug_gamemode_value 0 2>/dev/null
+    $ADB shell settings put secure oplus_games_game_assistant_switch_key 1 2>/dev/null
+    echo "[IDLE-INHIBITOR] Deactivated."
+    ;;
+  *)
+    echo "Usage: phone-idle-inhibitor [on|off]"
+    exit 1
+    ;;
+esac
