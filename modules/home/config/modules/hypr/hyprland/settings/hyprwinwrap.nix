@@ -40,10 +40,7 @@
         size_y = 97,
       })
 
-      -- Toggle focus/editing on the background window (SUPER + B)
-      hl.bind("SUPER + B", function()
-        hl.plugin.hyprwinwrap.focus("window-bg")
-      end, { description = "Toggle hyprwinwrap background focus" })
+
     end
   '';
 }

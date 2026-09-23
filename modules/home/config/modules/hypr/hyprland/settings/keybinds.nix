@@ -341,6 +341,18 @@
         hl.define_submap("shell-widgets", "reset", function()
           hl.bind("M", hl.dsp.exec_cmd(scripts .. "/widget-toggle.sh com.widget.metro nix run github:5c0/metropolis"), { description = "Toggle metropolis widget" })
           hl.bind("C", hl.dsp.exec_cmd(scripts .. "/widget-toggle.sh com.widget.cava " .. scripts .. "/cava-auto.sh"), { description = "Toggle cava widget" })
+          hl.bind("F", function()
+            local handle = io.popen("hyprctl clients -j 2>/dev/null")
+            if not handle then return end
+            local data = handle:read("*a")
+            handle:close()
+            for cls in data:gmatch('"class"%s*:%s*"([^"]-)"') do
+              if cls:match("^com%.widget%.") or cls == "window-bg" then
+                hl.plugin.hyprwinwrap.focus(cls)
+                return
+              end
+            end
+          end, { description = "Focus hyprwinwrap widget window" })
           hl.bind("escape", hl.dsp.submap("reset"), { description = "Exit widgets mode" })
         end)
 
