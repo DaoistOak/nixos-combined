@@ -7,7 +7,10 @@ modules/_git-clones/
 .crush/
 pkgs/logs/
 
-# Secrets — never commit API keys/tokens
+# Secrets — never commit API keys/tokens.
+# Top-level secrets/ holds private files (e.g. secrets/zsh.secrets); each name
+# also guarded individually below.
+secrets/
 secrets.zsh
 *.zshrc.custom
 .github_token

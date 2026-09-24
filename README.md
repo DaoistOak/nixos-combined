@@ -7,7 +7,7 @@ Built on the dendritic pattern: `flake-parts` + `import-tree` for auto-discovery
 
 - **Flake-Powered**: Declarative NixOS and home-manager configs in one flake
 - **Dendritic Layout**: `flake-parts` + `import-tree` auto-discovery of modules
-- **Hyprland Ecosystem**: Modern Wayland WM with plugins (`hypr-dynamic-cursors`, `hyprland-scroll-overview`), noctalia shell, hyprpanel, and KDE/Plasma coexistence
+- **Hyprland Ecosystem**: Modern Wayland WM with plugins (`hypr-dynamic-cursors`, `hyprland-scroll-overview`, `hyprEdgehover`, `hyprWinwrap`), noctalia shell, hyprpanel, quickshell, and KDE/Plasma coexistence
 - **Theming**: Stylix + Catppuccin with a custom themer (QML script) and tmux/kitty/zsh integration
 - **Gaming & Development**: Steam, Lutris, Neovim, VSCode, and full dev toolchain
 - **Modular & Secure**: Organized modules; no secrets are stored in the repo
@@ -42,10 +42,11 @@ Built on the dendritic pattern: `flake-parts` + `import-tree` for auto-discovery
 - **Build without switching**:
   - System: `nh os build .#nixosConfigurations.Lingnao`
   - Home: `home-manager build --flake .#zeph`
-- **Rebuild system**: `nh os switch .#nixosConfigurations.Lingnao`
+- **Rebuild system**: `nh os switch .#nixosConfigurations.Lingnao` (escalates via pkexec/polkit, not plain sudo)
 - **Rebuild home**: `home-manager switch --flake .#zeph`
 - **Format code**: `nixfmt .`
 - **Validate**: `nix flake check`
+- After changing Hyprland keybinds/settings: `hyprctl reload` (running session)
 
 ## ⌨️ Essential Keybinds
 
@@ -55,10 +56,12 @@ Built on the dendritic pattern: `flake-parts` + `import-tree` for auto-discovery
 | --- | --- |
 | `SUPER` (tap) | Run launcher |
 | `SUPER` + `K` | List keybinds (cheatsheet) |
-| `SUPER` + `RETURN` | Terminal (wezterm + tmux) |
+| `SUPER` + `RETURN` | Terminal (default: **ghostty** + tmux; switchable via quickshell terminal-switcher) |
 | `SUPER` + `SPACE` ×3 / `SUPER` + `SHIFT` + `SPACE` | Window switcher |
 | `SUPER` + `Q` | Toggle workspace overview |
 | `SUPER` + `D` | Control center |
+| `SUPER` + `SHIFT` + `W` | Weather panel |
+| `SUPER` + `SHIFT` + `T` | Cycle theme |
 | `SUPER` + `V` | Clipboard menu |
 | `SUPER` + `C` | Close window |
 | `SUPER` + `X` | Session menu |
@@ -77,12 +80,12 @@ Built on the dendritic pattern: `flake-parts` + `import-tree` for auto-discovery
 
 - `flake.nix` — entry point; `import-tree ./flake-parts` + host composition
 - `modules/system/hosts/Lingnao.nix` — thin host composition (NixOS + home-manager)
-- `modules/system/` — NixOS modules (boot, network, desktop, themes, pkgs, users, services, misc)
+- `modules/system/` — NixOS modules (boot, network, desktop, sddm, themes, pkgs, users, services, misc)
 - `modules/home/` — home-manager modules (`base/` entry point, `config/modules/`, `config/themes/`)
 - `flake-parts/` — auto-discovered flake-parts modules
 - `overlays/` — package overlays (additions, modifications, NUR)
 - `pkgs/` — package definitions (reachable only through `overlays/`)
-- `scripts/` — `updt` update helper
+- `scripts/` — `updt` update helper, `theme` switcher, `update-hyprland.sh`, `phone-idle-inhibitor`
 
 ## 🤝 Contributing
 

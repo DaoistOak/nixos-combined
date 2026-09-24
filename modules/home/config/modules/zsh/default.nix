@@ -23,6 +23,67 @@ in
     dotDir = zshDir;
     defaultKeymap = "viins";
 
+    history = {
+      path = "${zshDir}/.zsh_history";
+      size = 10000000;
+      save = 10000000;
+    };
+
+    envExtra = ''
+      export PATH="$PATH:$HOME/bin"
+      export PATH="$PATH:/home/zeph/.spicetify"
+      export ZSH_TMUX_AUTOSTART_ONC_ONCE=true
+      export ZSH_TMUX_DEFAULT_SESSION_NAME=Base
+      export NIX_LD_LIBRARY_PATH=$(nix eval --raw nixpkgs#glibc.outPath)/lib
+      export TERM=tmux-256color
+      export NIXPKGS_ALLOW_UNFREE=1
+    '';
+
+    initExtra = lib.mkOrder 500 (builtins.readFile ./src/init.zsh);
+
+    shellAliases = {
+      emacs = "emacsclient -c -a \"emacs\"";
+      # Git shortcuts (curated subset of the oh-my-zsh git plugin, no omz).
+      g = "git";
+      ga = "git add";
+      gaa = "git add --all";
+      gapa = "git add --patch";
+      gb = "git branch";
+      gba = "git branch -a";
+      gbd = "git branch -d";
+      gbD = "git branch -D";
+      gbl = "git blame -b -w";
+      gc = "git commit -v";
+      "gc!" = "git commit --amend";
+      gca = "git commit -v -a";
+      "gca!" = "git commit -v -a --amend";
+      gcb = "git checkout -b";
+      gcm = "git checkout \"$(git_main_branch)\"";
+      gco = "git checkout";
+      gd = "git diff";
+      gdca = "git diff --cached";
+      gdw = "git diff --word-diff";
+      gf = "git fetch";
+      gfa = "git fetch --all --prune";
+      gfo = "git fetch origin";
+      gl = "git pull";
+      glg = "git log --stat";
+      glgg = "git log --graph";
+      glgga = "git log --graph --decorated --all";
+      glo = "git log --oneline --decorate";
+      glog = "git log --oneline --decorate --graph";
+      gpsup = "git push --set-upstream origin \"$(git_current_branch)\"";
+      gpf = "git push --force-with-lease";
+      gpoat = "git push origin --all && git push origin --tags";
+      gr = "git remote";
+      grv = "git remote -v";
+      gst = "git status";
+      gss = "git status -s";
+      gsta = "git stash";
+      gstl = "git stash list";
+      gstp = "git stash pop";
+    };
+
     initContent = lib.mkOrder 1000 (builtins.readFile ./src/zshrc.custom);
   };
 
