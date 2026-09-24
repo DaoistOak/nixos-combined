@@ -170,8 +170,10 @@ stage_all() {
     # nh/home-manager evaluate the flake from the git tree; untracked files are
     # invisible to it and break builds. Stage everything (incl. deletions and
     # the auto-synced nvim lazy-lock.json) so builds see the working tree.
+    # Deliberately NOT -f: force-adding would re-stage git-ignored files such
+    # as result/, AGENTS.md and secrets/* into commits.
     info "Staging working tree for flake evaluation..."
-    if git add -Af -- .; then
+    if git add -A -- .; then
         ok "Working tree staged"
         return 0
     fi
