@@ -103,7 +103,6 @@ let
     copyq
     eza
     fish
-    neovim
     pcmanfm
     superfile
     vim
