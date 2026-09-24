@@ -70,34 +70,6 @@
     pulse.enable = true;
     jack.enable = false;
     wireplumber.enable = true;
-
-    # Higher fidelity audio: 24-bit processing, best resampler.
-    extraConfig.pipewire."99-audio-quality" = {
-      context.properties = {
-        default.clock.rate = 48000;
-        default.clock.allowed-rates = [
-          44100
-          48000
-          96000
-        ];
-      };
-      stream.properties = {
-        audio.format = "S32LE";
-        audio.resample.quality = 15;
-      };
-    };
-
-    wireplumber.extraConfig."99-audio-quality" = {
-      "wireplumber.settings" = {
-        "audio.format" = "S32LE";
-        "audio.rate" = 48000;
-        "audio.channels" = 2;
-        "audio.position" = [
-          "FL"
-          "FR"
-        ];
-      };
-    };
   };
 
   security.rtkit.enable = true;

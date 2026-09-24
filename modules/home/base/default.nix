@@ -33,6 +33,7 @@ in
     ../config/modules/tmux
     ../config/modules/phone-bt-bridge
     ../config/modules/keepassxc
+    ../config/modules/qutebrowser
     ../config/modules/rofi
     ../config/modules/atuin
     ../config/themes/colors

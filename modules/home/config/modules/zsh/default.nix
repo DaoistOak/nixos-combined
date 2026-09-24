@@ -39,7 +39,10 @@ in
       export NIXPKGS_ALLOW_UNFREE=1
     '';
 
-    initExtra = lib.mkOrder 500 (builtins.readFile ./src/init.zsh);
+    initContent = lib.mkMerge [
+      (lib.mkOrder 500 (builtins.readFile ./src/init.zsh))
+      (lib.mkOrder 1000 (builtins.readFile ./src/zshrc.custom))
+    ];
 
     shellAliases = {
       emacs = "emacsclient -c -a \"emacs\"";
@@ -84,7 +87,6 @@ in
       gstp = "git stash pop";
     };
 
-    initContent = lib.mkOrder 1000 (builtins.readFile ./src/zshrc.custom);
   };
 
   programs.fzf = {

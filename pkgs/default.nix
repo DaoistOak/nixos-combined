@@ -3,7 +3,7 @@
 { pkgs, inputs, ... }:
 
 let
-  # Patch nix-search-tv to always exec zsh instead of its own bash.
+  # Patch nix-search-tv to always exec zsh instead of resolving $SHELL.
   ns = pkgs.writeShellApplication {
     name = "ns";
     runtimeInputs = with pkgs; [
@@ -13,10 +13,10 @@ let
     text =
       builtins.replaceStrings
         [
-          "NIX_SHELL_CMD='nix-shell --run $SHELL -p $(echo \"{}\" | sed \"s:nixpkgs/::g\"\""
+          "nix-shell --run $SHELL -p "
         ]
         [
-          "NIX_SHELL_CMD='nix-shell --run zsh -p zsh $(echo \"{}\" | sed \"s:nixpkgs/::g\"\""
+          "nix-shell --run zsh -p zsh "
         ]
         (builtins.readFile "${pkgs.nix-search-tv.src}/nixpkgs.sh");
   };
