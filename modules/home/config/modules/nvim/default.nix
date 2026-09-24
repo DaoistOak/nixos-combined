@@ -6,7 +6,7 @@
   ...
 }:
 let
-  repoLockPath = "${config.home.homeDirectory}/.config/nixos/modules/home/config/modules/nvim/src/nvim/lazy-lock.json";
+  repoLockPath = "${config.var.configDirectory}/modules/home/config/modules/nvim/src/nvim/lazy-lock.json";
 in
 {
   imports = [ inputs.nvnix.homeManagerModules.nvnix ];

@@ -1,7 +1,7 @@
-// Tab-completion menu: mirror oh-my-zsh's lib/completion.zsh so the first Tab
-// lists candidates, a second Tab enters the picker, and Enter accepts the
-// highlighted match (e.g. `cd .config/nixo<Tab><Tab>` then Enter goes into
-// nixos/). `special-dirs` also offers `..` and `.` entries in `cd`.
+# Tab-completion menu: mirror oh-my-zsh's lib/completion.zsh so the first Tab
+# lists candidates, a second Tab enters the picker, and Enter accepts the
+# highlighted match (e.g. `cd .config/nixo<Tab><Tab>` then Enter goes into
+# nixos/). `special-dirs` also offers `..` and `.` entries in `cd`.
 unsetopt menu_complete
 setopt auto_menu
 setopt complete_in_word
@@ -10,7 +10,7 @@ zstyle ':completion:*:*:*:*:*' menu select
 zstyle ':completion:*' special-dirs true
 zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
 
-// Global aliases (substitute anywhere in a command line).
+# Global aliases (substitute anywhere in a command line).
 alias -g ls='eza --icons -a --color=always --group-directories-first'
 alias -g la='eza --icons -al --color=always --group-directories-first'
 alias -g cls='clear'
@@ -33,7 +33,7 @@ alias -g wget='wget --hsts-file="$XDG_DATA_HOME/wget-hsts"'
 alias -g dosbox='dosbox -conf "$XDG_CONFIG_HOME"/dosbox/dosbox.conf'
 alias -g tabby_start='sudo tabby serve --model DeepSeekCoder-1.3B --chat-model Qwen3-4B --device rocm'
 
-// sudo: prepend/remove "sudo " on the current line (Ctrl-X Ctrl-S; omz sudo plugin).
+# sudo: prepend/remove "sudo " on the current line (Ctrl-X Ctrl-S; omz sudo plugin).
 sudo-command-line() {
   [[ -z $BUFFER ]] && zle up-history
   if [[ $BUFFER == "sudo "* ]]; then
@@ -49,7 +49,7 @@ bindkey -M emacs '^Xs' sudo-command-line
 bindkey -M viins '^Xs' sudo-command-line
 bindkey -M vicmd '^Xs' sudo-command-line
 
-// Git helper functions used by the gcm/gpsup aliases.
+# Git helper functions used by the gcm/gpsup aliases.
 git_main_branch() {
   command git rev-parse --git-dir >/dev/null 2>&1 \
     && command git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@'
@@ -58,8 +58,8 @@ git_current_branch() {
   command git symbolic-ref --quiet HEAD 2>/dev/null | sed 's@^refs/heads/@@'
 }
 
-// you-should-use: after a command finishes, remind you if a defined alias is
-// exactly it (manual; replaces oh-my-zsh plugins/you-should-use).
+# you-should-use: after a command finishes, remind you if a defined alias is
+# exactly it (manual; replaces oh-my-zsh plugins/you-should-use).
 autoload -Uz add-zsh-hook
 you-should-use() {
   local cmd
@@ -80,9 +80,9 @@ you-should-use() {
 }
 add-zsh-hook precmd you-should-use
 
-// autonotify: desktop notification via notify-send when a command finishes if
-// it ran for at least AUTONOTIFY_THRESHOLD seconds (manual; replaces
-// oh-my-zsh plugins/autonotify).
+# autonotify: desktop notification via notify-send when a command finishes if
+# it ran for at least AUTONOTIFY_THRESHOLD seconds (manual; replaces
+# oh-my-zsh plugins/autonotify).
 zmodload -i zsh/datetime
 AUTONOTIFY_THRESHOLD=60
 _autonotify_preexec() {
@@ -104,7 +104,7 @@ _autonotify_precmd() {
 add-zsh-hook preexec _autonotify_preexec
 add-zsh-hook precmd _autonotify_precmd
 
-// edit_file: nvim for writable files, sudoedit otherwise (or create).
+# edit_file: nvim for writable files, sudoedit otherwise (or create).
 edit_file() {
   if [[ -e "$1" ]]; then
     if [[ -f "$1" ]]; then
@@ -147,26 +147,26 @@ edit_file() {
   fi
 }
 
-// chpwd hooks: run on every directory change.
+# chpwd hooks: run on every directory change.
 autoload -Uz add-zsh-hook
 
-// Re-source the theme-switcher's p10k overrides on every prompt so a
-// mid-session `./theme set ...` recolors POWERLEVEL9K_DIR_BACKGROUND (and any
-// future p10k overrides) on the next render.
+# Re-source the theme-switcher's p10k overrides on every prompt so a
+# mid-session `./theme set ...` recolors POWERLEVEL9K_DIR_BACKGROUND (and any
+# future p10k overrides) on the next render.
 theme_p10k_sync() {
   [[ -f "$HOME/.config/theme-switcher/p10k-theme.zsh" ]] && source "$HOME/.config/theme-switcher/p10k-theme.zsh"
 }
 add-zsh-hook precmd theme_p10k_sync
 
-// 1) List directory contents after every cd (mirrors the `ls` alias).
+# 1) List directory contents after every cd (mirrors the `ls` alias).
 chpwd_ls() {
   setopt localoptions aliases
   command eza --icons -a --color=always --group-directories-first
 }
 add-zsh-hook chpwd chpwd_ls
 
-// 2) Auto-activate a local environment: source a python venv, or enter a
-//    nix-shell when shell.nix is present (guarded against recursion).
+# 2) Auto-activate a local environment: source a python venv, or enter a
+#    nix-shell when shell.nix is present (guarded against recursion).
 chpwd_autoenv() {
   local vd
   for vd in .venv venv; do
@@ -184,6 +184,6 @@ chpwd_autoenv() {
 }
 add-zsh-hook chpwd chpwd_autoenv
 
-// Greater prompt (runs after every alias above is defined).
+# Greater prompt (runs after every alias above is defined).
 greet
 echo "\n"

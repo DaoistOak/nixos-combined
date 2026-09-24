@@ -449,7 +449,7 @@ write_selection() {
 rebuild_stylix() {
   local label="$1"
   echo "Rebuilding home-manager so Stylix (GTK/KDE/Qt/..) follows..."
-  if ( cd "$REPO_ROOT" && home-manager switch --flake .#zeph ); then
+  if ( cd "$REPO_ROOT" && home-manager switch --flake .#"${CONFIG_VAR_USERNAME:-zeph}" ); then
     # Persist the selection in git so future clean builds stay consistent.
     ( cd "$REPO_ROOT" \
       && git add modules/home/config/themes/colors/src/selection \
@@ -477,7 +477,7 @@ cmd_set() {
     if [[ "${SYSTEM_SWITCH:-0}" == "1" ]]; then
       echo "Switching NixOS system (console/plymouth follow)..."
       ( cd "$REPO_ROOT" \
-        && nh os switch --elevation-strategy pkexec .#nixosConfigurations.Lingnao ) \
+        && nh os switch --elevation-strategy pkexec .#nixosConfigurations."${CONFIG_VAR_HOSTNAME:-Lingnao}" ) \
         || { echo "error: system switch failed" >&2; return 1; }
     fi
   else

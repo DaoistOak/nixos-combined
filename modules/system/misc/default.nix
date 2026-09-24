@@ -23,13 +23,12 @@
   };
 
   services.udev.extraRules = ''
-    # SPICE client (running as zeph) calls setfacl on USB device nodes
-    # during redirection. setfacl requires file ownership, so make zeph
+    # SPICE client (running as ${config.var.username}) calls setfacl on USB device nodes
+    # during redirection. setfacl requires file ownership, so make ${config.var.username}
     # the owner of USB device nodes.
-    SUBSYSTEM=="usb_device", ENV{DEVTYPE}=="usb_device", MODE="0660", OWNER="zeph", GROUP="users", TAG+="uaccess"
-    SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", MODE="0660", OWNER="zeph", GROUP="users", TAG+="uaccess"
+    SUBSYSTEM=="usb_device", ENV{DEVTYPE}=="usb_device", MODE="0660", OWNER="${config.var.username}", GROUP="users", TAG+="uaccess"
+    SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", MODE="0660", OWNER="${config.var.username}", GROUP="users", TAG+="uaccess"
   '';
-
 
   boot.kernelParams = [
     "kvm.ignore_msrs=1"
@@ -43,7 +42,7 @@
     settings = {
       global = {
         "workgroup" = "WORKGROUP";
-        "server string" = "Lingnao (NixOS)";
+        "server string" = "${config.var.hostname} (NixOS)";
         "netbios name" = "LINGNAO";
         security = "user";
         "map to guest" = "bad user";
@@ -52,11 +51,11 @@
         "hosts deny" = "0.0.0.0/0";
       };
       shared = {
-        path = "/home/zeph";
+        path = "/home/${config.var.username}";
         browseable = "yes";
         "read only" = "no";
         "guest ok" = "yes";
-        "force user" = "zeph";
+        "force user" = config.var.username;
         "force group" = "users";
         "create mask" = "0664";
         "directory mask" = "0775";

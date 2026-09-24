@@ -17,6 +17,7 @@ let
 in
 {
   imports = [
+    ../../shared/var.nix
     ../config/modules/hypr/hyprland
     ../config/modules/hypr/hypridle
     ../config/modules/hypr/hyprlock
@@ -36,6 +37,7 @@ in
     ../config/modules/qutebrowser
     ../config/modules/rofi
     ../config/modules/atuin
+    ../config/modules/updt
     ../config/themes/colors
     ../config/themes/themer
     ../config/themes/theme
@@ -44,8 +46,8 @@ in
     inputs.noctalia.homeModules.default
   ];
 
-  home.username = "zeph";
-  home.homeDirectory = "/home/zeph";
+  home.username = config.var.username;
+  home.homeDirectory = "/home/${config.var.username}";
   gtk.enable = true;
   stylix.targets.gtk.extraCss = ''
     @import url("noctalia.css");
@@ -117,7 +119,7 @@ in
     TERMINAL = "ghostty";
     QT_QPA_PLATFORMTHEME = lib.mkForce "qt6ct";
     QT_STYLE_OVERRIDE = lib.mkForce "kvantum";
-    FLAKE_DIR = "/home/zeph/.config/nixos";
+    FLAKE_DIR = config.var.configDirectory;
   };
 
   xdg.configFile.".gtkrc-2.0" = {

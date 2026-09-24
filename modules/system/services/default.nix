@@ -67,9 +67,9 @@
 
     syncthing = {
       enable = true;
-      user = "zeph";
-      dataDir = "/home/zeph/Sync";
-      configDir = "/home/zeph/.config/syncthing";
+      user = config.var.username;
+      dataDir = "/home/${config.var.username}/Sync";
+      configDir = "/home/${config.var.username}/.config/syncthing";
     };
 
     power-profiles-daemon.enable = false;

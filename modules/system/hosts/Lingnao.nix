@@ -4,6 +4,7 @@
     system = "x86_64-linux";
     specialArgs = { inherit inputs; };
     modules = [
+      ../../shared/var.nix
       ../boot/default.nix
       ../config/network/default.nix
       ../nix/default.nix

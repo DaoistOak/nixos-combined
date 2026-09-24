@@ -1,7 +1,7 @@
-{ ... }:
+{ config, ... }:
 {
   networking = {
-    hostName = "Lingnao";
+    hostName = config.var.hostname;
     networkmanager.enable = true;
     nftables.enable = true;
     firewall = {

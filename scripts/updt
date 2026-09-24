@@ -11,9 +11,11 @@
 set -euo pipefail
 
 # --- Configuration ----------------------------------------------------------
-FLAKE_PATH="$HOME/.config/nixos"
-NIXOS_HOST="Lingnao"
-HOME_USER="zeph"
+# Values default to the var module's (see modules/shared/var.nix); the
+# `updt`/`theme` wrappers installed by home-manager export the real ones.
+FLAKE_PATH="${CONFIG_VAR_CONFIG_DIRECTORY:-$HOME/.config/nixos}"
+NIXOS_HOST="${CONFIG_VAR_HOSTNAME:-Lingnao}"
+HOME_USER="${CONFIG_VAR_USERNAME:-zeph}"
 SUCCESS_SOUND="/run/current-system/sw/share/sounds/freedesktop/stereo/complete.oga"
 ERROR_SOUND="/run/current-system/sw/share/sounds/freedesktop/stereo/dialog-error.oga"
 
@@ -164,6 +166,51 @@ update_flatpak() {
     return 1
 }
 
+stage_all() {
+    # nh/home-manager evaluate the flake from the git tree; untracked files are
+    # invisible to it and break builds. Stage everything (incl. deletions and
+    # the auto-synced nvim lazy-lock.json) so builds see the working tree.
+    info "Staging working tree for flake evaluation..."
+    if git add -Af -- .; then
+        ok "Working tree staged"
+        return 0
+    fi
+    err "git add failed"
+    return 1
+}
+
+gc() {
+    info "Collecting old generations (system + user)..."
+    if ! pkexec nix-collect-garbage -d >/dev/null 2>&1; then
+        sudo -n nix-collect-garbage -d >/dev/null 2>&1 || warn "System gc skipped (needs root)"
+    fi
+    nix-collect-garbage -d >/dev/null 2>&1 || warn "User gc skipped"
+    info "Optimising the store..."
+    nix-store --optimise >/dev/null 2>&1 || warn "Store optimise skipped"
+    ok "Garbage collected"
+}
+
+cb() {
+    info "Rebuilding the boot menu from the current system..."
+    if ! pkexec /run/current-system/bin/switch-to-configuration boot >/dev/null 2>&1; then
+        sudo -n /run/current-system/bin/switch-to-configuration boot >/dev/null 2>&1 || {
+            err "Boot menu rebuild failed"
+            return 1
+        }
+    fi
+    ok "Boot menu rebuilt"
+}
+
+listgen() {
+    info "System generations:"
+    if ! pkexec nix-env -p /nix/var/nix/profiles/system --list-generations; then
+        sudo -n nix-env -p /nix/var/nix/profiles/system --list-generations || {
+            err "Could not list generations"
+            return 1
+        }
+    fi
+}
+
 commit_and_push() {
     if [[ -z "$(git status --porcelain 2>/dev/null)" ]]; then
         info "No changes to commit"
@@ -224,14 +271,46 @@ run_workflow() {
 # --- Menu -----------------------------------------------------------------------
 execute_option() {
     case "$1" in
-        1) run_workflow "Update All"           true  auth_pkexec update_flake build_system switch_system build_home switch_home ;;
+        1) run_workflow "Update All"           true  auth_pkexec update_flake stage_all build_system switch_system build_home switch_home ;;
         2) run_workflow "Update Flake Only"    true  update_flake ;;
-        3) run_workflow "Update System Only"   true  auth_pkexec build_system switch_system ;;
-        4) run_workflow "Update Home Only"     true  build_home switch_home ;;
+        3) run_workflow "Update System Only"   true  auth_pkexec stage_all build_system switch_system ;;
+        4) run_workflow "Update Home Only"     true  stage_all build_home switch_home ;;
         5) run_workflow "Update Flatpak"       false update_flatpak ;;
         6) run_workflow "Git Push"             false push_only ;;
         7) exit 0 ;;
         *) err "Invalid option: $1" ; return 1 ;;
+    esac
+}
+
+usage_sub() {
+    echo "usage: $0 [subcommand]"
+    echo
+    echo "  (no args)          interactive menu"
+    echo "  all / update       flake + system + home (commit + push)"
+    echo "  flake              flake inputs only (commit + push)"
+    echo "  system             NixOS build + switch (commit + push)"
+    echo "  home               home-manager build + switch (commit + push)"
+    echo "  flatpak            update flatpak applications"
+    echo "  push               push committed changes"
+    echo "  gc                 collect garbage + optimise the store"
+    echo "  cb / boot          rebuild the boot menu"
+    echo "  listgen            list NixOS generations"
+    echo "  help               show this help"
+}
+
+subcommand() {
+    case "$1" in
+        all | update)      execute_option 1 ;;
+        flake)             execute_option 2 ;;
+        system | sys)      execute_option 3 ;;
+        home)              execute_option 4 ;;
+        flatpak)           execute_option 5 ;;
+        push)              execute_option 6 ;;
+        gc)                run_workflow "Garbage Collect"       false gc ;;
+        cb | boot)         run_workflow "Rebuild Boot Menu"     false cb ;;
+        listgen)           run_workflow "List Generations"      false listgen ;;
+        help | -h | --help) usage_sub ;;
+        *) err "Unknown subcommand: $1"; usage_sub >&2; return 1 ;;
     esac
 }
 
@@ -266,6 +345,13 @@ parse_choices() {
 
 main() {
     check_directory
+
+    # Subcommand mode (updt gc, updt home, ...) bypasses the interactive menu.
+    if [[ $# -gt 0 ]]; then
+        subcommand "$@"
+        return $?
+    fi
+
     check_git_status
 
     clear || true
@@ -281,6 +367,8 @@ main() {
     echo -e "  5. ${YELLOW}Update Flatpak${NC}    — flatpak applications"
     echo -e "  6. ${GREEN}Git Push${NC}         — push committed changes"
     echo -e "  7. ${RED}Exit${NC}"
+    echo
+    echo -e "${BOLD}Subcommands${NC}: updt gc | cb | listgen | push | all | help"
     echo
 
     read -rp "Enter choice(s) (1-7): " input
