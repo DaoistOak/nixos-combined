@@ -68,6 +68,12 @@ let
         # the standard way (see sddm-face activation script below).
         sed -i 's/Qt.UserRole + 3/Qt.UserRole + 4/' Main.qml
 
+        # SDDM resolves icons to ~/.face.icon / the AccountsService icon dir —
+        # URLs that end in ".icon" or have no extension at all. Pixie only
+        # accepts classic image extensions, so the model's icon never matches
+        # and it falls back to assets/avatar.jpg. Accept .icon URLs too.
+        sed -i 's@\.(jpg|jpeg|png|bmp|webp|svg)\$@\.(jpg|jpeg|png|bmp|webp|svg|icon)$@' Main.qml
+
         # The four fallback "white" texts (user label, session name, password,
         # login button) sit on different backgrounds, so match by pixelSize.
         perl -0777 -pi -e '
