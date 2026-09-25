@@ -10,6 +10,7 @@
     text = ''
       import os
 
+      config.load_autoconfig()
       colors_path = os.path.expanduser("~/.config/qutebrowser/noctalia/colors.py")
       if os.path.exists(colors_path):
           exec(open(colors_path).read())
