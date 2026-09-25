@@ -15,6 +15,15 @@ let
   # with the home-dir traversal permission.
   face = ./src/face.jpg;
 
+  # Square, center-cropped copy of the avatar. The greeter draws it into a
+  # round square; a square source can never warp regardless of QML layout.
+  faceSq = pkgs.runCommand "face-square" {
+    nativeBuildInputs = [ pkgs.imagemagick ];
+  } ''
+    mkdir -p $out
+    magick '${face}' -auto-orient -gravity center -resize 512x512^ -extent 512x512 "$out/face.png"
+  '';
+
   pixie =
     let
       base = inputs.pixie-sddm.packages.${pkgs.stdenv.hostPlatform.system}.pixie-sddm.override {
@@ -103,7 +112,7 @@ in
     deps = [ "users" ];
     text = ''
       install -m 0644 -o ${config.var.username} -g users ${face} /home/${config.var.username}/.face
-      install -m 0644 -o ${config.var.username} -g users ${face} /home/${config.var.username}/.face.icon
+      install -m 0644 -o ${config.var.username} -g users ${faceSq}/face.png /home/${config.var.username}/.face.icon
       chmod 0711 /home/${config.var.username}
     '';
   };
