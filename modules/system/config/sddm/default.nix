@@ -72,6 +72,13 @@ in
       qt5compat
     ];
     settings.Theme.CursorTheme = "catppuccin-macchiato-light-cursors";
+
+    # AccountsService is installed (pulled in by Plasma) and SDDM defaults to
+    # the AccountsService user model when its daemon is running — but we don't
+    # seed /var/lib/AccountsService, so the greeter never sees icons and pixie
+    # falls back to its bundled default avatar.jpg. Force the filesystem model
+    # so the avatar is read from ~/.face (installed by the activation script).
+    settings.Users.UsesAccountsService = false;
   };
 
   security.pam.services.sddm.enableKwallet = true;

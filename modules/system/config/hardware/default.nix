@@ -27,6 +27,14 @@ let
   themeMod = import ../../../home/config/themes/colors/themes.nix { inherit lib; };
   themeSel = themeMod.readSelection ../../../home/config/themes/colors/src/selection;
 
+  # 16-color ANSI palette -> kernel vt.default_{red,grn,blu} args. NixOS injects
+  # these via boot.kernelParams, but this module is the single mkForce owner of
+  # that list, so the palette args must be spelled out here or the TTY keeps the
+  # default VGA colors.
+  vtChannels = builtins.map (
+    i: builtins.concatStringsSep "," (map (c: "0x${builtins.substring (i * 2) 2 c}") themeSel.r.ansi)
+  ) [ 0 1 2 ];
+
   # NixOS snowflake plymouth theme, recolored to match the theme-changer
   # accent. The "white" variant ships transparent-bg PNG frames of the wordmark
   # + lambda arms; -colorize swaps white → accent while keeping the anti-aliased
@@ -60,6 +68,9 @@ in
   # The previous config had runpm=0 (GPU never sleeps) and gpu_recovery=1 (lockup→recovery→lockup loop)
   # which caused progressive soft lockups escalating 26s→48s→74s→82s until system freeze.
   boot.kernelParams = lib.mkForce [
+    "vt.default_red=${builtins.elemAt vtChannels 0}"
+    "vt.default_grn=${builtins.elemAt vtChannels 1}"
+    "vt.default_blu=${builtins.elemAt vtChannels 2}"
     "quiet"
     "splash"
     "rd.systemd.show_status=auto"
