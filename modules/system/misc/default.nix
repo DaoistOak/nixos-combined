@@ -30,9 +30,7 @@
     SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", MODE="0660", OWNER="${config.var.username}", GROUP="users", TAG+="uaccess"
   '';
 
-  boot.kernelParams = [
-    "kvm.ignore_msrs=1"
-  ];
+  # kernelParams (kvm.ignore_msrs=1) are owned by ../config/hardware/default.nix (single mkForce).
 
   hardware.ksm.enable = true;
 
