@@ -50,10 +50,11 @@ let
           -e 's|color: isCurrent ? container.extractedAccent : "gray"|color: isCurrent ? container.extractedAccent : config.mutedTextColor|' \
           Main.qml
 
-        # Fix avatar: SDDM's IconRole is UserRole+4 (+1 Name, +2 RealName, +3
-        # HomeDir), but pixie reads UserRole+3 (the user's home dir) so the
-        # ~/.face avatar never matches and it falls back to assets/avatar.jpg.
-        sed -i 's/Qt.UserRole + 3/Qt.UserRole + 4/' Main.qml
+        # Fix avatar: source the machine-local face image directly in QML. SDDM's
+        # user-model lookup (IconRole = UserRole+4, fs model needs ~/.face.icon)
+        # proved unreliable in practice, so hardcode the initial source. If the
+        # model later yields a valid image URL it resolves to the same file.
+        sed -i 's|var s = Qt.resolvedUrl("assets/avatar.jpg");|var s = "file:///home/zeph/.face.icon";|' Main.qml
 
         # The four fallback "white" texts (user label, session name, password,
         # login button) sit on different backgrounds, so match by pixelSize.
