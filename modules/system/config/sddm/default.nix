@@ -15,13 +15,15 @@ let
   # with the home-dir traversal permission.
   face = ./src/face.jpg;
 
-  # Square, center-cropped copy of the avatar. The greeter draws it into a
-  # round square; a square source can never warp regardless of QML layout.
+  # Square avatar crop for the login circle. The source is a full-body portrait
+  # (736x1472) on a solid background, so a plain center crop lands on the torso
+  # (face cut off, looks zoomed). Anchor the square at the top full width to
+  # keep head + shoulders, centered horizontally.
   faceSq = pkgs.runCommand "face-square" {
     nativeBuildInputs = [ pkgs.imagemagick ];
   } ''
     mkdir -p $out
-    magick '${face}' -auto-orient -gravity center -resize 512x512^ -extent 512x512 "$out/face.png"
+    magick '${face}' -auto-orient -gravity North -crop '%[w]x%[w]+0+0' +repage -resize 512x512 "$out/face.png"
   '';
 
   pixie =
