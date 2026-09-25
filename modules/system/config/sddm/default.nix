@@ -10,6 +10,11 @@ let
   themeMod = import ../../../home/config/themes/colors/themes.nix { inherit lib; };
   themeSel = themeMod.readSelection ../../../home/config/themes/colors/src/selection;
 
+  # Login avatar. SDDM's greeter runs as the `sddm` user and reads it from
+  # ~/.face, so it is installed by the activation script below (root) along
+  # with the home-dir traversal permission.
+  face = ./src/face.jpg;
+
   pixie =
     let
       base = inputs.pixie-sddm.packages.${pkgs.stdenv.hostPlatform.system}.pixie-sddm.override {
@@ -70,6 +75,17 @@ in
   };
 
   security.pam.services.sddm.enableKwallet = true;
+
+  # picwd uses FilesystemUserModel (UsesAccountsService defaults to false), so
+  # the avatar must be readable by the sddm user at /home/<user>/.face. Install
+  # it from the theme source and make the user's home dir traversable.
+  system.activationScripts.sddm-face = {
+    deps = [ "users" ];
+    text = ''
+      install -m 0644 -o ${config.var.username} -g users ${face} /home/${config.var.username}/.face
+      chmod 0711 /home/${config.var.username}
+    '';
+  };
 
   environment.systemPackages = [ pixie ];
 }

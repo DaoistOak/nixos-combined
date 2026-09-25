@@ -39,20 +39,9 @@
     ];
   };
 
-  # SDDM greeter (and pixie-sddm avatar) reads the user icon from
-  # /var/lib/AccountsService. Populate it from ~/.face on activation.
-  system.activationScripts.accountsservice-face = {
-    deps = [ "users" ];
-    text = ''
-      mkdir -p /var/lib/AccountsService/icons
-      install -m 0644 /home/zeph/.face /var/lib/AccountsService/icons/zeph.jpg
-      cat > /var/lib/AccountsService/users/zeph << 'EOF'
-      [User]
-      Icon=/var/lib/AccountsService/icons/zeph.jpg
-      EOF
-      chown root:root /var/lib/AccountsService/users/zeph
-    '';
-  };
+  # SDDM's greeter (and the pixie-sddm avatar) runs as the `sddm` user and reads
+  # the profile picture from ~/.face; the file + home-dir perms are deployed by
+  # the sddm module's activation script.
 
   environment.variables = {
     EDITOR = "nvim";

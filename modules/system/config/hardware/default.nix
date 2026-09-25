@@ -2,25 +2,44 @@
    config,
    pkgs,
    lib,
+   inputs,
    ...
 }:
 let
-   # Guard: ignore failures when ryzen_smu is missing or /dev/mem is restricted.
-   applyAcPower = pkgs.writeShellScript "apply-ac-power" ''
-     set -u
-     ONLINE="$(cat /sys/class/power_supply/ACAD/online 2>/dev/null || echo 0)"
-     if [ "$ONLINE" = "1" ]; then
-       ${pkgs.ryzenadj}/bin/ryzenadj \
-         --stapm-limit=54000 --fast-limit=60000 --slow-limit=54000 --tctl-temp=95 \
-         2>/dev/null || true
-       echo $((65535 * 60 / 100)) > /sys/class/backlight/amdgpu_bl1/brightness 2>/dev/null || true
-     else
-       ${pkgs.ryzenadj}/bin/ryzenadj \
-         --stapm-limit=25000 --fast-limit=30000 --slow-limit=25000 --tctl-temp=90 \
-         2>/dev/null || true
-       echo $((65535 * 30 / 100)) > /sys/class/backlight/amdgpu_bl1/brightness 2>/dev/null || true
-     fi
-   '';
+# Guard: ignore failures when ryzen_smu is missing or /dev/mem is restricted.
+  applyAcPower = pkgs.writeShellScript "apply-ac-power" ''
+    set -u
+    ONLINE="$(cat /sys/class/power_supply/ACAD/online 2>/dev/null || echo 0)"
+    if [ "$ONLINE" = "1" ]; then
+      ${pkgs.ryzenadj}/bin/ryzenadj \
+        --stapm-limit=54000 --fast-limit=60000 --slow-limit=54000 --tctl-temp=95 \
+        2>/dev/null || true
+      echo $((65535 * 60 / 100)) > /sys/class/backlight/amdgpu_bl1/brightness 2>/dev/null || true
+    else
+      ${pkgs.ryzenadj}/bin/ryzenadj \
+        --stapm-limit=25000 --fast-limit=30000 --slow-limit=25000 --tctl-temp=90 \
+        2>/dev/null || true
+      echo $((65535 * 30 / 100)) > /sys/class/backlight/amdgpu_bl1/brightness 2>/dev/null || true
+    fi
+  '';
+
+  # Active theme selection (single source of truth, same as sddm/themer).
+  themeMod = import ../../../home/config/themes/colors/themes.nix { inherit lib; };
+  themeSel = themeMod.readSelection ../../../home/config/themes/colors/src/selection;
+
+  # NixOS snowflake plymouth theme, recolored to match the theme-changer
+  # accent. The "white" variant ships transparent-bg PNG frames of the wordmark
+  # + lambda arms; -colorize swaps white → accent while keeping the anti-aliased
+  # luminance ramp (and the theme's own dark gradient background).
+  nixosLoadingTheme = pkgs.runCommand "plymouth-nixos-loading-${themeSel.r.accent}" { } ''
+    themeDir="$out/share/plymouth/themes/nixos-loading-white"
+    mkdir -p "$themeDir"
+    cp -r ${inputs.nixos-loading-plymouth.packages.${pkgs.stdenv.hostPlatform.system}.nixos-loading-white}/share/plymouth/themes/nixos-loading-white/* "$themeDir/"
+    for f in "$themeDir"/frame-*.png; do
+      chmod u+w "$f"
+      ${pkgs.imagemagick}/bin/magick "$f" -fill '#${themeSel.r.accent}' -colorize 100 "$f"
+    done
+  '';
 in
 {
   imports = [ ./hardware-configuration.nix ];
@@ -41,6 +60,9 @@ in
   # The previous config had runpm=0 (GPU never sleeps) and gpu_recovery=1 (lockup→recovery→lockup loop)
   # which caused progressive soft lockups escalating 26s→48s→74s→82s until system freeze.
   boot.kernelParams = lib.mkForce [
+    "quiet"
+    "splash"
+    "rd.systemd.show_status=auto"
     "amdgpu.runpm=1"
     "amdgpu.gpu_recovery=0"
     "amdgpu.dcdebugmask=0"
@@ -49,6 +71,15 @@ in
     "zswap.enabled=0"
     "amdgpu.sg_display=0"
   ];
+
+  # Plymouth boot splash (enabled in hardware-configuration.nix). NixOS
+  # snowflake/wordmark theme recolored to the theme-changer accent.
+  boot.plymouth = {
+    theme = "nixos-loading-white";
+    themePackages = [ nixosLoadingTheme ];
+  };
+  boot.consoleLogLevel = 3;
+  boot.initrd.verbose = false;
 
   # Lenovo IdeaPad Slim 5 hardware tweaks
   #

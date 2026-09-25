@@ -61,6 +61,7 @@
       flake = false;
     };
     preload-ng.url = "github:miguel-b-p/preload-ng";
+    nixos-loading-plymouth.url = "github:qboileau/nixos-load-plymouth";
   };
 
   outputs =
