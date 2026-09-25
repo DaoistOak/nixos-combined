@@ -50,6 +50,11 @@ let
           -e 's|color: isCurrent ? container.extractedAccent : "gray"|color: isCurrent ? container.extractedAccent : config.mutedTextColor|' \
           Main.qml
 
+        # Fix avatar: SDDM's IconRole is UserRole+4 (+1 Name, +2 RealName, +3
+        # HomeDir), but pixie reads UserRole+3 (the user's home dir) so the
+        # ~/.face avatar never matches and it falls back to assets/avatar.jpg.
+        sed -i 's/Qt.UserRole + 3/Qt.UserRole + 4/' Main.qml
+
         # The four fallback "white" texts (user label, session name, password,
         # login button) sit on different backgrounds, so match by pixelSize.
         perl -0777 -pi -e '
@@ -83,13 +88,16 @@ in
 
   security.pam.services.sddm.enableKwallet = true;
 
-  # picwd uses FilesystemUserModel (UsesAccountsService defaults to false), so
-  # the avatar must be readable by the sddm user at /home/<user>/.face. Install
-  # it from the theme source and make the user's home dir traversable.
+  # pixie uses SDDM's filesystem user model with UsesAccountsService=false, so
+  # the avatar must be readable by the sddm user. SDDM 0.21 only looks for
+  # ~/.face.icon (checks systemFace first, then <home>/.face.icon) — NOT
+  # ~/.face — so install the image under both names and make the home dir
+  # traversable.
   system.activationScripts.sddm-face = {
     deps = [ "users" ];
     text = ''
       install -m 0644 -o ${config.var.username} -g users ${face} /home/${config.var.username}/.face
+      install -m 0644 -o ${config.var.username} -g users ${face} /home/${config.var.username}/.face.icon
       chmod 0711 /home/${config.var.username}
     '';
   };
