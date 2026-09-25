@@ -56,6 +56,11 @@ let
         # model later yields a valid image URL it resolves to the same file.
         sed -i 's|var s = Qt.resolvedUrl("assets/avatar.jpg");|var s = "file:///home/zeph/.face.icon";|' Main.qml
 
+        # Fix avatar warping: pin the avatar to a square source and center-crop
+        # it in the Canvas, instead of stretching the full photo into the circle.
+        sed -i 's|^                            fillMode: Image.PreserveAspectCrop$|&\n                            sourceSize: Qt.size(120, 120)|' Main.qml
+        sed -i 's#ctx.drawImage(avatar, 0, 0, width, height);#var iw = avatar.sourceSize.width || width;\nvar ih = avatar.sourceSize.height || height;\nvar side = Math.min(iw, ih);\nvar sx = (iw - side) / 2;\nvar sy = (ih - side) / 2;\nctx.drawImage(avatar, sx, sy, side, side, 0, 0, width, height);#' Main.qml
+
         # The four fallback "white" texts (user label, session name, password,
         # login button) sit on different backgrounds, so match by pixelSize.
         perl -0777 -pi -e '
