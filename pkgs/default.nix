@@ -145,8 +145,6 @@ let
     # --- Gaming & Compatibility ---
     gamescope
     goverlay
-    hydralauncher
-    heroic
     lutris
     mangohud
     scrcpy
