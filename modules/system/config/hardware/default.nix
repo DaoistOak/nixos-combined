@@ -30,31 +30,24 @@ in
 
   # Single owner of boot.kernelParams (mkForce): previously this module and
   # boot/default.nix both mkForced it, so they *merged* rather than overriding,
-  # silently dropping hw-config params like amd_pstate=active, amdgpu.dpm=1,
-  # nvme_core.default_ps_max_latency_us, kvm.ignore_msrs and the PSR fix
-  # (dcdebugmask 0x410 → 0) from the actual cmdline.
+  # silently dropping hw-config params (amd_pstate, amdgpu.dpm, kvm.ignore_msrs,
+  # nvme latency, etc.) from the actual cmdline. Restored here EXPLICITLY to the
+  # set that has been verified to boot (the old union) + kvm.ignore_msrs=1.
+  #
+  # NOTE: amd_pstate=active was tried and caused an early-boot hang (no journal
+  # got written) — this IdeaPad never had it applied before. Leave it out.
   #
   # Fix GPU soft lockups: enable runtime PM, disable recovery loop, disable unsafe MMIO
   # The previous config had runpm=0 (GPU never sleeps) and gpu_recovery=1 (lockup→recovery→lockup loop)
   # which caused progressive soft lockups escalating 26s→48s→74s→82s until system freeze.
   boot.kernelParams = lib.mkForce [
-    "quiet"
-    "splash"
-    "loglevel=3"
-    "rd.systemd.show_status=auto"
-    "amd_pstate=active"
-    "amdgpu.dpm=1"
-    # Phoenix (DCN 3.14) PSR/Replay corruption restore: dcdebugmask 0 disables
-    # the artifact-producing paths that the stock 0x410 mask leaves enabled.
-    "amdgpu.dcdebugmask=0"
-    # Cap NVMe wake latency so the disk never enters states that stall I/O.
-    "nvme_core.default_ps_max_latency_us=1000"
     "amdgpu.runpm=1"
     "amdgpu.gpu_recovery=0"
+    "amdgpu.dcdebugmask=0"
+    "kvm.ignore_msrs=1"
+    "kvm.allow_unsafe_mmio_access=0"
     "zswap.enabled=0"
     "amdgpu.sg_display=0"
-    "kvm.allow_unsafe_mmio_access=0"
-    "kvm.ignore_msrs=1"
   ];
 
   # Lenovo IdeaPad Slim 5 hardware tweaks
