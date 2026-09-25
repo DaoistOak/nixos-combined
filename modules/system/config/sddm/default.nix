@@ -10,9 +10,11 @@ let
   themeMod = import ../../../home/config/themes/colors/themes.nix { inherit lib; };
   themeSel = themeMod.readSelection ../../../home/config/themes/colors/src/selection;
 
-  # Login avatar. SDDM's greeter runs as the `sddm` user and reads it from
-  # ~/.face, so it is installed by the activation script below (root) along
-  # with the home-dir traversal permission.
+  # Login avatar. SDDM's greeter runs as the `sddm` user. We seed the profile
+  # picture the standard way — where KDE Plasma and other SDDM greeters expect
+  # it:
+  #   - /var/lib/AccountsService/icons/<user>  (AccountsService icon)
+  #   - ~/.face and ~/.face.icon               (home-dir standard)
   face = ./src/face.jpg;
 
   # Square avatar crop for the login circle: side = min(w,h), centered at
@@ -59,16 +61,12 @@ let
           -e 's|color: isCurrent ? container.extractedAccent : "gray"|color: isCurrent ? container.extractedAccent : config.mutedTextColor|' \
           Main.qml
 
-        # Fix avatar: source the machine-local face image directly in QML. SDDM's
-        # user-model lookup (IconRole = UserRole+4, fs model needs ~/.face.icon)
-        # proved unreliable in practice, so hardcode the initial source. If the
-        # model later yields a valid image URL it resolves to the same file.
-        sed -i 's|var s = Qt.resolvedUrl("assets/avatar.jpg");|var s = "file:///home/zeph/.face.icon";|' Main.qml
-
-        # Fix avatar warping: pin the avatar to a square source and center-crop
-        # it in the Canvas, instead of stretching the full photo into the circle.
-        sed -i 's|^                            fillMode: Image.PreserveAspectCrop$|&\n                            sourceSize: Qt.size(120, 120)|' Main.qml
-        sed -i 's#ctx.drawImage(avatar, 0, 0, width, height);#var iw = avatar.sourceSize.width || width;\nvar ih = avatar.sourceSize.height || height;\nvar side = Math.min(iw, ih);\nvar sx = (iw - side) / 2;\nvar sy = (ih - side) / 2;\nctx.drawImage(avatar, sx, sy, side, side, 0, 0, width, height);#' Main.qml
+        # Fix avatar: SDDM's IconRole is UserRole+4 (roles: +1 Name, +2
+        # RealName, +3 HomeDir, +4 Icon), but pixie reads +3 — the home dir —
+        # so the model icon never matches and it falls back to the bundled
+        # assets/avatar.jpg. Read the right role; the icon itself is resolved
+        # the standard way (see sddm-face activation script below).
+        sed -i 's/Qt.UserRole + 3/Qt.UserRole + 4/' Main.qml
 
         # The four fallback "white" texts (user label, session name, password,
         # login button) sit on different backgrounds, so match by pixelSize.
@@ -93,24 +91,24 @@ in
     ];
     settings.Theme.CursorTheme = "catppuccin-macchiato-light-cursors";
 
-    # AccountsService is installed (pulled in by Plasma) and SDDM defaults to
-    # the AccountsService user model when its daemon is running — but we don't
-    # seed /var/lib/AccountsService, so the greeter never sees icons and pixie
-    # falls back to its bundled default avatar.jpg. Force the filesystem model
-    # so the avatar is read from ~/.face (installed by the activation script).
+    # AccountsService is installed (pulled in by Plasma); keep the filesystem
+    # user model (UsesAccountsService=false) — it resolves icons by priority
+    # FacesDir -> ~/.face.icon -> /var/lib/AccountsService/icons, all seeded
+    # by the sddm-face activation script below.
     settings.Users.UsesAccountsService = false;
   };
 
   security.pam.services.sddm.enableKwallet = true;
 
-  # pixie uses SDDM's filesystem user model with UsesAccountsService=false, so
-  # the avatar must be readable by the sddm user. SDDM 0.21 only looks for
-  # ~/.face.icon (checks systemFace first, then <home>/.face.icon) — NOT
-  # ~/.face — so install the image under both names and make the home dir
-  # traversable.
+  # Seed the profile picture at the standard locations the greeter's user model
+  # resolves (priority: SDDM FacesDir -> ~/.face.icon -> AccountsService icon
+  # dir), exactly like KDE Plasma's user manager does. Also keep the home dir
+  # traversable for the sddm user.
   system.activationScripts.sddm-face = {
     deps = [ "users" ];
     text = ''
+      install -d -m 0755 /var/lib/AccountsService/icons
+      install -m 0644 -o ${config.var.username} -g users ${faceSq}/face.png /var/lib/AccountsService/icons/${config.var.username}
       install -m 0644 -o ${config.var.username} -g users ${face} /home/${config.var.username}/.face
       install -m 0644 -o ${config.var.username} -g users ${faceSq}/face.png /home/${config.var.username}/.face.icon
       chmod 0711 /home/${config.var.username}
