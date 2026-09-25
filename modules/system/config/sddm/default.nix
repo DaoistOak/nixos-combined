@@ -15,15 +15,13 @@ let
   # with the home-dir traversal permission.
   face = ./src/face.jpg;
 
-  # Square avatar crop for the login circle. The source is a full-body portrait
-  # (736x1472) on a solid background, so a plain center crop lands on the torso
-  # (face cut off, looks zoomed). Anchor the square at the top full width to
-  # keep head + shoulders, centered horizontally.
+  # Square avatar crop for the login circle: side = min(w,h), centered at
+  # (w/2, h/2) — the canonical center square.
   faceSq = pkgs.runCommand "face-square" {
     nativeBuildInputs = [ pkgs.imagemagick ];
   } ''
     mkdir -p $out
-    magick '${face}' -auto-orient -gravity North -crop '%[w]x%[w]+0+0' +repage -resize 512x512 "$out/face.png"
+    magick '${face}' -auto-orient -crop '%[fx:min(w,h)]x%[fx:min(w,h)]+%[fx:(w-min(w,h))/2]+%[fx:(h-min(w,h))/2]' +repage -resize 512x512 "$out/face.png"
   '';
 
   pixie =
