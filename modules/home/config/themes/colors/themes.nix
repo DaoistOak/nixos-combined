@@ -294,6 +294,15 @@ let
       builtins.split " " (builtins.replaceStrings [ "\n" ] [ "" ] s)
     );
 
+  # The home-manager catppuccin module (and therefore the accent name
+  # scripts/theme writes into src/selection for Stylix) uses catppuccin/nvim's
+  # accent list, which names one color differently from the database above.
+  # Resolve those aliases to the same hex instead of falling through to the
+  # "unknown accent" branch, which silently picked the first accent (blue).
+  accentAliases = {
+    sky = "cyan";
+  };
+
   # Resolve a raw variant slot into normalized roles given a chosen accent name.
   # Returns raw hex (no '#'). Supports custom hex accents ("#aabbcc" / "aabbcc")
   # in addition to named accents from the palette.
@@ -301,9 +310,10 @@ let
     v: accent:
     let
       stripped = stripHash accent;
+      lookup = if v.accents ? ${accent} then accent else accentAliases.${accent} or accent;
       resolvedAccent =
-        if v.accents ? ${accent} then
-          v.accents.${accent}
+        if v.accents ? ${lookup} then
+          v.accents.${lookup}
         else if accent == "default" then
           v.text
         else if isHex accent then
@@ -314,7 +324,7 @@ let
     {
       polarity = v.polarity;
       title = v.title;
-      accentName = if (v.accents ? ${accent}) || accent == "default" then accent else stripped;
+      accentName = if (v.accents ? ${lookup}) || accent == "default" then accent else stripped;
       accent = resolvedAccent;
       inherit (v)
         base
@@ -394,7 +404,9 @@ let
         let
           a = part 2;
         in
-        if a != "" && (a == "default" || builtins.hasAttr a accentsOf || isHex a) then
+        if
+          a != "" && (a == "default" || builtins.hasAttr a accentsOf || accentAliases ? ${a} || isHex a)
+        then
           a
         else
           defaults.accent;

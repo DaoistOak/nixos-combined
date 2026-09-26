@@ -99,6 +99,31 @@ in
   # explicitly: colors/base16.vim requires it while applying the colorscheme.
   xdg.configFile."nvim/lua/theme.lua".source = ./src/nvim/lua/theme.lua;
 
+  # lazyvim-nix only ever *adds* to ~/.config/nvim: a file that is removed or
+  # renamed in src/nvim keeps its old symlink and is still sourced at startup.
+  # A leftover lua/matugen.lua + lua/plugins/base16.lua pair from the matugen
+  # era did exactly that and re-applied its own hardcoded palette over the
+  # theme-switcher one on every launch, so the theme only looked right after a
+  # :ThemeReload. Every managed file in these directories is a store symlink, so
+  # a regular file there is always a leftover.
+  home.activation.nvimPruneStaleConfig =
+    lib.hm.dag.entryAfter
+      [
+        "writeBoundary"
+      ]
+      ''
+        for dir in "$HOME/.config/nvim/lua" "$HOME/.config/nvim/colors"; do
+          [[ -d "$dir" ]] || continue
+          # A NUL delimiter keeps the read safe for odd file names, and the
+          # $'\\0' form is used because two single quotes in a row would close
+          # this Nix indented string.
+          while IFS= read -r -d $'\0' f; do
+            $DRY_RUN_CMD rm -f "$f"
+            echo "removed stale nvim config file: $f"
+          done < <(find "$dir" -type f -print0)
+        done
+      '';
+
   # Stylix's neovim target injects a build-time palette into the generated
   # init.lua. nvim is themed from the tracked selection through the runtime
   # palette instead (lua/theme.lua + scripts/theme), which is the same palette
