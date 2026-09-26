@@ -71,6 +71,10 @@ in
     wezterm.enable = false;
     ghostty.enable = false;
     tmux.enable = false;
+    # nvim is themed from the tracked selection too, but through the base16
+    # palette in lua/theme.lua (so `theme set` can recolor it live) instead of
+    # a generated `colorscheme catppuccin` line in init.lua.
+    nvim.enable = false;
   };
 
   xdg.configFile."gtk-3.0/gtk.css".force = true;

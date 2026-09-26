@@ -2,43 +2,146 @@
   pkgs,
   inputs,
   lib,
-  config,
   ...
 }:
 let
-  repoLockPath = "${config.var.configDirectory}/modules/home/config/modules/nvim/src/nvim/lazy-lock.json";
+  # Store paths for plugins lazy.nvim would otherwise clone, as `dir` is what
+  # dev mode ends up using anyway. Two reasons a plugin ends up here: the module
+  # only builds its dev path from plugins it can find in the *live* config dir
+  # (~/.config/nvim/lua/plugins), and a flake eval is pure and cannot read paths
+  # outside the store, so that scan always comes back empty and anything declared
+  # in src/nvim/lua/plugins is invisible to it. The two LazyVim plugins at the
+  # end fail for the opposite reason: catppuccin/nvim is linked into the dev path
+  # as "nvim" while lazy.nvim knows that plugin as "catppuccin" (lazy.nvim names
+  # a bare "<owner>/nvim" repo after its owner), and friendly-snippets does not
+  # resolve to a nixpkgs package by name. The hand-written spec files still
+  # provide opts/keys, which merge on top of the generated one.
+  nixLinkedPlugins = {
+    "AckslD/nvim-neoclip.lua" = {
+      package = "nvim-neoclip-lua";
+    };
+    "kkharji/sqlite.lua" = {
+      package = "sqlite-lua";
+    };
+    "nvim-telescope/telescope.nvim" = {
+      package = "telescope-nvim";
+    };
+    "folke/base16-nvim" = {
+      package = "base16-nvim";
+    };
+    # LazyVim v16 defaults to blink.cmp; the module only tracks it through the
+    # coding.blink extra, so it is not in the dev path either.
+    "saghen/blink.cmp" = {
+      package = "blink-cmp";
+    };
+    "saghen/blink-copilot" = {
+      package = "blink-copilot";
+    };
+    "catppuccin/nvim" = {
+      package = "catppuccin-nvim";
+      name = "catppuccin";
+    };
+    "rafamadriz/friendly-snippets" = {
+      package = "friendly-snippets";
+    };
+  };
 in
 {
-  imports = [ inputs.nvnix.homeManagerModules.nvnix ];
+  imports = [ inputs.lazyvim.homeManagerModules.default ];
 
-  programs.nvchad = {
+  programs.lazyvim = {
     enable = true;
-    package = pkgs.neovim;
-    starterConfig = ./src/nvim;
-    lazyLock = ./src/nvim/lazy-lock.json;
-    backup = false;
-    desktopEntry.enable = false;
+
+    # Everything comes from nixpkgs (including plugins that LazyVim does not
+    # pin, like the ones declared in lua/plugins). With "latest" the module
+    # builds unpinned plugins from GitHub HEAD at eval time, and the plugins
+    # added in lua/plugins/ have no version metadata at all, so they would not
+    # resolve to a store path and lazy.nvim would clone them on first launch.
+    pluginSource = "nixpkgs";
+
+    # Shipped verbatim: config/ -> lua/config, plugins/ -> lua/plugins,
+    # colors/ -> runtime colorscheme entry point, lua/ -> lua/.
+    # These files have to be tracked by git: nix copies a dirty flake tree with
+    # git semantics, so untracked files are missing from the store copy and the
+    # module's builtins.pathExists check on this directory would fail.
+    configFiles = ./src/nvim;
+
+    extras = {
+      ai.copilot.enable = true;
+      ai.copilot-chat.enable = true;
+      lang.nix.enable = true;
+    };
+
+    # LazyVim's core treesitter spec asks for css (used by the html/cssls
+    # servers below) but only extras like lang.astro pull it in, so pin it.
+    treesitterParsers = with pkgs.vimPlugins.nvim-treesitter-parsers; [ css ];
+
+    # LSP servers + formatters. Mason is disabled by the module, so every tool
+    # a server or formatter shells out to has to come from Nix.
+    extraPackages = with pkgs; [
+      copilot-language-server
+      lua-language-server
+      nixd
+      nixfmt
+      statix
+      stylua
+      vscode-langservers-extracted
+    ];
   };
+
+  # base16-nvim is declared in src/nvim/lua/plugins/base16-nvim.lua instead of
+  # programs.neovim.plugins: lazy.nvim resets the runtimepath at startup
+  # (performance.rtp.reset), so Home Manager's pack/*/start links never make it
+  # into the runtimepath and the colorscheme would not find the module.
+
+  # configFiles only keeps lua/config/{keymaps,options,autocmds}.lua,
+  # lua/plugins/*.lua and the runtime dirs, so the theme helper is linked
+  # explicitly: colors/base16.vim requires it while applying the colorscheme.
+  xdg.configFile."nvim/lua/theme.lua".source = ./src/nvim/lua/theme.lua;
+
+  # Stylix's neovim target injects a build-time palette into the generated
+  # init.lua. nvim is themed from the tracked selection through the runtime
+  # palette instead (lua/theme.lua + scripts/theme), which is the same palette
+  # but switchable at runtime, so drop the injected block.
+  stylix.targets.neovim.enable = false;
 
   home.packages = lib.mkDefault [
     pkgs.stylua
     pkgs.lua-language-server
+    # Keeps lua/config/nix.lua's sqlite_clib path alive in the profile.
+    pkgs.sqlite
   ];
 
-  # After the nvchad config is copied into place, headlessly update the lazy.nvim
-  # plugins so a switch also upgrades Neovim plugins, then copy the freshly
-  # rewritten lockfile back into the repo so `updt` commits the new pins.
-  home.activation.updateNvimPlugins = lib.hm.dag.entryAfter [ "copyNvchadConfig" ] ''
-    launcher=( "${lib.getExe config.programs.nvchad.finalPackage}" --headless "+Lazy! update" +qa )
-    if PATH="${pkgs.gnumake}/bin:${pkgs.curl}/bin:${pkgs.python3}/bin:${pkgs.git}/bin:$PATH" \
-      ''${launcher[@]} >/dev/null 2>&1; then
-      if [ -f "${config.home.homeDirectory}/.config/nvim/lazy-lock.json" ]; then
-        ${pkgs.coreutils}/bin/cp \
-          "${config.home.homeDirectory}/.config/nvim/lazy-lock.json" \
-          "${repoLockPath}"
-      fi
-    else
-      echo "warning: nvim headless Lazy update failed; keeping existing pins"
-    fi
-  '';
+  # Store paths that cannot be discovered at runtime: nvim-neoclip's backend
+  # needs the sqlite C library, and nix has no neovim built with it in.
+  xdg.configFile."nvim/lua/config/nix.lua" = {
+    text = ''
+      -- Generated by modules/home/config/modules/nvim.
+      return {
+        sqlite_clib = "${lib.getLib pkgs.sqlite}/lib/libsqlite3.so.0";
+      }
+    '';
+  };
+
+  # Store paths for the plugins lazy.nvim would otherwise clone (see
+  # nixLinkedPlugins above).
+  xdg.configFile."nvim/lua/plugins/zz-nixpkgs.lua" = {
+    text = ''
+      -- Generated by modules/home/config/modules/nvim. Sorted last so it merges
+      -- after the hand-written spec files, which only add opts/keys on top of
+      -- `dir`.
+      return {
+      ${lib.concatStringsSep "\n" (
+        map (
+          repo:
+          let
+            entry = nixLinkedPlugins.${repo};
+            name = lib.optionalString (entry ? name) ", name = \"${entry.name}\"";
+          in
+          "  { \"${repo}\"${name}, dir = \"${pkgs.vimPlugins.${entry.package}}\" },"
+        ) (lib.attrNames nixLinkedPlugins)
+      )}
+      }
+    '';
+  };
 }

@@ -1,12 +1,12 @@
 {
-   config,
-   pkgs,
-   lib,
-   inputs,
-   ...
+  config,
+  pkgs,
+  lib,
+  inputs,
+  ...
 }:
 let
-# Guard: ignore failures when ryzen_smu is missing or /dev/mem is restricted.
+  # Guard: ignore failures when ryzen_smu is missing or /dev/mem is restricted.
   applyAcPower = pkgs.writeShellScript "apply-ac-power" ''
     set -u
     ONLINE="$(cat /sys/class/power_supply/ACAD/online 2>/dev/null || echo 0)"
@@ -31,9 +31,14 @@ let
   # these via boot.kernelParams, but this module is the single mkForce owner of
   # that list, so the palette args must be spelled out here or the TTY keeps the
   # default VGA colors.
-  vtChannels = builtins.map (
-    i: builtins.concatStringsSep "," (map (c: "0x${builtins.substring (i * 2) 2 c}") themeSel.r.ansi)
-  ) [ 0 1 2 ];
+  vtChannels =
+    builtins.map
+      (i: builtins.concatStringsSep "," (map (c: "0x${builtins.substring (i * 2) 2 c}") themeSel.r.ansi))
+      [
+        0
+        1
+        2
+      ];
 
   # NixOS snowflake plymouth theme, recolored to match the theme-changer
   # accent. The "white" variant ships transparent-bg PNG frames of the wordmark
@@ -42,7 +47,9 @@ let
   nixosLoadingTheme = pkgs.runCommand "plymouth-nixos-loading-${themeSel.r.accent}" { } ''
     themeDir="$out/share/plymouth/themes/nixos-loading-white"
     mkdir -p "$themeDir"
-    cp -r ${inputs.nixos-loading-plymouth.packages.${pkgs.stdenv.hostPlatform.system}.nixos-loading-white}/share/plymouth/themes/nixos-loading-white/* "$themeDir/"
+    cp -r ${
+      inputs.nixos-loading-plymouth.packages.${pkgs.stdenv.hostPlatform.system}.nixos-loading-white
+    }/share/plymouth/themes/nixos-loading-white/* "$themeDir/"
     for f in "$themeDir"/frame-*.png; do
       chmod u+w "$f"
       ${pkgs.imagemagick}/bin/magick "$f" -fill '#${themeSel.r.accent}' -colorize 100 "$f"
@@ -81,6 +88,13 @@ in
     "kvm.allow_unsafe_mmio_access=0"
     "zswap.enabled=0"
     "amdgpu.sg_display=0"
+    # boot.resumeDevice lives in ../boot/default.nix, but nixpkgs only turns it
+    # into a `resume=` cmdline param at normal priority — which this mkForce
+    # discards. Without it, resume depends entirely on the HibernateLocation
+    # EFI variable that the initrd's hibernate-resume generator reads; if the
+    # firmware doesn't keep it, hibernate silently fails to resume. Re-state it
+    # here so the param is actually on the cmdline.
+    "resume=UUID=c90cb3d2-feba-424e-a25b-146d24f9bd0d"
   ];
 
   # Plymouth boot splash (enabled in hardware-configuration.nix). NixOS

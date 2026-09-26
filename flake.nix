@@ -26,8 +26,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hyprland.url = "github:hyprwm/Hyprland/5c9377c15f85c50648f35ca5a213754f95b93ca0"; # v0.56.1 (has input.keyboard.key event AND activeWorkspace.id for noctalia)
-    nvnix = {
-      url = "github:aguirre-matteo/nvnix";
+    lazyvim = {
+      # LazyVim home-manager module (programs.lazyvim). Plugin versions come
+      # from nixpkgs; LazyVim itself is the nixpkgs vimPlugins.LazyVim package.
+      url = "github:pfassina/lazyvim-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     pixie-sddm.url = "github:xCaptaiN09/pixie-sddm";
