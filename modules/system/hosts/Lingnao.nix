@@ -29,17 +29,22 @@
     ];
   };
 
-  flake.homeConfigurations."zeph" = inputs.home-manager.lib.homeManagerConfiguration {
-    pkgs = import inputs.nixpkgs {
-      system = "x86_64-linux";
-      config.allowUnfree = true;
-      overlays = (import ../../../overlays/overlays.nix { inherit inputs; }).home;
-    };
-    extraSpecialArgs = { inherit inputs; };
-    modules = [
-      ../../home/base/default.nix
-      inputs.catppuccin.homeModules.catppuccin
-      inputs.stylix.homeModules.stylix
-    ];
-  };
+  # homeConfigurations must have type = "homeManagerConfiguration" (string)
+  # for `nh home build` to work. Older home-manager versions set this automatically;
+  # home-manager 4.4.2 does not, so we set it here.
+  flake.homeConfigurations."zeph" =
+    let cfg = inputs.home-manager.lib.homeManagerConfiguration {
+      pkgs = import inputs.nixpkgs {
+        system = "x86_64-linux";
+        config.allowUnfree = true;
+        overlays = (import ../../../overlays/overlays.nix { inherit inputs; }).home;
+      };
+      extraSpecialArgs = { inherit inputs; };
+      modules = [
+        ../../home/base/default.nix
+        inputs.catppuccin.homeModules.catppuccin
+        inputs.stylix.homeModules.stylix
+      ];
+    }; in
+    builtins.removeAttrs cfg [ "type" ] // { type = "homeManagerConfiguration"; };
 }

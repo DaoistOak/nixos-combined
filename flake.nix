@@ -75,6 +75,7 @@
       ]
       ++ [
         ./modules/system/hosts/Lingnao.nix
+        inputs.home-manager.flakeModules.home-manager
       ];
     };
 }

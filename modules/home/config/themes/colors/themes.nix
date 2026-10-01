@@ -373,6 +373,26 @@ let
       base0D = h r.accent; # Stylix' primary accent (matches the old override)
       base0E = h (a "mauve" (a "purple" (ansi 5)));
       base0F = h (a "flamingo" (a "maroon" (ansi 9)));
+
+      # The named roles are emitted alongside the base16 slots so consumers can
+      # layer backgrounds by name. base16 collapses the 4-step neutral ramp
+      # (crust/mantle/base/surface0) onto base00..base02, which leaves no way to
+      # give the editor, the bufferline bar and the file explorer distinct
+      # backgrounds. base16-nvim only reads base0[0-9A-F], so these extra keys
+      # are inert there and are consumed by nvim's lua/theme.lua.
+      crust = h r.crust;
+      mantle = h r.mantle;
+      base = h r.base;
+      surface0 = h r.surface0;
+      surface1 = h r.surface1;
+      surface2 = h r.surface2;
+      overlay0 = h r.overlay0;
+      overlay1 = h r.overlay1;
+      overlay2 = h r.overlay2;
+      subtext0 = h r.subtext0;
+      subtext1 = h r.subtext1;
+      text = h r.text;
+      accent = h r.accent;
     };
 
   # Read the persisted theme selection ("theme flavor accent") from a repo

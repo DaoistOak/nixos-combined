@@ -12,6 +12,23 @@ require("theme").setup()
 -- colors/base16.vim -> lua/theme.lua
 require("lazyvim.config").colorscheme = "base16"
 
+-- Soft wrap. LazyVim's options set `opt.wrap = false`, so a line wider than the
+-- window scrolls sideways and the rest of the sentence is off screen. This file
+-- is loaded by lazyvim.config.load("options") *after* lazyvim.config.options, so
+-- these win: it is not a plugin spec, because a spec named "options" is a plugin
+-- lazy would try to install.
+-- `linebreak` (already on in LazyVim) breaks at word boundaries rather than
+-- mid-word and `breakindent` keeps continuation lines at the indent of the line
+-- they came from instead of column zero. `sbr` puts the showbreak marker at the
+-- left of the indent rather than after it, and `min` stops a line indented near
+-- the right border from eating vertical space. Drop the last three to wrap
+-- plainly. `<leader>uw` still toggles wrap per session.
+vim.opt.wrap = true
+vim.opt.linebreak = true
+vim.opt.breakindent = true
+vim.opt.breakindentopt = "sbr,min:20"
+vim.opt.showbreak = "󰌑 "
+
 -- nvim-neoclip's sqlite backend needs the C library, which nvim does not have
 -- built in. lua/config/nix.lua is generated from pkgs.sqlite3, so point at it
 -- right away; the profile glob is only a fallback for an editor started from
