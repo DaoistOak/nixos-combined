@@ -24,16 +24,21 @@ local sep_right = glyph(0xE0B6)
 local cap_left = glyph(0xE0B6)
 local cap_right = glyph(0xE0B4)
 
--- The caps are static highlight groups instead of components that resolve their
--- own colour on every redraw. lualine builds the whole statusline string *before*
--- drawing it, so a component calling nvim_set_hl while the string is composed
--- leaves neovide (which composites its own glyph atlas against the groups it saw
--- at the start of the frame) painting the caps in the foreground colour, over and
--- over. theme.lua derives StatusLineCapLeft/Right from the palette, next to the
--- blocks they join, and regenerates them on ThemeReload.
+-- Caps switch pre-built highlight groups (theme.lua). Do not call nvim_set_hl
+-- while the statusline string is composed: neovide caches groups for the frame.
 local function cap_component(glyph, group)
 	return {
 		"%#" .. group .. "#" .. glyph,
+		padding = { left = 0, right = 0 },
+		separator = "",
+	}
+end
+
+local function mode_cap(glyph)
+	return {
+		function()
+			return "%#StatusLineCap_" .. require("theme").lualine_mode() .. "#" .. glyph
+		end,
 		padding = { left = 0, right = 0 },
 		separator = "",
 	}
@@ -69,7 +74,7 @@ return {
 
 			opts.sections.lualine_a = opts.sections.lualine_a or {}
 			opts.sections.lualine_z = opts.sections.lualine_z or {}
-			table.insert(opts.sections.lualine_a, 1, cap_component(cap_left, "StatusLineCapLeft"))
+			table.insert(opts.sections.lualine_a, 1, mode_cap(cap_left))
 			table.insert(opts.sections.lualine_z, cap_component(cap_right, "StatusLineCapRight"))
 			require("lualine").setup(opts)
 		end,

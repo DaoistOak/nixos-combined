@@ -215,35 +215,58 @@ local function apply_overrides(p)
 	set({ "WhichKeyValue", "WhichKeyBorder" }, { fg = c.text, bg = c.surface0 })
 	set({ "WhichKeyIcon", "WhichKeyIconAzure" }, { fg = c.accent, bg = c.surface0 })
 
-	local mode_colours = {
-		normal = c.text,
+	-- Mode pill NORMAL: label stays on `text`; only the fill changes.
+	local mode_fills = {
+		normal = c.accent,
 		insert = c.base0B,
 		visual = c.base0E,
 		replace = c.base08,
 		command = c.base0F,
 		terminal = c.base0C,
-		inactive = c.overlay0,
+		inactive = c.surface0,
 	}
 	M.lualine = {}
-	for mode, fg in pairs(mode_colours) do
+	for mode, fill in pairs(mode_fills) do
 		local inactive = mode == "inactive"
+		local bg = inactive and c.surface0 or mix(c.base, fill, 0.7)
 		M.lualine[mode] = {
-			a = {
-				fg = fg,
-				bg = inactive and c.surface0 or mix(c.surface0, fg, 0.4),
-				bold = not inactive,
-			},
+			a = { fg = c.text, bg = bg, bold = not inactive },
 			b = { fg = c.subtext0, bg = c.surface0 },
 			c = { fg = c.text, bg = c.surface0 },
 			x = { fg = c.subtext0, bg = c.surface0 },
 			y = { fg = c.subtext0, bg = c.surface0 },
 			z = { fg = c.subtext0, bg = c.surface0 },
 		}
+		hi("StatusLineCap_" .. mode, { fg = bg, bg = inactive and c.mantle or c.base })
 	end
 	hi("StatusLine", { fg = c.subtext0, bg = c.base })
 	hi("StatusLineNC", { fg = c.overlay0, bg = c.mantle })
-	hi("StatusLineCapLeft", { fg = c.surface0, bg = c.base })
 	hi("StatusLineCapRight", { fg = c.surface0, bg = c.base })
+end
+
+local mode_names = {
+	n = "normal",
+	no = "normal",
+	nov = "normal",
+	i = "insert",
+	ic = "insert",
+	ix = "insert",
+	v = "visual",
+	V = "visual",
+	["\22"] = "visual",
+	s = "visual",
+	S = "visual",
+	["\19"] = "visual",
+	R = "replace",
+	Rv = "replace",
+	c = "command",
+	cv = "command",
+	ce = "command",
+	t = "terminal",
+}
+
+function M.lualine_mode()
+	return mode_names[vim.fn.mode()] or "normal"
 end
 
 function M.lualine_theme()
