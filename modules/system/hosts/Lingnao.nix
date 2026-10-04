@@ -13,6 +13,7 @@
       ../users/zeph/default.nix
       ../config/desktop/default.nix
       ../config/pkgs/default.nix
+      ../config/browser/default.nix
       ../config/sddm/default.nix
       ../config/themes/default.nix
       ../config/hardware
@@ -33,18 +34,20 @@
   # for `nh home build` to work. Older home-manager versions set this automatically;
   # home-manager 4.4.2 does not, so we set it here.
   flake.homeConfigurations."zeph" =
-    let cfg = inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = import inputs.nixpkgs {
-        system = "x86_64-linux";
-        config.allowUnfree = true;
-        overlays = (import ../../../overlays/overlays.nix { inherit inputs; }).home;
+    let
+      cfg = inputs.home-manager.lib.homeManagerConfiguration {
+        pkgs = import inputs.nixpkgs {
+          system = "x86_64-linux";
+          config.allowUnfree = true;
+          overlays = (import ../../../overlays/overlays.nix { inherit inputs; }).home;
+        };
+        extraSpecialArgs = { inherit inputs; };
+        modules = [
+          ../../home/base/default.nix
+          inputs.catppuccin.homeModules.catppuccin
+          inputs.stylix.homeModules.stylix
+        ];
       };
-      extraSpecialArgs = { inherit inputs; };
-      modules = [
-        ../../home/base/default.nix
-        inputs.catppuccin.homeModules.catppuccin
-        inputs.stylix.homeModules.stylix
-      ];
-    }; in
+    in
     builtins.removeAttrs cfg [ "type" ] // { type = "homeManagerConfiguration"; };
 }

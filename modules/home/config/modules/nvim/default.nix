@@ -74,7 +74,26 @@ in
 
     # LazyVim's core treesitter spec asks for css (used by the html/cssls
     # servers below) but only extras like lang.astro pull it in, so pin it.
-    treesitterParsers = with pkgs.vimPlugins.nvim-treesitter-parsers; [ css ];
+    # The rest are the parsers LazyVim's ensure_installed wants but that are not
+    # in the module's dev path: the extras live in ~/.config/nvim/lazyvim.json
+    # (lang.cmake, util.dot, test.core, ...), and lazyvim-nix's Nix stub prints a
+    # "parsers are managed by Nix; runtime installation is disabled" notice plus
+    # a list of everything missing. Anything not named here silently falls back
+    # to regex highlighting.
+    treesitterParsers = with pkgs.vimPlugins.nvim-treesitter-parsers; [
+      cmake
+      css
+      fish
+      git_config
+      git_rebase
+      gitattributes
+      gitcommit
+      gitignore
+      graphql
+      http
+      hyprlang
+      rasi
+    ];
 
     # LSP servers + formatters. Mason is disabled by the module, so every tool
     # a server or formatter shells out to has to come from Nix.

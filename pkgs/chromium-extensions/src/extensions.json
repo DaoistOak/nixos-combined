@@ -1,0 +1,38 @@
+{
+  "keepassxcBrowser": {
+    "description": "KeePassXC-Browser",
+    "source": "release-asset",
+    "owner": "keepassxreboot",
+    "repo": "keepassxc-browser",
+    "tag": "1.10.4",
+    "version": "1.10.4",
+    "asset": "keepassxc-browser_{version}_chromium.zip",
+    "url": "https://github.com/keepassxreboot/keepassxc-browser/releases/download/1.10.4/keepassxc-browser_1.10.4_chromium.zip",
+    "hash": "sha256-1beA4ohw3rjaJgMRvxQaw6eojRQrS55cWBVicMEOo/c=",
+    "extensionId": "dgnpnhdihelhjhonmdlinoooffpgnnmd",
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtUhiDJPFulzpp+tYerlewd4ZKJDf3dWUS25TOfDQm9VJ7vdO6YadbbshlNHADy8C2E7Dw7z7oXCESZU+aDvrQTTvs8uAn1jPzbVFZlrYkxQxEmV28PUsO4Fq4+MsIEaNQnwVc3KJyh0liRHBOpkkfyrFxRee2XTIUP6/uh6sIu/vmmsxFCcJICrgbFuX4+sSqXxvRr3IcyB2pS8BmgOEFhnqbTLmn1GgUtzuW7p9CeikImgYxDGiFzq03z7P019YxCPeCj7P37dqZqnNlJWQAqk63qYeUnNDYevFyyhuG+Da+OQDL8RcrttvRrpyHFrmuSjqUazBs51weA5TOpCICQIDAQAB"
+  },
+  "plasmaIntegration": {
+    "description": "Plasma Integration",
+    "source": "tag-tarball",
+    "owner": "KDE",
+    "repo": "plasma-browser-integration",
+    "tag": "v6.7.91",
+    "version": "6.7.91",
+    "url": "https://github.com/KDE/plasma-browser-integration/archive/refs/tags/v6.7.91.tar.gz",
+    "hash": "sha256-aar3zfs90nNjLApCLAcbFE8wN1kCjWtXGf8Z+Ejixjc=",
+    "extensionId": "onghfpjfjchahfihmdblgcnncpifnlgp",
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoJT3q+r2ejL6U7qZggjujNlbmflp3nTX9w9S2MxzaFLJ36fhsK/qJv9WTkR6HPQazngeEz204TqP+xusakc8uIX9Nyj11VQT1g1ITIziU2i2naX3NpnYh+xGjt+kHfQr7GF6ODNgVL1p4issftZ9FNAf7+tJMm3TcExud1WghQ3u2LkF1/kNdBor9/5+wnaWFxQcRtbOIFibeWvZwOkmXbhSBCp4l1M8WN/k5TcGthHKqJHX1w0X2gHeaIo/8I9Sk5cpea7eKgRtgs+D9wTpsDB95FCeVrjYCcFyP02KSEPh9WnV6DhjfFUle+raDiBiwCRc/zXLVqujswFSULQWZQIDAQAB"
+  },
+  "stylus": {
+    "description": "Stylus",
+    "source": "release-asset",
+    "owner": "openstyles",
+    "repo": "stylus",
+    "tag": "v2.4.14",
+    "version": "2.4.14",
+    "asset": "stylus-chrome-mv3-v{version}-id.zip",
+    "url": "https://github.com/openstyles/stylus/releases/download/v2.4.14/stylus-chrome-mv3-v2.4.14-id.zip",
+    "hash": "sha256-IEqjuoyZ2YtxYHtjTryqQDL4ac6brDKj6lBGYMWxwD0="
+  }
+}

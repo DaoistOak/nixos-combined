@@ -1,0 +1,82 @@
+# Global user stylesheet.
+#
+# Chromium has no Firefox-style user.css support (the browser binary has no
+# --user-style-sheet switch), so this file is injected into every page by the
+# local "User CSS" extension built in pkgs/chromium-extensions.
+#
+# Keep it small and non-destructive: page-specific theming belongs in Stylus, and
+# anything that sets `background` or `color` on `html`/`body` tends to fight the
+# site's own styles.
+:root {
+  /* Colourless accents: inherit from the page instead of hardcoding. */
+  --user-selection-tint: color-mix(in srgb, currentColor 22%, transparent);
+}
+
+::selection {
+  background-color: var(--user-selection-tint);
+  color: inherit;
+}
+
+/* Keyboard users get a visible ring; pointer users don't. */
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Firefox-style dotted keyboard focus for text fields, so tabbing through forms
+   is obvious without changing any colours. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 1px dashed currentColor;
+  outline-offset: 1px;
+}
+
+/* Respect the OS setting, but make in-page anchors glide instead of jumping. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  html:focus-within {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Kill the caret-blink animation flash for people sensitive to it. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Form controls should inherit the page's font instead of the UA default,
+   which looks broken next to surrounding text. */
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Long URLs and ids in tables shouldn't blow out the layout. */
+pre,
+code,
+samp {
+  overflow-wrap: anywhere;
+}
+
+/* Print: drop the sticky cruft most sites forget to hide. */
+@media print {
+  nav,
+  aside,
+  [role="navigation"],
+  [role="complementary"] {
+    display: none !important;
+  }
+}

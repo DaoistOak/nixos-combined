@@ -28,6 +28,15 @@ vim.opt.linebreak = true
 vim.opt.breakindent = true
 vim.opt.breakindentopt = "sbr,min:20"
 vim.opt.showbreak = "󰌑 "
+-- `sbr` alone puts the showbreak at the text column, i.e. after the number
+-- column and after any indent. `:h 'showbreak'`: "If you want the 'showbreak' to
+-- appear in between line numbers, add the `n` flag to 'cpoptions'" — that is the
+-- 'cpo-n' flag, which makes wrapped lines use the number column as well. So the
+-- marker lands in the gutter instead of pushing the text right:
+--
+--   1|some very long line that
+--   󰌑 |wraps onto a second screen line
+vim.opt.cpo:append("n")
 
 -- nvim-neoclip's sqlite backend needs the C library, which nvim does not have
 -- built in. lua/config/nix.lua is generated from pkgs.sqlite3, so point at it

@@ -36,6 +36,10 @@ err()    { echo -e "${RED}❌${NC} $1"; }
 
 notify() {
     local title="$1" message="$2" urgency="${3:-normal}"
+    # notify-send needs a session bus, so stay quiet when run from a timer.
+    if [[ -z "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]]; then
+        return 0
+    fi
     if command -v notify-send >/dev/null 2>&1; then
         notify-send -u "$urgency" "$title" "$message" >/dev/null 2>&1 || true
     fi
@@ -213,6 +217,160 @@ listgen() {
     fi
 }
 
+# --- Chromium extensions -------------------------------------------------------
+# Extensions live as unpacked directories loaded via --load-extension (see
+# pkgs/chromium-extensions). Chromium cannot update unpacked extensions itself,
+# so upstream pins in $EXT_PINS are bumped here instead.
+EXT_PINS="pkgs/chromium-extensions/src/extensions.json"
+# Unauthenticated GitHub API calls are capped at 60/h; a token raises that.
+GITHUB_TOKEN_FILE="$FLAKE_PATH/.github_token"
+EXT_QUERY_ERRORS=0
+
+ext_is_newer() {
+    [[ "$1" != "$2" ]] && [[ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | tail -n1)" == "$2" ]]
+}
+
+ext_latest_tag() {
+    local owner="$1" repo="$2" source="$3"
+    if [[ "$source" == "tag-tarball" ]]; then
+        git ls-remote --tags --refs --sort=-v:refname "https://github.com/$owner/$repo" 2>/dev/null |
+            awk 'NR == 1 { sub(/^refs\/tags\//, "", $2); print $2 }'
+        return
+    fi
+
+    local -a headers=(-H "Accept: application/vnd.github+json")
+    local token="${GITHUB_TOKEN:-}"
+    if [[ -z "$token" && -r "$GITHUB_TOKEN_FILE" ]]; then
+        token="$(<"$GITHUB_TOKEN_FILE")"
+    fi
+    [[ -n "$token" ]] && headers+=(-H "Authorization: Bearer $token")
+
+    local body code
+    body="$(mktemp)"
+    code="$(curl -sSL -o "$body" -w '%{http_code}' "${headers[@]}" \
+        "https://api.github.com/repos/$owner/$repo/releases/latest" || echo 000)"
+    if [[ "$code" != "200" ]]; then
+        if [[ "$code" == "403" || "$code" == "429" ]]; then
+            err "GitHub API rate limit hit — export GITHUB_TOKEN or add $GITHUB_TOKEN_FILE"
+        else
+            err "GitHub API returned HTTP $code for $owner/$repo"
+        fi
+        rm -f "$body"
+        return 1
+    fi
+    jq -r '.tag_name // empty' "$body"
+    rm -f "$body"
+}
+
+ext_asset_url() {
+    local owner="$1" repo="$2" source="$3" tag="$4" asset="$5"
+    if [[ "$source" == "tag-tarball" ]]; then
+        printf 'https://github.com/%s/%s/archive/refs/tags/%s.tar.gz' "$owner" "$repo" "$tag"
+    else
+        printf 'https://github.com/%s/%s/releases/download/%s/%s' "$owner" "$repo" "$tag" "$asset"
+    fi
+}
+
+# Writes "name<TAB>pinned<TAB>tag<TAB>version<TAB>url" per outdated extension.
+# The tab-separated reader collapses empty fields (tab is IFS whitespace), so
+# jq substitutes a sentinel for the optional asset name.
+ext_scan() {
+    local out="$1"
+    : >"$out"
+    EXT_QUERY_ERRORS=0
+    local name owner repo source pinned_tag asset pinned latest latest_version url
+    while IFS=$'\t' read -r name owner repo source pinned_tag asset pinned; do
+        [[ "$asset" == "__NULL__" ]] && asset=""
+        if ! latest="$(ext_latest_tag "$owner" "$repo" "$source")" || [[ -z "$latest" ]]; then
+            warn "Could not query upstream for $name ($owner/$repo)"
+            EXT_QUERY_ERRORS=$((EXT_QUERY_ERRORS + 1))
+            continue
+        fi
+        latest_version="${latest#v}"
+        ext_is_newer "$pinned" "$latest_version" || continue
+        asset="${asset//\{version\}/$latest_version}"
+        asset="${asset//\{tag\}/$latest}"
+        url="$(ext_asset_url "$owner" "$repo" "$source" "$latest" "$asset")"
+        printf '%s\t%s\t%s\t%s\t%s\n' "$name" "$pinned" "$latest" "$latest_version" "$url" >>"$out"
+    done < <(jq -r 'to_entries[] |
+        [.key, .value.owner, .value.repo, .value.source, .value.tag,
+         (.value.asset // "__NULL__"), .value.version] | @tsv' "$EXT_PINS")
+}
+
+ext_report() {
+    local scan="$1"
+    local count
+    count="$(grep -c . "$scan" || true)"
+    if [[ "$count" -eq 0 ]]; then
+        ok "Chromium extensions are up to date"
+        return 1
+    fi
+    warn "$count Chromium extension update(s) available:"
+    local name pinned tag version url
+    while IFS=$'\t' read -r name pinned tag version url; do
+        echo -e "    ${BOLD}$name${NC}: $pinned -> ${GREEN}$version${NC}"
+    done <"$scan"
+    return 0
+}
+
+ext_check() {
+    if [[ ! -f "$EXT_PINS" ]]; then
+        err "Missing $EXT_PINS"
+        return 1
+    fi
+    info "Checking Chromium extension updates..."
+    local scan
+    scan="$(mktemp)"
+    ext_scan "$scan"
+    local status=0
+    if [[ "$EXT_QUERY_ERRORS" -gt 0 ]]; then
+        err "$EXT_QUERY_ERRORS extension(s) could not be checked — results are incomplete"
+        status=1
+    fi
+    if ext_report "$scan"; then
+        notify "Chromium extensions" "Updates available — run: updt ext --apply"
+    fi
+    rm -f "$scan"
+    return "$status"
+}
+
+ext_apply() {
+    if [[ ! -f "$EXT_PINS" ]]; then
+        err "Missing $EXT_PINS"
+        return 1
+    fi
+    local scan
+    scan="$(mktemp)"
+    ext_scan "$scan"
+    if [[ "$EXT_QUERY_ERRORS" -gt 0 ]]; then
+        err "Refusing to bump pins with $EXT_QUERY_ERRORS upstream lookup(s) failing"
+        rm -f "$scan"
+        return 1
+    fi
+    ext_report "$scan" || {
+        rm -f "$scan"
+        return 0
+    }
+    info "Bumping pins and prefetching hashes..."
+    local name pinned tag version url hash
+    while IFS=$'\t' read -r name pinned tag version url; do
+        hash="$(nix store prefetch-file --json "$url" 2>/dev/null | jq -r '.hash // empty')"
+        if [[ -z "$hash" ]]; then
+            err "Could not prefetch $url"
+            rm -f "$scan"
+            return 1
+        fi
+        jq --arg name "$name" --arg tag "$tag" --arg version "$version" \
+           --arg url "$url" --arg hash "$hash" \
+           '.[$name] |= (.tag = $tag | .version = $version | .url = $url | .hash = $hash)' \
+           "$EXT_PINS" >"$EXT_PINS.tmp"
+        mv "$EXT_PINS.tmp" "$EXT_PINS"
+        ok "$name: $pinned -> $version"
+    done <"$scan"
+    rm -f "$scan"
+    return 0
+}
+
 commit_and_push() {
     if [[ -z "$(git status --porcelain 2>/dev/null)" ]]; then
         info "No changes to commit"
@@ -297,6 +455,7 @@ usage_sub() {
     echo "  gc                 collect garbage + optimise the store"
     echo "  cb / boot          rebuild the boot menu"
     echo "  listgen            list NixOS generations"
+    echo "  ext                check Chromium extension updates (--apply bumps + rebuilds)"
     echo "  help               show this help"
 }
 
@@ -311,6 +470,12 @@ subcommand() {
         gc)                run_workflow "Garbage Collect"       false gc ;;
         cb | boot)         run_workflow "Rebuild Boot Menu"     false cb ;;
         listgen)           run_workflow "List Generations"      false listgen ;;
+        ext)
+            case "${2:-}" in
+                --apply | apply) run_workflow "Extension Update"     false auth_pkexec ext_apply stage_all build_system switch_system ;;
+                *)             run_workflow "Extension Update Check" false ext_check ;;
+            esac
+            ;;
         help | -h | --help) usage_sub ;;
         *) err "Unknown subcommand: $1"; usage_sub >&2; return 1 ;;
     esac
@@ -370,7 +535,7 @@ main() {
     echo -e "  6. ${GREEN}Git Push${NC}         — push committed changes"
     echo -e "  7. ${RED}Exit${NC}"
     echo
-    echo -e "${BOLD}Subcommands${NC}: updt gc | cb | listgen | push | all | help"
+    echo -e "${BOLD}Subcommands${NC}: updt gc | cb | listgen | push | ext | all | help"
     echo
 
     read -rp "Enter choice(s) (1-7): " input

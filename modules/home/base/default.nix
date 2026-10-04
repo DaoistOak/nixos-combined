@@ -31,9 +31,11 @@ in
     ../config/modules/alacritty
     ../config/modules/wezterm
     ../config/modules/ghostty
+    ../config/modules/neovide
     ../config/modules/tmux
     ../config/modules/phone-bt-bridge
     ../config/modules/keepassxc
+    ../config/modules/chromium
     ../config/modules/qutebrowser
     ../config/modules/rofi
     ../config/modules/atuin

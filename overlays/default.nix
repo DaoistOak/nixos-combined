@@ -106,6 +106,11 @@
     # Pinned to a72d3ee (v0.56.0 line in its hyprpm.toml; v0.56.1 is a patch on
     # the same ABI line).
     hyprWinwrap = import ../pkgs/hyprwinwrap.nix { inherit inputs; };
+
+    # Unpacked Chromium extensions for --load-extension (the Chrome Web Store
+    # install flow does not work in ungoogled-chromium). Exposes
+    # chromiumExtensions.loadArg plus the individual extension packages.
+    chromiumExtensions = import ../pkgs/chromium-extensions { pkgs = final; };
   };
 
   # NUR (Nix User Repository) overlay

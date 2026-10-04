@@ -69,7 +69,23 @@ let
     kdePackages.kdeconnect-kde
     qutebrowser
     thunderbird
-    ungoogled-chromium
+    # ungoogled-chromium refuses extension installs from outside the Chrome Web
+    # Store (ExtensionManagement::IsOffstoreInstallAllowed is false unless the
+    # ExtensionInstallSources policy is set), so the Web Store just tells you to
+    # switch to Chrome. That flag re-enables off-store/CRX installs and makes
+    # .crx downloads prompt for installation.
+    #
+    # The store's own install flow is a dead end though: Google serves extension
+    # payloads through a signed-blob flow ungoogled cannot complete, and the CRX
+    # update endpoint answers 204/404 for nearly every extension. So the four
+    # extensions we actually use are packaged as unpacked directories from
+    # upstream release assets (see pkgs/chromium-extensions) and loaded from the
+    # store -- Chromium honours --load-extension in non-Google builds as long as
+    # no ExtensionInstallTypeBlocklist::command_line policy is set (it isn't).
+    # `updt ext` bumps the upstream pins.
+    (ungoogled-chromium.override {
+      commandLineArgs = "${chromiumExtensions.loadArg} --extension-mime-request-handling=always-prompt-for-install";
+    })
     vesktop
 
     # --- Development Tools & Compilers ---

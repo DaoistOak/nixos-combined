@@ -48,7 +48,8 @@ in
         --user-data-dir="$profile" \
         --class="$class" \
         --no-first-run \
-        --password-store=basic >/dev/null 2>&1 &
+        --password-store=basic \
+         --disable-extensions >/dev/null 2>&1 &
     '';
   };
 

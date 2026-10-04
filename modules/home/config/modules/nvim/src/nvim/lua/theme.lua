@@ -41,6 +41,10 @@ local function apply_overrides(p)
   c.text = c.text or c.base05
   c.accent = c.accent or c.base0D
 
+  -- Keep the resolved palette around: the lualine theme table and the statusline
+  -- caps below are derived from it, and both have to be rebuilt on SIGUSR1.
+  M.palette = c
+
   local function hi(group, opts)
     vim.api.nvim_set_hl(0, group, opts)
   end
@@ -51,20 +55,43 @@ local function apply_overrides(p)
     end
   end
 
+  -- Blend two palette hexes. The neutral ramp has no slot between base and
+  -- surface0, and the cursorline has to be visible against the canvas without
+  -- reading as a different panel.
+  local function mix(a, b, amount)
+    local function channel(shift)
+      local ca = tonumber(a:sub(shift, shift + 1), 16)
+      local cb = tonumber(b:sub(shift, shift + 1), 16)
+      return string.format("%02x", math.floor(ca + (cb - ca) * amount + 0.5))
+    end
+    return string.format("#%s%s%s", channel(2), channel(4), channel(6))
+  end
+
   -- Layered backgrounds. base16 collapses the neutral ramp onto
   -- base00..base02, so the editor, the tab bar and the explorer all ended up on
-  -- one flat panel. Crust is the editor canvas, mantle the bar the buffer
-  -- headers sit on, surface0 the chrome (file explorer, scratch buffer,
-  -- cmdline) and base the floating panels.
-  hi("Normal", { fg = c.text, bg = c.crust })
-  hi("NormalNC", { fg = c.text, bg = c.crust })
-  hi("SignColumn", { fg = c.subtext0, bg = c.crust })
-  hi("SignColumnSB", { fg = c.subtext0, bg = c.crust })
-  hi("CursorLine", { bg = c.base })
-  hi("CursorLineNr", { bg = c.base })
-  hi("CursorLineSign", { bg = c.base })
-  hi("WinSeparator", { fg = c.surface0, bg = c.crust })
-  hi("VertSplit", { fg = c.surface0, bg = c.crust })
+  -- one flat panel. The ramp is used as one layer per surface:
+  --
+  --   crust    the darkest step: the bar behind the tabs (the space left beside
+  --            them), the statusline strip and the window separators
+  --   mantle   one step up: the inactive tab headers
+  --   base     the editor canvas, and the active tab header so it reads as
+  --            continuous with the text area
+  --   surface0 chrome: file explorer, cmdline, scratch buffer
+  --   surface1 selected rows inside that chrome
+  --   surface2 separators and filler text
+  --
+  -- Backing the editor with `base` rather than `crust` puts the canvas *above*
+  -- the tab bar, which is what makes the active tab look like a hole cut into
+  -- the bar instead of a tab that is lighter than its neighbours.
+  hi("Normal", { fg = c.text, bg = c.base })
+  hi("NormalNC", { fg = c.text, bg = c.base })
+  hi("SignColumn", { fg = c.subtext0, bg = c.base })
+  hi("SignColumnSB", { fg = c.subtext0, bg = c.base })
+  hi("CursorLine", { bg = mix(c.base, c.surface0, 0.45) })
+  hi("CursorLineNr", { bg = mix(c.base, c.surface0, 0.45) })
+  hi("CursorLineSign", { bg = mix(c.base, c.surface0, 0.45) })
+  hi("WinSeparator", { fg = c.crust, bg = c.base })
+  hi("VertSplit", { fg = c.crust, bg = c.base })
 
   -- Floating panels sit a step above the canvas rather than on it.
   hi("NormalFloat", { fg = c.text, bg = c.base })
@@ -109,15 +136,15 @@ local function apply_overrides(p)
   set({ "SnacksTerminalCursor" }, { fg = c.crust, bg = c.accent })
   set({ "ToggleTermNormal", "ToggleTermNormalNC" }, { fg = c.text, bg = c.surface0 })
 
-  -- Bufferline. The bar behind the tabs is mantle; the active tab takes the
-  -- editor background so it reads as continuous with the text area. LazyVim
-  -- left the active tab's name on surface0, which is darker than the overlay0
-  -- used for inactive tabs, so the current buffer read as dimmer than its
-  -- neighbours, and the active tab shared the editor background exactly, so it
-  -- had no edge of its own.
+  -- Bufferline. Three steps, darkest first: crust is the bar the tabs sit on
+  -- (and so the colour of the empty space beside them), mantle is an inactive
+  -- tab, and the active tab takes the editor background so it reads as
+  -- continuous with the text area. LazyVim left the active tab's name on
+  -- surface0, which is darker than the overlay0 used for inactive tabs, so the
+  -- current buffer read as dimmer than its neighbours, and it gave the fill
+  -- (BufferLineFill) the same colour as the tabs, so the bar had no edge at all.
+  set({ "BufferLineBackground", "BufferLineFill" }, { fg = c.crust, bg = c.crust })
   set({
-    "BufferLineBackground",
-    "BufferLineFill",
     "BufferLineBuffer",
     "BufferLineBufferVisible",
     "BufferLineTab",
@@ -126,12 +153,12 @@ local function apply_overrides(p)
     fg = c.overlay0,
     bg = c.mantle,
   })
-  set({ "BufferLineBufferSelected", "BufferLineTabSelected" }, { fg = c.text, bg = c.crust, bold = true })
+  set({ "BufferLineBufferSelected", "BufferLineTabSelected" }, { fg = c.text, bg = c.base, bold = true })
   -- Separators take the colour of the surface they sit on so the bar reads as
   -- one piece and the active tab opens up out of it.
-  set({ "BufferLineSeparator", "BufferLineTabSeparator" }, { fg = c.mantle, bg = c.mantle })
-  set({ "BufferLineSeparatorSelected", "BufferLineTabSeparatorSelected" }, { fg = c.crust, bg = c.crust })
-  set({ "BufferLineIndicatorVisible", "BufferLineIndicatorSelected" }, { fg = c.accent, bg = c.crust })
+  set({ "BufferLineSeparator", "BufferLineTabSeparator" }, { fg = c.crust, bg = c.mantle })
+  set({ "BufferLineSeparatorSelected", "BufferLineTabSeparatorSelected" }, { fg = c.base, bg = c.base })
+  set({ "BufferLineIndicatorVisible", "BufferLineIndicatorSelected" }, { fg = c.accent, bg = c.base })
   set(
     { "BufferLineCloseButton", "BufferLineCloseButtonVisible", "BufferLineTabClose" },
     { fg = c.surface2, bg = c.mantle }
