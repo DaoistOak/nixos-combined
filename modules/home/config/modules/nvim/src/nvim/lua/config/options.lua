@@ -27,7 +27,7 @@ vim.opt.wrap = true
 vim.opt.linebreak = true
 vim.opt.breakindent = true
 vim.opt.breakindentopt = "sbr,min:20"
-vim.opt.showbreak = "󰌑 "
+vim.opt.showbreak = " 󰌑 "
 -- `sbr` alone puts the showbreak at the text column, i.e. after the number
 -- column and after any indent. `:h 'showbreak'`: "If you want the 'showbreak' to
 -- appear in between line numbers, add the `n` flag to 'cpoptions'" — that is the

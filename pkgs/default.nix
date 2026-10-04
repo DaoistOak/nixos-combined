@@ -120,6 +120,7 @@ let
     eza
     fish
     pcmanfm
+    sesh
     superfile
     vim
     yazi

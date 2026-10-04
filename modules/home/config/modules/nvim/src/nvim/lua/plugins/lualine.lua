@@ -20,50 +20,16 @@ local sep_right = "\u{E0B6}"
 local cap_left = "\u{E0B6}"
 local cap_right = "\u{E0B4}"
 
--- The group lualine paints section a with: lualine_a_normal, lualine_a_insert,
--- lualine_a_visual, ... Tracking the mode suffix is what makes the left cap
--- follow the mode block. The auto theme also maps x/y/z onto c/b/a
--- (section_highlight_map in lualine/highlight.lua), so the clock in section z is
--- painted with the *same* lualine_a<suffix> colors, which is why the right cap
--- reuses this group too. Read the suffix rather than asking for a resolved
--- highlight: lualine's theme state is not populated yet while the statusline is
--- being drawn, so format_highlight returns empty at exactly that point.
--- Required lazily: lualine is a lazy-loaded plugin.
-local function bar_group()
-  return "lualine_a" .. require("lualine.highlight").get_mode_suffix()
-end
-
-local function bg_of(names)
-  for _, name in ipairs(names) do
-    local bg = vim.api.nvim_get_hl(0, { name = name, link = false }).bg
-    if bg then
-      return bg
-    end
-  end
-end
-
--- A cap is the bar's own background drawn over the editor background, which is
--- what tmux does with #[fg=<bar bg>,bg=<terminal bg>]<glyph>. A lualine component
--- can only pick a whole highlight group, and a cap needs the *background* of the
--- bar next to it, so resolve the pair into a highlight group and select it with
--- %#. Resolving per redraw (instead of once at setup) keeps the caps correct when
--- the palette changes, e.g. on SIGUSR1 from scripts/theme, and when the mode
--- changes and lualine repaints the mode block.
-local function cap(glyph, group)
-  return function()
-    local editor_bg = bg_of({ "Normal", "EndOfBuffer" }) or 0
-    local bar_bg = bg_of({ bar_group(), "Normal" }) or editor_bg
-    vim.api.nvim_set_hl(0, group, { fg = bar_bg, bg = editor_bg })
-    return "%#" .. group .. "#" .. glyph
-  end
-end
-
--- Each cap needs its own highlight group: lualine builds the whole statusline
--- string before it is drawn, so a shared group would leave both glyphs in the
--- color the last cap resolved.
+-- The caps are static highlight groups instead of components that resolve their
+-- own colour on every redraw. lualine builds the whole statusline string *before*
+-- drawing it, so a component calling nvim_set_hl while the string is composed
+-- leaves neovide (which composites its own glyph atlas against the groups it saw
+-- at the start of the frame) painting the caps in the foreground colour, over and
+-- over. theme.lua derives StatusLineCapLeft/Right from the palette, next to the
+-- blocks they join, and regenerates them on ThemeReload.
 local function cap_component(glyph, group)
   return {
-    cap(glyph, group),
+    "%#" .. group .. "#" .. glyph,
     padding = { left = 0, right = 0 },
     separator = "",
   }
@@ -78,14 +44,22 @@ return {
         section_separators = { left = sep_left, right = sep_right },
       },
     },
-    -- LazyVim builds its lualine opts in a function, so the caps are inserted
-    -- here rather than through `sections` in opts: tbl_deep_extend merges arrays
+    -- LazyVim builds its lualine opts in a function, so the theme and the caps
+    -- are applied here rather than through `opts`: tbl_deep_extend merges arrays
     -- positionally, so `sections.lualine_a = { cap }` would overwrite index 1 and
-    -- drop the mode component. LazyVim's lualine spec has no `config`, so this
-    -- one is the only setup call.
+    -- drop the mode component. LazyVim's lualine spec has no `config`, so this one
+    -- is the only setup call.
     config = function(_, opts)
-      -- Left cap inherits the mode block's color, right cap the clock's; both
-      -- resolve to lualine_a<mode suffix> under the auto theme.
+      -- The palette owns the block colours (see theme.lua). Hand lualine that
+      -- table instead of leaving it on "auto": automatic mode copies the colours
+      -- of the block after each component, which is what made the bar a flat blur
+      -- of the mode colour, and it cannot express the caps above at all.
+      opts.options.theme = require("theme").lualine_theme() or "auto"
+      -- LazyVim lays the sections out as
+      --   a mode | b branch | c root/diagnostics/path | x profiler | y progress/location | z clock
+      -- with a leftmost and z rightmost, so a cap goes in front of a and after z:
+      -- a glyph in the block colour on the bare bar, opening the mode block out
+      -- of the strip and closing the clock block into it.
       table.insert(opts.sections.lualine_a, 1, cap_component(cap_left, "StatusLineCapLeft"))
       table.insert(opts.sections.lualine_z, cap_component(cap_right, "StatusLineCapRight"))
       require("lualine").setup(opts)
