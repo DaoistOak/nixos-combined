@@ -69,3 +69,8 @@ fi
 # systems see recorded commands.
 eval "$(atuin init zsh)"
 eval "$(zoxide init zsh)"
+
+# fzf paints itself in the terminal, so the Neovim highlights never reach it.
+# scripts/theme rewrites this file on every switch and `theme set` cannot reload
+# a running shell, so it is sourced once per shell instead.
+[[ -r "$HOME/.config/theme-switcher/fzf-theme.zsh" ]] && source "$HOME/.config/theme-switcher/fzf-theme.zsh"

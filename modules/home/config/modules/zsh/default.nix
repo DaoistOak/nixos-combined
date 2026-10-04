@@ -93,7 +93,9 @@ in
     enable = true;
     enableZshIntegration = true;
   };
-  catppuccin.fzf.enable = true;
+  # catppuccin.fzf bakes the flavour into FZF_DEFAULT_OPTS at build time, so it
+  # cannot follow `theme set`; scripts/theme writes the runtime palette that
+  # src/zshrc.custom sources instead.
 
   home.file."${zshDir}/powerlevel10k".source = powerlevel10k;
   home.file."${zshDir}/zsh-vi-mode".source = pkgs.zsh-vi-mode;
