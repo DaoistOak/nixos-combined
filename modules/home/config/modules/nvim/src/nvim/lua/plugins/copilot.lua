@@ -5,15 +5,15 @@
 -- `accept` is the one custom bind from the old NvChad config; LazyVim sets it
 -- to false so blink.cmp owns <Tab>, so remove it if that clash is annoying.
 return {
-  {
-    "zbirenbaum/copilot.lua",
-    opts = {
-      server = { custom_server_filepath = "copilot-language-server" },
-      suggestion = {
-        keymap = {
-          accept = "<Tab>",
-        },
-      },
-    },
-  },
+	{
+		"zbirenbaum/copilot.lua",
+		opts = {
+			server = { custom_server_filepath = "copilot-language-server" },
+			suggestion = {
+				keymap = {
+					accept = "<Tab>",
+				},
+			},
+		},
+	},
 }

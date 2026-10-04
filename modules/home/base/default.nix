@@ -23,7 +23,7 @@ in
     ../config/modules/hypr/hyprlock
     ../config/modules/herdr
     ../config/modules/crush
-    ../config/cava
+    ../config/modules/cava
     ../config/modules/nvim
     ../config/modules/yazi
     ../config/modules/superfile
