@@ -5,17 +5,6 @@
   ...
 }:
 let
-  # Store paths for plugins lazy.nvim would otherwise clone, as `dir` is what
-  # dev mode ends up using anyway. Two reasons a plugin ends up here: the module
-  # only builds its dev path from plugins it can find in the *live* config dir
-  # (~/.config/nvim/lua/plugins), and a flake eval is pure and cannot read paths
-  # outside the store, so that scan always comes back empty and anything declared
-  # in src/nvim/lua/plugins is invisible to it. The two LazyVim plugins at the
-  # end fail for the opposite reason: catppuccin/nvim is linked into the dev path
-  # as "nvim" while lazy.nvim knows that plugin as "catppuccin" (lazy.nvim names
-  # a bare "<owner>/nvim" repo after its owner), and friendly-snippets does not
-  # resolve to a nixpkgs package by name. The hand-written spec files still
-  # provide opts/keys, which merge on top of the generated one.
   nixLinkedPlugins = {
     "AckslD/nvim-neoclip.lua" = {
       package = "nvim-neoclip-lua";
@@ -52,18 +41,8 @@ in
   programs.lazyvim = {
     enable = true;
 
-    # Everything comes from nixpkgs (including plugins that LazyVim does not
-    # pin, like the ones declared in lua/plugins). With "latest" the module
-    # builds unpinned plugins from GitHub HEAD at eval time, and the plugins
-    # added in lua/plugins/ have no version metadata at all, so they would not
-    # resolve to a store path and lazy.nvim would clone them on first launch.
     pluginSource = "nixpkgs";
 
-    # Shipped verbatim: config/ -> lua/config, plugins/ -> lua/plugins,
-    # colors/ -> runtime colorscheme entry point, lua/ -> lua/.
-    # These files have to be tracked by git: nix copies a dirty flake tree with
-    # git semantics, so untracked files are missing from the store copy and the
-    # module's builtins.pathExists check on this directory would fail.
     configFiles = ./src/nvim;
 
     extras = {
@@ -72,14 +51,6 @@ in
       lang.nix.enable = true;
     };
 
-    # LazyVim's core treesitter spec asks for css (used by the html/cssls
-    # servers below) but only extras like lang.astro pull it in, so pin it.
-    # The rest are the parsers LazyVim's ensure_installed wants but that are not
-    # in the module's dev path: the extras live in ~/.config/nvim/lazyvim.json
-    # (lang.cmake, util.dot, test.core, ...), and lazyvim-nix's Nix stub prints a
-    # "parsers are managed by Nix; runtime installation is disabled" notice plus
-    # a list of everything missing. Anything not named here silently falls back
-    # to regex highlighting.
     treesitterParsers = with pkgs.vimPlugins.nvim-treesitter-parsers; [
       cmake
       css
@@ -95,8 +66,6 @@ in
       rasi
     ];
 
-    # LSP servers + formatters. Mason is disabled by the module, so every tool
-    # a server or formatter shells out to has to come from Nix.
     extraPackages = with pkgs; [
       copilot-language-server
       lua-language-server
@@ -108,29 +77,18 @@ in
     ];
   };
 
-  # base16-nvim is declared in src/nvim/lua/plugins/base16-nvim.lua instead of
-  # programs.neovim.plugins: lazy.nvim resets the runtimepath at startup
-  # (performance.rtp.reset), so Home Manager's pack/*/start links never make it
-  # into the runtimepath and the colorscheme would not find the module.
+  xdg.configFile."nvim/lua/theme".source = ./src/nvim/lua/theme;
 
-  # configFiles only keeps lua/config/{keymaps,options,autocmds}.lua,
-  # lua/plugins/*.lua and the runtime dirs, so the theme helper is linked
-  # explicitly: colors/base16.vim requires it while applying the colorscheme.
-  xdg.configFile."nvim/lua/theme.lua".source = ./src/nvim/lua/theme.lua;
-
-  # lazyvim-nix only ever *adds* to ~/.config/nvim: a file that is removed or
-  # renamed in src/nvim keeps its old symlink and is still sourced at startup.
-  # A leftover lua/matugen.lua + lua/plugins/base16.lua pair from the matugen
-  # era did exactly that and re-applied its own hardcoded palette over the
-  # theme-switcher one on every launch, so the theme only looked right after a
-  # :ThemeReload. Every managed file in these directories is a store symlink, so
-  # a regular file there is always a leftover.
   home.activation.nvimPruneStaleConfig =
     lib.hm.dag.entryAfter
       [
         "writeBoundary"
       ]
       ''
+        if [[ -L "$HOME/.config/nvim/lua/theme.lua" ]]; then
+          $DRY_RUN_CMD rm -f "$HOME/.config/nvim/lua/theme.lua"
+          echo "removed stale nvim theme.lua (superseded by the theme/ directory)"
+        fi
         for dir in "$HOME/.config/nvim/lua" "$HOME/.config/nvim/colors"; do
           [[ -d "$dir" ]] || continue
           # A NUL delimiter keeps the read safe for odd file names, and the
@@ -143,21 +101,14 @@ in
         done
       '';
 
-  # Stylix's neovim target injects a build-time palette into the generated
-  # init.lua. nvim is themed from the tracked selection through the runtime
-  # palette instead (lua/theme.lua + scripts/theme), which is the same palette
-  # but switchable at runtime, so drop the injected block.
   stylix.targets.neovim.enable = false;
 
   home.packages = lib.mkDefault [
     pkgs.stylua
     pkgs.lua-language-server
-    # Keeps lua/config/nix.lua's sqlite_clib path alive in the profile.
     pkgs.sqlite
   ];
 
-  # Store paths that cannot be discovered at runtime: nvim-neoclip's backend
-  # needs the sqlite C library, and nix has no neovim built with it in.
   xdg.configFile."nvim/lua/config/nix.lua" = {
     text = ''
       -- Generated by modules/home/config/modules/nvim.
@@ -167,8 +118,6 @@ in
     '';
   };
 
-  # Store paths for the plugins lazy.nvim would otherwise clone (see
-  # nixLinkedPlugins above).
   xdg.configFile."nvim/lua/plugins/zz-nixpkgs.lua" = {
     text = ''
       -- Generated by modules/home/config/modules/nvim. Sorted last so it merges

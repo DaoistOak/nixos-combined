@@ -24,11 +24,12 @@ local sep_right = glyph(0xE0B6)
 local cap_left = glyph(0xE0B6)
 local cap_right = glyph(0xE0B4)
 
--- A rounded end needs two colours in one cell: the fill of the segment it
--- closes and the line background behind it, which no single component group
--- can hold. Caps are therefore literal statusline text that switches to a
--- pre-built group (theme.lua). Do not call nvim_set_hl while the statusline
--- string is composed: neovide caches groups for the frame.
+-- The left cap opens the mode pill: it is literal statusline text, because the
+-- round end needs two colours in one cell (the pill fill and the bar behind it)
+-- and a component's own group can only hold one pair. It switches to the
+-- pre-built StatusLineCap_<mode> group from theme/statusline, which is repainted
+-- with the palette, so do not call nvim_set_hl while the statusline string is
+-- composed: neovide caches groups for the frame.
 local function cap(group, code)
 	return "%#" .. group .. "#" .. code
 end
@@ -55,14 +56,19 @@ local pill = {
 -- nothing but the cap that divider would land on the cap and paint a second,
 -- unpaired end, so it is switched off here.
 --
--- The group is handed over as `color` rather than as a literal `%#group#`
--- prefix. utils/section.lua treats a leading `%#` as "this component brings its
--- own highlight" and replies with a transitional divider whose colours are a
--- snapshot (extract_highlight_colors) of that group; the snapshot can miss and
--- fall back to the section default, which is subtext0 for z. Letting lualine
--- link the group itself keeps the cap on one authoritative colour.
+-- The glyph is the component's content and its colour is a group name: lualine
+-- links the component group to StatusLineCapRight (highlight.lua,
+-- create_component_highlight_group), so the cell shows the bar colour on the
+-- base background and follows the palette on its own. That only holds because
+-- nothing clears lualine's groups underneath it: setup_theme() opens with
+-- clear_highlights(), which wipes every group lualine has loaded, and it runs
+-- from setup() on every ColorScheme. sync_lualine() therefore repaints just the
+-- a-z section groups instead of going through create_highlight_groups(); see
+-- theme/statusline/init.lua.
 local right_cap = {
-	cap_right,
+	function()
+		return cap_right
+	end,
 	color = "StatusLineCapRight",
 	padding = { left = 0, right = 0 },
 	separator = "",
