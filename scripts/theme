@@ -359,12 +359,13 @@ EOF
     jq -r '
       [
         .crust, .mantle, .base, .surface0, .surface1, .surface2,
-        .overlay0, .overlay1, .overlay2, .subtext0, .subtext1, .text, .accent
+        .overlay0, .overlay1, .overlay2, .subtext0, .subtext1, .text, .accent,
+        .named.blue, .base16.mauve
       ]
       | to_entries[]
       | "  " + ["crust", "mantle", "base", "surface0", "surface1", "surface2",
                "overlay0", "overlay1", "overlay2", "subtext0", "subtext1",
-               "text", "accent"][.key] + " = \"#" + .value + "\","
+               "text", "accent", "blue", "mauve"][.key] + " = \"#" + .value + "\","
     ' <<<"$RJSON"
     echo "}"
   } > "$CFG/nvim-base16.lua"

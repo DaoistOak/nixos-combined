@@ -30,6 +30,8 @@ local function apply_overrides(p)
 	c.subtext1 = c.subtext1 or c.base04
 	c.text = c.text or c.base05
 	c.accent = c.accent or c.base0D
+	c.blue = c.blue or c.base07
+	c.mauve = c.mauve or c.base0E
 	M.palette = c
 
 	local function hi(group, opts)
@@ -56,13 +58,13 @@ local function apply_overrides(p)
 
 	hi("Normal", { fg = c.text, bg = c.base })
 	hi("NormalNC", { fg = c.text, bg = c.base })
-	hi("SignColumn", { fg = c.subtext0, bg = c.surface0 })
-	hi("SignColumnSB", { fg = c.overlay0, bg = c.surface0 })
+	hi("SignColumn", { fg = c.subtext0 })
+	hi("SignColumnSB", { fg = c.overlay0 })
 	hi("FoldColumn", { fg = c.overlay0, bg = c.base })
 	hi("Folded", { fg = c.accent, bg = c.base })
-	set({ "LineNr", "LineNrAbove" }, { fg = c.overlay0, bg = c.surface0 })
-	set({ "CursorLineNr", "CursorLineSign" }, { fg = c.text, bg = c.surface0 })
-	hi("CursorLineFold", { fg = c.overlay0, bg = c.surface0 })
+	set({ "LineNr", "LineNrAbove" }, { fg = c.overlay0 })
+	set({ "CursorLineNr", "CursorLineSign" }, { fg = c.text })
+	hi("CursorLineFold", { fg = c.overlay0 })
 
 	local cursorline = mix(c.base, c.surface0, 0.45)
 	hi("CursorLine", { bg = cursorline })
@@ -94,12 +96,14 @@ local function apply_overrides(p)
 	hi("SnacksTerminalCursor", { fg = c.crust, bg = c.accent })
 
 	set({ "BufferLineBackground", "BufferLineFill" }, { fg = c.mantle, bg = c.mantle })
+	-- Inactive titles need to stay readable: overlay0 on mantle is too close to
+	-- the bar background to read, let alone to look like the crust behind it.
 	set({
 		"BufferLineBuffer",
 		"BufferLineBufferVisible",
 		"BufferLineTab",
 		"BufferLineOffsetSeparator",
-	}, { fg = c.overlay0, bg = c.mantle })
+	}, { fg = c.subtext0, bg = c.mantle })
 	set({ "BufferLineBufferSelected", "BufferLineTabSelected" }, { fg = c.text, bg = c.base, bold = true })
 	set({ "BufferLineSeparator", "BufferLineTabSeparator" }, { fg = c.mantle, bg = c.mantle })
 	set({ "BufferLineSeparatorSelected", "BufferLineTabSeparatorSelected" }, { fg = c.base, bg = c.base })
@@ -215,33 +219,42 @@ local function apply_overrides(p)
 	set({ "WhichKeyValue", "WhichKeyBorder" }, { fg = c.text, bg = c.surface0 })
 	set({ "WhichKeyIcon", "WhichKeyIconAzure" }, { fg = c.accent, bg = c.surface0 })
 
-	-- Mode pill NORMAL: label stays on `text`; only the fill changes.
+	-- Mode pill NORMAL: the fill carries the mode, the label is `base`
+	-- on top of it.
 	local mode_fills = {
+		-- One hue per mode, straight out of the palette: the accent for normal,
+		-- the named blue/mauve roles for insert/visual, base16 slots for the
+		-- rest. base0C (teal) is left out on purpose, it is the default accent
+		-- and would collide with normal.
 		normal = c.accent,
-		insert = c.base0B,
-		visual = c.base0E,
+		insert = c.blue,
+		visual = c.mauve,
 		replace = c.base08,
-		command = c.base0F,
-		terminal = c.base0C,
+		command = c.base0A,
+		terminal = c.base0B,
 		inactive = c.surface0,
 	}
 	M.lualine = {}
 	for mode, fill in pairs(mode_fills) do
 		local inactive = mode == "inactive"
-		local bg = inactive and c.surface0 or mix(c.base, fill, 0.7)
+		local bg = inactive and c.surface0 or fill
 		M.lualine[mode] = {
-			a = { fg = c.text, bg = bg, bold = not inactive },
+			-- Dark label on the fill, like tmux's message-command-style: the
+			-- fills are full-brightness accents now, not washes of base.
+			a = { fg = inactive and c.text or c.base, bg = bg, bold = not inactive },
 			b = { fg = c.subtext0, bg = c.surface0 },
 			c = { fg = c.text, bg = c.surface0 },
 			x = { fg = c.subtext0, bg = c.surface0 },
 			y = { fg = c.subtext0, bg = c.surface0 },
 			z = { fg = c.subtext0, bg = c.surface0 },
 		}
-		hi("StatusLineCap_" .. mode, { fg = bg, bg = inactive and c.mantle or c.base })
+		-- The bar is surface0 edge to edge, so a cap's second colour is
+		-- surface0 as well: the rounded end dissolves into the bar.
+		hi("StatusLineCap_" .. mode, { fg = bg, bg = inactive and c.mantle or c.surface0 })
 	end
-	hi("StatusLine", { fg = c.subtext0, bg = c.base })
+	hi("StatusLine", { fg = c.subtext0, bg = c.surface0 })
 	hi("StatusLineNC", { fg = c.overlay0, bg = c.mantle })
-	hi("StatusLineCapRight", { fg = c.surface0, bg = c.base })
+	hi("StatusLineCapRight", { fg = c.base, bg = c.surface0 })
 end
 
 local mode_names = {

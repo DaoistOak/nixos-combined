@@ -393,6 +393,10 @@ let
       subtext1 = h r.subtext1;
       text = h r.text;
       accent = h r.accent;
+      # Named accents with no base16 slot, exported for nvim's mode colours:
+      # base0E is already the mauve slot, but there is no blue one at all.
+      blue = h (a "blue" (ansi 4));
+      mauve = h (a "mauve" (a "purple" (ansi 5)));
     };
 
   # Read the persisted theme selection ("theme flavor accent") from a repo

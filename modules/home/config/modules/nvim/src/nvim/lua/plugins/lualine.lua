@@ -24,25 +24,42 @@ local sep_right = glyph(0xE0B6)
 local cap_left = glyph(0xE0B6)
 local cap_right = glyph(0xE0B4)
 
--- Caps switch pre-built highlight groups (theme.lua). Do not call nvim_set_hl
--- while the statusline string is composed: neovide caches groups for the frame.
-local function cap_component(glyph, group)
-	return {
-		"%#" .. group .. "#" .. glyph,
-		padding = { left = 0, right = 0 },
-		separator = "",
-	}
+-- A rounded end needs two colours in one cell: the fill of the segment it
+-- closes and the line background behind it, which no single component group
+-- can hold. Caps are therefore literal statusline text that switches to a
+-- pre-built group (theme.lua). Do not call nvim_set_hl while the statusline
+-- string is composed: neovide caches groups for the frame.
+local function cap(group, code)
+	return "%#" .. group .. "#" .. code
 end
 
-local function mode_cap(glyph)
-	return {
-		function()
-			return "%#StatusLineCap_" .. require("theme").lualine_mode() .. "#" .. glyph
-		end,
-		padding = { left = 0, right = 0 },
-		separator = "",
-	}
+-- The mode pill is one component: the cap opens it, the label follows. Both
+-- groups are keyed by theme.lualine_mode(), so the cap can never lag a frame
+-- behind the fill it has to match.
+local function mode_pill()
+	local theme = require("theme")
+	local mode = theme.lualine_mode()
+	local ok, util = pcall(require, "lualine.utils.mode")
+	local label = ok and util.get_mode() or mode:upper()
+	return cap("StatusLineCap_" .. mode, cap_left) .. "%#lualine_a_" .. mode .. "# " .. label .. " "
 end
+
+local pill = {
+	mode_pill,
+	padding = { left = 0, right = 0 },
+	separator = "",
+}
+
+-- The right cap is the last cell of the line, and the right-aligned sections
+-- (y, z) get a section divider prepended (utils/section.lua). With z holding
+-- nothing but the cap that divider would land on the cap and paint a second,
+-- unpaired end, so it is switched off here.
+local right_cap = {
+	cap("StatusLineCapRight", cap_right),
+	padding = { left = 0, right = 0 },
+	separator = "",
+	ls_separator = "",
+}
 
 return {
 	{
@@ -60,22 +77,22 @@ return {
 			opts.options.theme = require("theme").lualine_theme() or "auto"
 			opts.sections = opts.sections or {}
 
-			for _, section in pairs(opts.sections) do
-				if type(section) == "table" then
-					for i = #section, 1, -1 do
-						local component = section[i]
-						local name = type(component) == "table" and component[1] or component
-						if name == "clock" or name == "date" then
-							table.remove(section, i)
-						end
-					end
+			-- LazyVim's last section is a single anonymous function that renders
+			-- the clock (LazyVim/lua/lazyvim/plugins/ui.lua), so it carries no
+			-- name to match the way "clock" would: drop the functions instead.
+			local z = opts.sections.lualine_z or {}
+			for i = #z, 1, -1 do
+				if type(z[i]) == "function" then
+					table.remove(z, i)
 				end
 			end
+			z[#z + 1] = right_cap
+			opts.sections.lualine_z = z
 
-			opts.sections.lualine_a = opts.sections.lualine_a or {}
-			opts.sections.lualine_z = opts.sections.lualine_z or {}
-			table.insert(opts.sections.lualine_a, 1, mode_cap(cap_left))
-			table.insert(opts.sections.lualine_z, cap_component(cap_right, "StatusLineCapRight"))
+			-- Section a is the pill alone, so the cap and the label stay one
+			-- element instead of two components sharing a boundary.
+			opts.sections.lualine_a = { pill }
+
 			require("lualine").setup(opts)
 		end,
 	},

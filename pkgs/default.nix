@@ -52,7 +52,7 @@ let
     socat
     (pkgs.writeShellApplication {
       name = "phone-idle-inhibitor";
-      text = (builtins.readFile ../scripts/phone-idle-inhibitor);
+      text = builtins.readFile ../scripts/phone-idle-inhibitor;
     })
   ];
 

@@ -241,6 +241,8 @@ let
         "subtext1"
         "text"
         "accent"
+        "blue"
+        "mauve"
       ];
     in
     ''
