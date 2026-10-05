@@ -119,6 +119,7 @@ let
     copyq
     eza
     fish
+    neovim
     pcmanfm
     sesh
     superfile

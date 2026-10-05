@@ -30,6 +30,9 @@ let
       package = "catppuccin-nvim";
       name = "catppuccin";
     };
+    "MeanderingProgrammer/render-markdown.nvim" = {
+      package = "render-markdown-nvim";
+    };
     "rafamadriz/friendly-snippets" = {
       package = "friendly-snippets";
     };
@@ -48,6 +51,7 @@ in
     extras = {
       ai.copilot.enable = true;
       ai.copilot-chat.enable = true;
+      lang.markdown.enable = true;
       lang.nix.enable = true;
     };
 
@@ -61,6 +65,8 @@ in
       gitcommit
       gitignore
       graphql
+      # also highlights kulala's http/rest buffers; kulala cannot install its
+      # own parser here, see src/nvim/lua/plugins/kulala.lua
       http
       hyprlang
       rasi
@@ -68,6 +74,8 @@ in
 
     extraPackages = with pkgs; [
       copilot-language-server
+      # octo.nvim shells out to gh for graphql/pickers
+      gh
       lua-language-server
       nixd
       nixfmt
@@ -78,6 +86,9 @@ in
   };
 
   xdg.configFile."nvim/lua/theme".source = ./src/nvim/lua/theme;
+  # The LazyVim module only deploys lua/config/{keymaps,options,autocmds}.lua out
+  # of configFiles, so any other lua/config module needs an explicit link.
+  xdg.configFile."nvim/lua/config/terminals.lua".source = ./src/nvim/lua/config/terminals.lua;
 
   home.activation.nvimPruneStaleConfig =
     lib.hm.dag.entryAfter

@@ -43,6 +43,11 @@ in
       # Scrollback
       scrollback-limit = 2000;
 
+      # Right click does nothing. Ghostty's default is a context menu, whose Paste
+      # entry pastes the clipboard straight into whatever is running (nvim included)
+      # and cannot be told apart from a click inside a fullscreen app.
+      right-click-action = "ignore";
+
       # Window
       window-padding-x = 3;
       window-padding-y = 3;

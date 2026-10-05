@@ -71,7 +71,7 @@
       set -g window-status-current-format "#[fg=#{?#{client_prefix},#{@thm_red},#{@thm_accent}},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{?#{client_prefix},#{@thm_red},#{@thm_accent}}]#{window_index} #[fg=#{?#{client_prefix},#{@thm_red},#{@thm_accent}},bg=#{@thm_surface_0}] #{=40:#{window_name}}#[fg=#{@thm_surface_0},bg=#{@thm_bg}]"
 
       # Right modules (Active Process, Sessions, Uptime).
-      set -g status-right "#[fg=#{@thm_maroon},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{@thm_maroon}]󰇅 #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #{pane_current_command} #[fg=#{@thm_green},bg=#{@thm_surface_0}]#[fg=#{@thm_bg},bg=#{@thm_green}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #{session_name} #[fg=#{@thm_sapphire},bg=#{@thm_surface_0}]#[fg=#{@thm_bg},bg=#{@thm_sapphire}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #(${config.home.homeDirectory}/.config/tmux/uptime.sh )#[fg=#{@thm_surface_0},bg={thm_overlay_1}]"
+      set -g status-right "#[fg=#{@thm_maroon},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{@thm_maroon}]󰇅 #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #{pane_current_command} #[fg=#{@thm_green},bg=#{@thm_surface_0}]#[fg=#{@thm_bg},bg=#{@thm_green}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #{session_name} #[fg=#{@thm_sapphire},bg=#{@thm_surface_0}]#[fg=#{@thm_bg},bg=#{@thm_sapphire}] #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #(${config.home.homeDirectory}/.config/tmux/uptime.sh)#[fg=#{@thm_surface_0},bg=#{@thm_bg}]"
 
       # Keybinds
       bind-key v split-window -v -c "#{pane_current_path}"
@@ -112,22 +112,25 @@
     '';
   };
 
-  # Uptime helper: formats /proc/uptime as "1 day 8h 21m" (see status-right).
+  # Uptime helper: formats /proc/uptime into exactly two parts (see status-right).
   home.file.".config/tmux/uptime.sh" = {
     executable = true;
     text = ''
       #!/usr/bin/env bash
       secs=$(awk '{printf "%d", $1}' /proc/uptime)
-      d=$((secs / 86400))
+      w=$((secs / 604800))
+      d=$(((secs % 604800) / 86400))
       h=$(((secs % 86400) / 3600))
       m=$(((secs % 3600) / 60))
-      if [ "$d" -gt 0 ]; then
-        pl="s"; [ "$d" -eq 1 ] && pl=""
-        printf '%d day%s %dh %dm' "$d" "$pl" "$h" "$m"
+      s=$((secs % 60))
+      if [ "$w" -gt 0 ]; then
+        printf '%dw %dd' "$w" "$d"
+      elif [ "$d" -gt 0 ]; then
+        printf '%dd %dh' "$d" "$h"
       elif [ "$h" -gt 0 ]; then
         printf '%dh %dm' "$h" "$m"
       else
-        printf '%dm' "$m"
+        printf '%dm %ds' "$m" "$s"
       fi
     '';
   };
