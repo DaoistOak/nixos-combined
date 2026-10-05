@@ -289,8 +289,8 @@ local function statusline(c)
 			b = { fg = c.subtext0, bg = c.surface2 },
 			c = { fg = c.text, bg = c.surface0 },
 			x = { fg = c.subtext0, bg = c.surface0 },
-			y = { fg = c.subtext0, bg = c.surface0 },
-			z = { fg = c.subtext0, bg = c.surface0 },
+			y = { fg = c.subtext0, bg = c.surface1 },
+			z = { fg = c.subtext0, bg = c.surface1 },
 		}
 		-- The bar is surface0 edge to edge, so a cap's second colour is
 		-- surface0 as well: the rounded end dissolves into the bar.

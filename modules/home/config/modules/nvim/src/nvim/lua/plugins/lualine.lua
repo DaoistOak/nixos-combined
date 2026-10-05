@@ -54,8 +54,16 @@ local pill = {
 -- (y, z) get a section divider prepended (utils/section.lua). With z holding
 -- nothing but the cap that divider would land on the cap and paint a second,
 -- unpaired end, so it is switched off here.
+--
+-- The group is handed over as `color` rather than as a literal `%#group#`
+-- prefix. utils/section.lua treats a leading `%#` as "this component brings its
+-- own highlight" and replies with a transitional divider whose colours are a
+-- snapshot (extract_highlight_colors) of that group; the snapshot can miss and
+-- fall back to the section default, which is subtext0 for z. Letting lualine
+-- link the group itself keeps the cap on one authoritative colour.
 local right_cap = {
-	cap("StatusLineCapRight", cap_right),
+	cap_right,
+	color = "StatusLineCapRight",
 	padding = { left = 0, right = 0 },
 	separator = "",
 	ls_separator = "",
