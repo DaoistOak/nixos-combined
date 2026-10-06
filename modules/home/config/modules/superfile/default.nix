@@ -7,7 +7,9 @@
 {
   xdg.configFile."superfile/config.toml" = {
     text = ''
-      theme = "catppuccin-macchiato"
+      # "theme-switcher" is written by scripts/theme (gen_superfile_theme) from
+      # the shared DB on every switch; superfile has no theme-follows-env option.
+      theme = "theme-switcher"
       editor = "nvim"
       auto_check_update = false
       default_open_file_preview = true

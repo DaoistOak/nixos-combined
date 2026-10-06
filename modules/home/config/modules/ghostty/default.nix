@@ -16,8 +16,12 @@ let
   # currently tracked selection (matches what scripts/theme writes at runtime).
   t = import ../../themes/colors/themes.nix { inherit lib; };
   sel = t.readSelection ../../themes/colors/src/selection;
+  selFlavor = t.themes.${sel.themeName}.flavors.${sel.flavorName};
+  # Flavor-independent fallback: flavors with no upstream Ghostty builtin (Yoru,
+  # Mountain) must still start dark-on-light correctly. Keep in sync with the
+  # fallback in modules/config/themes/colors/default.nix and scripts/theme.
   ghosttyBuiltin =
-    t.themes.${sel.themeName}.flavors.${sel.flavorName}.ghostty or "Ghostty Default Style Dark";
+    selFlavor.ghostty or (if selFlavor.polarity == "light" then "Builtin Light" else "Builtin Dark");
 in
 {
   programs.ghostty = {

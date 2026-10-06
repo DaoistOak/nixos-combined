@@ -16,10 +16,16 @@
 #       - alacritty  ~/.config/theme-switcher/alacritty-theme.toml
 #       - wezterm    ~/.config/theme-switcher/wezterm-theme.lua
 #       - ghostty    ~/.config/theme-switcher/ghostty-theme.conf
-#                   (built-in theme + primary-color overrides)
+#                   (built-in theme + full ANSI palette override)
 #       - tmux       ~/.config/theme-switcher/tmux-theme.conf
 #       - neovim     ~/.config/theme-switcher/nvim-base16.lua
 #                   (base16 palette, applied by nvim's lua/theme.lua)
+#   * Apps that only accept a file path, rewritten in place on every switch:
+#       - herdr      [theme.custom] block in ~/.config/herdr/config.toml
+#       - superfile  ~/.config/superfile/theme/theme-switcher.toml
+#       - rofi       ~/.config/rofi/colors/theme-switcher.rasi
+#       - qutebrowser ~/.config/qutebrowser/noctalia/colors.py
+#       - hyprlock   the $hl_* variables in ~/.config/hypr/hyprlock.conf
 #   * Noctalia v5+ native theming (palette JSON + config.toml via HM)
 #   * The GTK/Qt icon theme (Papirus) + gsettings dark/light
 #   * Live reloads (kitty USR1, nvim USR1, tmux source-file, noctalia msg config-reload + templates-apply, hyprctl)
@@ -28,6 +34,8 @@
 #   theme Catppuccin Macchiato Mauve     Switch to a theme/variant/accent
 #   theme set Catppuccin Macchiato Mauve Same as above (explicit subcommand)
 #   theme set dracula dark default        Any theme in the DB (theme-agnostic)
+#   theme mutagen                        Derive a Material You palette from the
+#                                         wallpaper Noctalia currently applies
 #   theme list                           List themes, variants and accents
 #   theme current                        Show the active selection
 #
@@ -61,7 +69,28 @@ ci_key() { # $1 = jq path to the object whose keys we search, $2 = search value
 }
 ci_theme()   { ci_key '. ' "$1"; }
 ci_variant() { ci_key ".[\"$1\"].flavors" "$2"; }
-ci_accent()  { ci_key ".[\"$1\"].flavors[\"$2\"].accents" "$3"; }
+# Keep in sync with accentAliases in themes.nix (also consulted by the Nix-side
+# `resolve`); an alias only applies when the flavor has no key of that name.
+ci_accent() {
+  local got; got=$(ci_key ".[\"$1\"].flavors[\"$2\"].accents" "$3")
+  [[ -n "$got" ]] && { echo "$got"; return 0; }
+  local want="${3,,}" alias
+  for alias in "${!ACCENT_ALIASES[@]}"; do
+    if [[ "${alias,,}" == "$want" ]]; then
+      ci_key ".[\"$1\"].flavors[\"$2\"].accents" "${ACCENT_ALIASES[$alias]}"
+      return
+    fi
+  done
+  echo ""
+}
+
+# accentAliases in themes.nix: upstream accent names -> this DB's key names.
+declare -A ACCENT_ALIASES=(
+  [sky]=cyan [frost]=cyan [polar]=blue [aurora]=green
+  [pink]=purple [iris]=purple [love]=red [foam]=cyan
+  [gold]=yellow [pine]=green
+  [waveBlue]=sapphire [lotusPink]=purple [dragonBlue]=blue
+)
 
 # Resolve theme/variant/accent into normalized roles (raw hex, no '#').
 # Emits JSON: { theme, variant, accentName, accent, polarity, base..text, ansi }
@@ -161,7 +190,15 @@ check_sel() {
   cvariant=$(ci_variant "$ctheme" "$variant")
   [[ -n "$cvariant" ]] || { echo "error: unknown variant '$variant' for '$ctheme'" >&2; die_list_variants "$ctheme"; }
   if [[ -z "$accent" ]]; then
-    caccent=$(jq -r --arg t "$ctheme" --arg v "$cvariant" '.[$t].flavors[$v].accents | (if has("default") then "default" else keys[0] end)' "$SCHEMES")
+    # "default" when the flavor declares one (every non-Catppuccin flavor does),
+    # else fall back to the theme's accent-ish keys in the same priority order
+    # themes.nix uses, rather than alphabetically-first `blue`.
+    caccent=$(jq -r --arg t "$ctheme" --arg v "$cvariant" '
+      .[$t].flavors[$v].accents as $a
+      | if $a | has("default") then "default"
+        else (["mauve","lavender","purple","rosewater","blue","sapphire","cyan"]
+              | map(select(. as $k | $a | has($k))) | .[0] // ($a | keys[0]))
+        end' "$SCHEMES")
   elif [[ "${accent,,}" == "default" ]]; then
     # "Default" accent = the theme's primary text color.
     caccent="default"
@@ -184,6 +221,246 @@ die_list_accents()  { echo "available accents: $(accents_of "$1" "$2" | paste -s
 
 # jq helper to read a field from RJSON.
 f() { jq -r "$1" <<<"$RJSON"; }
+
+# [theme.custom] block for herdr, built from the active palette. Assigned to
+# HERDR_THEME_BLOCK by gen_herdr_theme once RJSON is available.
+HERDR_THEME_BLOCK=""
+gen_herdr_theme_block() {
+  local b16='.base16' na='.named'
+  local mauve peach green yellow red blue teal
+  mauve=$(f "$b16.mauve"); peach=$(f "$b16.peach")
+  green=$(f "$na.green"); yellow=$(f "$na.yellow")
+  red=$(f "$na.red"); blue=$(f "$na.blue"); teal=$(f "$na.teal")
+  HERDR_THEME_BLOCK=$(cat <<EOF
+# Managed by scripts/theme ($(f '.title') / $(f '.accentName')) — regenerated
+# on every switch; other sections in this file are left untouched.
+[theme]
+name = "$(f '.title')"
+
+[theme.custom]
+accent = "#$(f '.accent')"
+panel_bg = "#$(f '.mantle')"
+active_row_bg = "#$(f '.base')"
+selection_bg = "#$(f '.surface0')"
+surface0 = "#$(f '.surface0')"
+surface1 = "#$(f '.surface1')"
+surface_dim = "#$(f '.crust')"
+overlay0 = "#$(f '.overlay0')"
+overlay1 = "#$(f '.overlay1')"
+text = "#$(f '.text')"
+subtext0 = "#$(f '.subtext0')"
+mauve = "#$mauve"
+green = "#$green"
+yellow = "#$yellow"
+red = "#$red"
+blue = "#$blue"
+teal = "#$teal"
+peach = "#$peach"
+EOF
+  )
+}
+
+gen_hermes_skin() {
+  # Generate a Hermes skin YAML that follows the active theme-switcher palette.
+  # Uses RJSON (set by check_sel); writes the skin and activates it via config.
+  local skins_dir
+  skins_dir="${HERMES_HOME:-$HOME/.hermes}/skins"
+  mkdir -p "$skins_dir"
+  local skin="$skins_dir/theme-switcher.yaml"
+  local bg text sub0 ov0 accent green yellow red bred cyan magenta base mantle sf0 sf1 sf2
+  bg=$(f '.crust')
+  text=$(f '.text')
+  sub0=$(f '.subtext0')
+  ov0=$(f '.overlay0')
+  accent=$(f '.accent')
+  green=$(jq -r '.ansi[2]' <<<"$RJSON")
+  yellow=$(jq -r '.ansi[3]' <<<"$RJSON")
+  red=$(jq -r '.ansi[1]' <<<"$RJSON")
+  bred=$(jq -r '.ansi[9]' <<<"$RJSON")
+  cyan=$(jq -r '.ansi[6]' <<<"$RJSON")
+  magenta=$(jq -r '.ansi[5]' <<<"$RJSON")
+  base=$(f '.base')
+  mantle=$(f '.mantle')
+  sf0=$(f '.surface0')
+  sf1=$(f '.surface1')
+  sf2=$(f '.surface2')
+  cat > "$skin" <<EOF
+# Auto-generated by scripts/theme from the theme-switcher palette.
+# Do not edit manually — run 'theme hermes' or switch themes to regenerate.
+name: theme-switcher
+description: "Follows the theme-switcher: $(f '.title') / $(f '.accentName')"
+
+colors:
+  background: "#$bg"
+  ui_accent: "#$accent"
+  ui_tool: "#$accent"
+  banner_accent: "#$accent"
+  ui_thinking: "#$sub0"
+  banner_title: "#$text"
+  ui_primary: "#$text"
+  ui_text: "#$text"
+  banner_text: "#$text"
+  ui_label: "#$text"
+  banner_dim: "#$sub0"
+  ui_border: "#$ov0"
+  banner_border: "#$ov0"
+  prompt: "#$accent"
+  input_rule: "#$accent"
+  ui_ok: "&$green"
+  ui_warn: "&$accent"
+  ui_error: "&$accent"
+  status_bar_bg: "&$mantle"
+  status_bar_text: "&$text"
+  status_bar_good: "&$green"
+  status_bar_warn: "&$accent"
+  status_bar_bad: "&$accent"
+  status_bar_critical: "&$accent"
+  diff_added: "&$green"
+  diff_removed: "&$accent"
+  diff_added_word: "&$green"
+  diff_removed_word: "&$accent"
+  syntax_string: "&$cyan"
+  syntax_number: "&$accent"
+  syntax_keyword: "&$magenta"
+  syntax_comment: "#$sub0"
+  completion_menu_bg: "#$sf0"
+  completion_menu_current_bg: "#$sf1"
+  completion_menu_meta_bg: "#$sf2"
+  completion_menu_fg: "#$text"
+  completion_menu_current_fg: "#$text"
+EOF
+  hermes config set display.skin theme-switcher 2>/dev/null || true
+  notify-send "Theme" "Hermes skin updated to $(f '.title') / $(f '.accentName')" 2>/dev/null || true
+}
+
+# herdr keeps its palette in a TOML config the app rewrites itself, so it is
+# NOT a generated file — rewrite only the [theme] block on every switch,
+# preserving the user's [keys]/[ui] sections. Reads the managed file so the
+# Nix-side defaults (see modules/herdr) apply on first run.
+# superfile only ships fixed theme files (catppuccin, gruvbox, nord, ...), so a
+# DB-driven theme must be written into its data dir. Default config.toml points
+# at "theme-switcher"; see modules/home/config/modules/superfile.
+# hyprlock has no include/variable-from-env mechanism, so rewrite only the
+# `$hl_*=` variable lines in place. Everything else in hyprlock.conf (positions,
+# commands, fonts) is left byte-identical.
+gen_hyprlock_theme() {
+  local conf="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprlock.conf"
+  [[ -f "$conf" ]] || return 0
+  [[ -w "$conf" ]] || return 0
+  sed -i \
+    -e "s|^\\\$hl_text=.*|\\\$hl_text=$(f '.text')|" \
+    -e "s|^\\\$hl_sub=.*|\\\$hl_sub=$(f '.subtext1')|" \
+    -e "s|^\\\$hl_faint=.*|\\\$hl_faint=$(f '.overlay0')|" \
+    -e "s|^\\\$hl_surface=.*|\\\$hl_surface=$(f '.surface0')|" \
+    "$conf"
+}
+
+# rofi resolves colors through themes/shared/colors.rasi, which imports
+# colors/theme-switcher.rasi. Written into the MANAGED ~/.config/rofi/colors/
+# tree (the old ~/.config/hypr/rofi/colors/ path was an unmanaged leftover).
+gen_rofi_colors() {
+  local dir="${XDG_CONFIG_HOME:-$HOME/.config}/rofi/colors"
+  mkdir -p "$dir"
+  local b16='.base16'
+  local teal; teal=$(f "$b16.teal")
+  cat > "$dir/theme-switcher.rasi" <<EOF
+/* Generated by scripts/theme ($(f '.title') / $(f '.accentName')) — do not edit. */
+* {
+    background:     #$(f '.base');
+    text:           #$(f '.text');
+    accent:         #$(f '.accent');
+    background-alt: #$(f '.mantle')99;
+    foreground:     #$(f '.text');
+    selected:       #$(f '.accent');
+    active:         #$(f '.overlay0');
+    urgent:         #$teal;
+}
+EOF
+}
+
+gen_superfile_theme() {
+  local dir="${XDG_CONFIG_HOME:-$HOME/.config}/superfile/theme"
+  mkdir -p "$dir"
+  local b16='.base16' na='.named'
+  local purple green red
+  purple=$(f "$b16.purple"); green=$(f "$na.green"); red=$(f "$na.red")
+  cat > "$dir/theme-switcher.toml" <<EOF
+# Generated by scripts/theme ($(f '.title') / $(f '.accentName')) — do not edit.
+# Syntax highlighting is chroma-side and independent of the superfile palette.
+code_syntax_highlight = "monokai"
+
+# ========= Border =========
+file_panel_border = "#$(f '.overlay0')"
+sidebar_border = "#$(f '.overlay0')"
+footer_border = "#$(f '.overlay0')"
+sidebar_divider = "#$(f '.overlay0')"
+
+# ========= Border Active =========
+file_panel_border_active = "#$(f '.accent')"
+sidebar_border_active = "#$(f '.accent')"
+footer_border_active = "#$(f '.accent')"
+modal_border_active = "#$(f '.accent')"
+
+# ========= Background (bg) =========
+full_screen_bg = "#$(f '.base')"
+file_panel_bg = "#$(f '.base')"
+sidebar_bg = "#$(f '.mantle')"
+footer_bg = "#$(f '.crust')"
+modal_bg = "#$(f '.surface0')"
+
+# ========= Foreground (fg) =========
+full_screen_fg = "#$(f '.text')"
+file_panel_fg = "#$(f '.text')"
+sidebar_fg = "#$(f '.text')"
+footer_fg = "#$(f '.text')"
+modal_fg = "#$(f '.text')"
+
+# ========= Selection =========
+file_panel_item_selected_bg = "#$(f '.accent')"
+file_panel_item_selected_fg = "#$(f '.crust')"
+sidebar_item_selected_bg = "#$(f '.accent')"
+sidebar_item_selected_fg = "#$(f '.crust')"
+
+# ========= Header / hint text =========
+file_panel_top_directory_icon = "#$(f '.accent')"
+file_panel_top_path = "#$(f '.accent')"
+sidebar_title = "#$(f '.accent')"
+gradient_color = "#$purple"
+hint = "#$(f '.subtext0')"
+cursor = "#$(f '.text')"
+
+# ========= Help menu =========
+help_menu_title = "#$(f '.accent')"
+help_menu_hotkey = "#$(f '.accent')"
+
+# ========= Modal buttons =========
+modal_confirm_bg = "#$green"
+modal_confirm_fg = "#$(f '.crust')"
+modal_cancel_bg = "#$(f '.surface1')"
+modal_cancel_fg = "#$(f '.subtext0')"
+
+# ========= Spinner / status =========
+correct = "#$green"
+error = "#$red"
+cancel = "#$(f '.subtext1')"
+EOF
+}
+
+gen_herdr_theme() {
+  local cfg="${XDG_CONFIG_HOME:-$HOME/.config}/herdr/config.toml"
+  mkdir -p "$(dirname "$cfg")"
+  printf '%s\n' "$HERDR_THEME_BLOCK" > "$cfg.tmp"
+  # Drop every [theme*] section (including [theme.custom]) from the existing
+  # file, keep [keys]/[ui]/anything else the user added.
+  if [[ -f "$cfg" ]]; then
+    awk '
+      /^\[theme/ { skip = 1; next }
+      /^\[/      { skip = 0 }
+      !skip     { print }
+    ' "$cfg" >> "$cfg.tmp"
+  fi
+  mv "$cfg.tmp" "$cfg"
+}
 
 write_runtime_files() {
   mkdir -p "$CFG"
@@ -258,19 +535,31 @@ EOF
     echo "}"
   } > "$CFG/wezterm-theme.lua"
 
-  # --- ghostty (built-in theme + primary-color overrides) --------------------
-  # Ghostty ships the selected theme as a built-in, so the runtime file only
-  # pins the theme name and overrides the accent-driven primary slots.
-  cat > "$CFG/ghostty-theme.conf" <<EOF
-# Generated by scripts/theme ($(f '.title') / $(f '.accentName'))
-theme = $(jq -r --arg t "$(f '.theme')" --arg v "$(f '.variant')" '.[$t].flavors[$v].ghostty // "Ghostty Default Style Dark"' "$SCHEMES")
-background = #$(f '.crust')
-foreground = #$fg
-cursor-color = #$accent
-cursor-text = #$(f '.crust')
-selection-background = #$accent
-selection-foreground = #$(f '.crust')
-EOF
+  # --- ghostty (built-in theme + full palette overrides) --------------------
+  # Ghostty ships many of these themes as built-ins, but the built-in palette is
+  # not guaranteed to match this flavor's ANSI slots and several flavors (Yoru,
+  # Mountain, Material You) have no built-in at all, so pin every color
+  # explicitly and fall back to the polarity-matched builtin. Mirror of
+  # modules/config/colors/default.nix `ghosttyTheme`.
+  {
+    echo "# Generated by scripts/theme ($(f '.title') / $(f '.accentName'))"
+    local gfallback
+    gfallback=$(
+      jq -r --arg t "$(f '.theme')" --arg v "$(f '.variant')" \
+        '.[$t].flavors[$v].ghostty // (if .[$t].flavors[$v].polarity == "light" then "Builtin Light" else "Builtin Dark" end)' \
+        "$SCHEMES"
+    )
+    echo "theme = $gfallback"
+    echo "background = #$(f '.crust')"
+    echo "foreground = #$fg"
+    echo "cursor-color = #$accent"
+    echo "cursor-text = #$(f '.crust')"
+    echo "selection-background = #$accent"
+    echo "selection-foreground = #$(f '.crust')"
+    # Ghostty requires the explicit `N=#hex` index form (verified with
+    # `ghostty +validate-config`); a bare `palette = #hex` is rejected.
+    jq -r '.ansi | to_entries[] | "palette = \(.key)=#\(.value)"' <<<"$RJSON"
+  } > "$CFG/ghostty-theme.conf"
 
   # --- tmux --------------------------------------------------------------
   # Colors are exposed as runtime tmux variables (@thm_*) that the static
@@ -418,6 +707,53 @@ EOF
 }
 
 # Build the Noctalia palette JSON for the resolved roles + accent.
+# qutebrowser has no env-var theming and its config.py execs this file, so
+# rewrite it wholesale. The variable set matches the M3 names noctalia/matugen
+# emits (the file was frozen on Catppuccin Macchiato values).
+gen_qutebrowser_colors() {
+  local dir="${XDG_CONFIG_HOME:-$HOME/.config}/qutebrowser/noctalia"
+  mkdir -p "$dir"
+  local b16='.base16'
+  local qred qmaroon; qred=$(f "$b16.red"); qmaroon=$(f "$b16.maroon")
+  cat > "$dir/colors.py" <<EOF
+# Generated by scripts/theme ($(f '.title') / $(f '.accentName')) — do not edit.
+# qutebrowser config.py exec()s this file, so the bare assignments below become
+# qutebrowser's color.* names.
+surface = "#$(f '.crust')"
+surface_dim = "#$(f '.mantle')"
+surface_bright = "#$(f '.surface2')"
+surface_container = "#$(f '.surface0')"
+surface_container_low = "#$(f '.mantle')"
+surface_container_lowest = "#$(f '.crust')"
+surface_container_high = "#$(f '.surface1')"
+surface_container_highest = "#$(f '.surface2')"
+surface_variant = "#$(f '.surface0')"
+on_surface = "#$(f '.text')"
+on_surface_variant = "#$(f '.subtext1')"
+inverse_surface = "#$(f '.text')"
+inverse_on_surface = "#$(f '.base')"
+primary = "#$(f '.accent')"
+on_primary = "#$(f '.crust')"
+primary_container = "#$(f '.surface1')"
+on_primary_container = "#$(f '.text')"
+inverse_primary = "#$(f '.mantle')"
+secondary = "#$(f '.secondary')"
+on_secondary = "#$(f '.crust')"
+secondary_container = "#$(f '.surface1')"
+on_secondary_container = "#$(f '.text')"
+tertiary = "#$(f '.tertiary')"
+on_tertiary = "#$(f '.crust')"
+tertiary_container = "#$(f '.surface1')"
+on_tertiary_container = "#$(f '.text')"
+outline = "#$(f '.overlay1')"
+outline_variant = "#$(f '.overlay0')"
+error = "#$qred"
+on_error = "#$(f '.crust')"
+error_container = "#$qmaroon"
+on_error_container = "#$(f '.text')"
+EOF
+}
+
 gen_noctalia_palette() {
   mkdir -p "$PALETTES_DIR"
   jq -c --arg pol "$(f '.polarity')" '
@@ -471,6 +807,218 @@ gen_noctalia_palette() {
     }' <<<"$RJSON" > "$PALETTE_JSON"
 }
 
+# ---------------------------------------------------------------------------
+# mutagen — derive a Material You palette from the wallpaper Noctalia has
+# currently applied, then push it through the exact same runtime writers as
+# `theme set`. Nothing here is committed to the DB or src/selection, so a
+# wallpaper-derived scheme never shows up in the Stylix rebuild; use it as a
+# live-only accent. `theme set <db theme>` restores a tracked selection.
+# ---------------------------------------------------------------------------
+MUTAGEN_CACHE="$HOME/.cache/theme-switcher/mutagen.json"
+
+# Current wallpaper, per Noctalia's own IPC (the authoritative answer; the
+# HM-managed config.toml deliberately carries no wallpaper section).
+current_wallpaper() {
+  require noctalia
+  noctalia msg wallpaper-get 2>/dev/null | head -1
+}
+
+# Noctalia's current light/dark mode, so mutagen follows the desktop rather
+# than forcing a polarity.
+current_polarity() {
+  local m
+  m=$(noctalia msg theme-mode-get 2>/dev/null | tr -d '[:space:]')
+  case "$m" in
+    light | dark) printf '%s' "$m" ;;
+    *) printf 'dark' ;;
+  esac
+}
+
+# Ask Noctalia to extract an M3 palette from the wallpaper. Cached per image so
+# repeated switches over the same wallpaper are instant.
+gen_m3_palette() {
+  local wallpaper="$1" scheme="${2:-m3-tonal-spot}" mtime key out
+  mtime=$(stat -c %Y "$wallpaper" 2>/dev/null || echo 0)
+  key=$(printf '%s' "$wallpaper" | cksum | cut -d' ' -f1)
+  out="$MUTAGEN_CACHE/${key}-${mtime}-${scheme}.json"
+  [[ -s "$out" ]] && { printf '%s' "$out"; return 0; }
+  mkdir -p "$MUTAGEN_CACHE"
+  if ! noctalia theme "$wallpaper" --scheme "$scheme" --both -o "$out" 2>/dev/null; then
+    # Older Noctalia builds may not know --both; fall back to the single-polarity
+    # form and let the caller pick whichever key is present.
+    if ! noctalia theme "$wallpaper" --scheme "$scheme" -o "$out" 2>/dev/null; then
+      echo "error: 'noctalia theme' could not generate a palette from $wallpaper" >&2
+      return 1
+    fi
+  fi
+  [[ -s "$out" ]] || { echo "error: Noctalia produced an empty palette" >&2; return 1; }
+  printf '%s' "$out"
+}
+
+# Translate Noctalia's M3 token map into the normalized roles the runtime
+# writers expect. M3 already ships a full surface-container ramp and a complete
+# 16-slot terminal palette, so these roles come straight from the tokens rather
+# than from the Catppuccin-ratio generator used for the static DB.
+m3_to_roles() { # $1 = m3 json, $2 = polarity (dark|light) -> normalized JSON
+  python3 - "$1" "$2" <<'PY'
+import json, re, sys
+
+m3 = json.load(open(sys.argv[1]))
+pol = sys.argv[2]
+
+# Prefer the requested polarity, then whichever one the file actually carries.
+tok = m3.get(pol) or m3.get("dark") or m3.get("light")
+if tok is None:
+    sys.exit("mutagen: no usable token map in " + sys.argv[1])
+
+
+def h(c):
+    c = str(c).lstrip("#")
+    return tuple(int(c[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def s(rgb):
+    return "%02x%02x%02x" % tuple(max(0, min(255, round(v))) for v in rgb)
+
+
+def mix(a, b, t):
+    return tuple(a[i] + (b[i] - a[i]) * t for i in range(3))
+
+
+def n(key, *fallbacks):
+    """First present token among key + fallbacks, as lowercase hex."""
+    for k in (key,) + fallbacks:
+        v = tok.get(k)
+        if v:
+            return str(v).lstrip("#").lower()
+    return "000000"
+
+
+# M3 ships a full surface-container ramp, so the roles map straight across.
+crust = h(n("surface_container_lowest", "surface"))
+mantle = h(n("surface_container_low", "surface"))
+base = h(n("surface"))
+sf0 = h(n("surface_container", "surface_variant"))
+sf1 = h(n("surface_container_high", "surface_bright"))
+sf2 = h(n("surface_container_highest"))
+text = h(n("on_surface"))
+ov0 = h(n("outline_variant", "outline"))
+ov1 = h(n("outline"))
+
+# M3 has no tokens for overlay2/subtext1; interpolate toward the foreground so
+# they land between outline and on-surface like the static DB flavors do.
+ov2 = mix(ov1, text, 0.5)
+sub0 = h(n("on_surface_variant", "outline"))
+sub1 = mix(sub0, text, 0.6)
+
+primary = n("primary")
+secondary = n("secondary")
+tertiary = n("tertiary")
+error = n("error")
+
+# Complete 16-slot terminal palette; fall back to M3 roles per channel so a
+# minimal token set still yields a usable palette.
+ansi = [
+    n("terminal_normal_black"),
+    n("terminal_normal_red", "error"),
+    n("terminal_normal_green", "terminal_bright_green"),
+    n("terminal_normal_yellow", "terminal_bright_yellow"),
+    n("terminal_normal_blue", "primary"),
+    n("terminal_normal_magenta", "tertiary"),
+    n("terminal_normal_cyan", "terminal_bright_cyan"),
+    n("terminal_normal_white", "terminal_bright_white"),
+    n("terminal_bright_black"),
+    n("terminal_bright_red", "error"),
+    n("terminal_bright_green", "terminal_normal_green"),
+    n("terminal_bright_yellow", "terminal_normal_yellow"),
+    n("terminal_bright_blue", "primary"),
+    n("terminal_bright_magenta", "tertiary"),
+    n("terminal_bright_cyan", "terminal_normal_cyan"),
+    n("terminal_bright_white", "on_surface"),
+]
+if not all(re.fullmatch(r"[0-9a-f]{6}", c) for c in ansi):
+    sys.exit("mutagen: token set is missing terminal palette slots")
+
+# M3 only defines primary/secondary/tertiary/error, so Noctalia's terminal slots
+# are often degenerate: all eight chromatic hues can collapse onto four colors
+# (blue+magenta = primary, green+magenta = tertiary, ...). Distinctness is the
+# whole point of an ANSI palette -- grep, diffs and build output all depend on
+# red/green/yellow being tellable apart -- so synthesize the chromatic slots by
+# rotating the accent hues when the extracted set is too degenerate to use.
+CHROMA = [1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14]
+if len({ansi[i] for i in CHROMA}) < 6:
+    import colorsys
+
+    # Hue anchors chosen to line up with the conventional ANSI order, then
+    # seeded from the wallpaper's own accent so the result still reads as
+    # derived from the image rather than as a canned palette.
+    hues = [0.00, 0.33, 0.13, 0.58, 0.83, 0.50, 0.00, 0.33, 0.13, 0.58, 0.83, 0.50]
+    srcs = [error, ansi[10], ansi[11], primary, tertiary, secondary,
+            error, ansi[10], ansi[11], primary, tertiary, secondary]
+    bright = {9: 1.00, 10: 1.00, 11: 1.00, 12: 1.00, 13: 1.00, 14: 1.00}
+    for slot, hue, src in zip(CHROMA, hues, srcs):
+        r, g, b = (v / 255.0 for v in h(src))
+        hh, ll, ss = colorsys.rgb_to_hls(r, g, b)
+        # Keep the accent's own saturation but lift lightness on the bright set.
+        if slot in bright:
+            ll = min(0.85, max(0.55, ll + 0.12))
+            ss = max(ss, 0.35)
+        ansi[slot] = s(tuple(c * 255 for c in colorsys.hls_to_rgb(hue, ll, ss)))
+
+roles = {
+    "theme": "mutagen",
+    "variant": pol,
+    "accentName": "primary",
+    "accent": primary,
+    "polarity": pol,
+    "title": "Mutagen " + pol.capitalize(),
+    "base": s(base),
+    "mantle": s(mantle),
+    "crust": s(crust),
+    "surface0": s(sf0),
+    "surface1": s(sf1),
+    "surface2": s(sf2),
+    "overlay0": s(ov0),
+    "overlay1": s(ov1),
+    "overlay2": s(ov2),
+    "subtext0": s(sub0),
+    "subtext1": s(sub1),
+    "text": s(text),
+    "ansi": ansi,
+    "named": {
+        "mauve": tertiary,
+        "red": error,
+        "maroon": ansi[9],
+        "green": ansi[10],
+        "yellow": ansi[11],
+        "blue": primary,
+        "sapphire": ansi[12],
+        "sky": secondary,
+        "lavender": ansi[15],
+        "teal": secondary,
+    },
+    "base16": {
+        "rosewater": s(text),
+        "lavender": s(text),
+        "red": error,
+        "peach": tertiary,
+        "orange": tertiary,
+        "yellow": ansi[11],
+        "green": ansi[10],
+        "teal": secondary,
+        "cyan": ansi[14],
+        "mauve": tertiary,
+        "purple": tertiary,
+        "flamingo": error,
+    },
+    "secondary": secondary,
+    "tertiary": tertiary,
+    "hover": ansi[10],
+}
+print(json.dumps(roles, separators=(",", ":")))
+PY
+}
+
 # Apply runtime changes across the stack.
 apply() {
   local label="$1" polarity="$2"
@@ -506,6 +1054,15 @@ apply() {
     noctalia msg templates-apply >/dev/null 2>&1 || true
   fi
   hyprctl reload >/dev/null 2>&1 || true
+  # Hermes Agent skin + the non-terminal apps that only accept a file path
+  # (herdr, superfile, rofi, hyprlock) follow the active theme-switcher palette.
+  gen_hermes_skin
+  gen_herdr_theme_block
+  gen_herdr_theme
+  gen_superfile_theme
+  gen_rofi_colors
+  gen_hyprlock_theme
+  gen_qutebrowser_colors
   # wezterm auto-reloads via its watch list when the theme file changes.
   notify-send "Theme" "Switched to $label" >/dev/null 2>&1 || true
 }
@@ -566,6 +1123,43 @@ cmd_set() {
   apply "$label" "$polarity"
 }
 
+# Derive a palette from the wallpaper Noctalia has currently applied and push it
+# through the same runtime writers as `theme set`. Always runtime-only: the
+# result is wallpaper-derived, so it is never written to src/selection and never
+# survives a rebuild. `theme set <db theme>` restores a tracked selection.
+cmd_mutagen() {
+  local scheme="$MUTAGEN_SCHEME" polarity wallpaper m3
+  wallpaper=$(current_wallpaper || true)
+  if [[ -z "$wallpaper" ]]; then
+    echo "error: could not read the current wallpaper from Noctalia" >&2
+    echo "       (is noctalia running? try 'noctalia msg wallpaper-get')" >&2
+    return 1
+  fi
+  if [[ ! -f "$wallpaper" ]]; then
+    echo "error: Noctalia reports wallpaper '$wallpaper', which does not exist" >&2
+    return 1
+  fi
+  polarity=$(current_polarity)
+  m3=$(gen_m3_palette "$wallpaper" "$scheme" || true)
+  if [[ -z "$m3" ]]; then
+    return 1
+  fi
+  RJSON=$(m3_to_roles "$m3" "$polarity")
+  if [[ -z "$RJSON" ]] || ! jq -e . >/dev/null <<<"$RJSON"; then
+    echo "error: could not map the Noctalia palette onto theme roles" >&2
+    return 1
+  fi
+  gen_noctalia_palette
+  write_runtime_files
+  mkdir -p "$(dirname "$STATE")"
+  printf 'mutagen %s primary\n' "$polarity" > "$STATE"
+  local label="Mutagen $(tr '[:lower:]' '[:upper:]' <<<"$polarity") (primary)"
+  echo "wallpaper: $wallpaper"
+  echo "theme: $label"
+  echo "(mutagen is runtime-only: not tracked in src/selection, no rebuild)"
+  apply "$label" "$polarity"
+}
+
 cmd_list() {
   for t in $(themes_list); do
     echo "Theme: $t"
@@ -583,15 +1177,30 @@ cmd_current() {
   fi
 }
 
+cmd_hermes() {
+  # Generate/update the Hermes Agent skin from the current theme-switcher state.
+  if [[ ! -f "$STATE" ]]; then
+    echo "error: no theme-switcher state at $STATE (run 'theme <theme> <variant> <accent>' first)" >&2
+    exit 1
+  fi
+  read -r theme variant accent <<<"$(cat "$STATE")"
+  check_sel "$theme" "$variant" "$accent" || exit 1
+  gen_hermes_skin
+  echo "hermes: skin generated for $(f '.title') / $(f '.accentName')"
+}
+
 usage() {
   echo "usage:"
   echo "  $0 <theme> <variant> [accent] [--runtime] [--system]"
   echo "  $0 set <theme> <variant> [accent] [--runtime] [--system]"
+  echo "  $0 mutagen           Derive a Material You palette from the current wallpaper"
   echo "  $0 list"
   echo "  $0 current"
+  echo "  $0 hermes            Regenerate the Hermes Agent skin from the current theme"
   echo
-  echo "  --runtime  hot-swap terminals/tmux only (skip the Stylix rebuild)"
+  echo "  --runtime  hot-swap everything that reads a file (skip the Stylix rebuild)"
   echo "  --system   also switch the NixOS system (console/plymouth; polkit)"
+  echo "  --scheme <name>  mutagen generator scheme (default: m3-tonal-spot)"
 }
 
 cmd="${1:-}"
@@ -599,13 +1208,18 @@ cmd="${1:-}"
 # Position-independent flags; everything else is treated as the theme selection.
 RUNTIME_ONLY=0
 SYSTEM_SWITCH=0
+MUTAGEN_SCHEME="m3-tonal-spot"
 SEL_ARGS=()
-for a in "$@"; do
-  case "$a" in
+for ((i = 1; i <= $#; i++)); do
+  case "${!i}" in
     --runtime) RUNTIME_ONLY=1 ;;
     --system) SYSTEM_SWITCH=1 ;;
-    set) : ;; # subcommand keyword
-    *) SEL_ARGS+=("$a") ;;
+    --scheme)
+      ((i++))
+      MUTAGEN_SCHEME="${!i:-m3-tonal-spot}"
+      ;;
+    set | mutagen) : ;; # subcommand keywords
+    *) SEL_ARGS+=("${!i}") ;;
   esac
 done
 
@@ -613,10 +1227,15 @@ if [[ "$cmd" == "set" ]]; then
   cmd_set "${SEL_ARGS[0]:?theme required}" "${SEL_ARGS[1]:?variant required}" "${SEL_ARGS[2]:-}"
   exit 0
 fi
+if [[ "$cmd" == "mutagen" ]]; then
+  cmd_mutagen
+  exit 0
+fi
 handled=0
 case "$cmd" in
   list | -l) cmd_list; handled=1 ;;
   current | status) cmd_current; handled=1 ;;
+  hermes) cmd_hermes; handled=1 ;;
   help | -h | --help)
     usage
     handled=1

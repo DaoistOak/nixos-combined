@@ -48,7 +48,11 @@ in
     targets.kde.useWallpaper = false;
     targets.kde.decorations = "org.kde.klassy";
     targets.kde.decorationTheme = "klassy";
-    targets.kde.applicationStyle = "kvantum-dark";
+    # Follows the selected flavor: kvantum-dark on every dark flavor,
+    # kvantum-light on latte/nord light/etc. Without this, light flavors
+    # render KDE dialogs with dark chrome.
+    targets.kde.applicationStyle =
+      if config.colors.active.polarity == "light" then "kvantum-light" else "kvantum-dark";
     targets.kde.widgetStyle = "qtcde";
     targets.noctalia-shell.enable = false;
     # Terminals/dotfiles are owned by the declarative modules under

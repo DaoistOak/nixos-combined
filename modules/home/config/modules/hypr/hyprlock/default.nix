@@ -5,8 +5,16 @@
   ...
 }:
 {
+  # Colors are declared as hyprlock variables sourced from the shared theme DB,
+  # so a light/dark switch is a one-line change here instead of 7 hardcoded
+  # Catppuccin hexes. scripts/theme rewrites just the `$\w+=` lines at runtime,
+  # so `theme <name> <variant>` recolors the lock screen without a rebuild.
   xdg.configFile."hypr/hyprlock.conf".text = ''
       $font=JetBrains Mono
+      $hl_text=${config.colors.active.text}
+      $hl_sub=${config.colors.active.subtext1}
+      $hl_faint=${config.colors.active.overlay0}
+      $hl_surface=${config.colors.active.surface0}
 
     # GENERAL
     general {
@@ -38,7 +46,7 @@
     label {
         monitor =
         text = cmd[update:1000] echo "<b><big> $(date +"%H") </big></b>"
-        color = rgb(cad3f5)
+        color = rgb($hl_text)
         font_size = 112
         font_family = $font
         shadow_passes = 3
@@ -53,7 +61,7 @@
     label {
         monitor =
         text = cmd[update:1000] echo "<b><big> $(date +"%M") </big></b>"
-        color = rgb(cad3f5)
+        color = rgb($hl_text)
         font_size = 112
         font_family = $font
         shadow_passes = 3
@@ -68,7 +76,7 @@
     label {
         monitor =
         text = cmd[update:18000000] echo "<b><big> "$(date +'%A')" </big></b>"
-        color = rgb(8087a2)
+        color = rgb($hl_sub)
         font_size = 22
         font_family = $font
 
@@ -85,11 +93,11 @@
         dots_size = 0.26 # Scale of input-field height, 0.2 - 0.8
         dots_spacing = 0.64 # Scale of dots' absolute size, 0.0 - 1.0
         dots_center = true
-        dots_rouding = -1
+        dots_rounding = -1
         rounding = 14
-        outer_color = rgb(cad3f5)
-        inner_color = rgb(363a4f)
-        font_color = rgb(cad3f5)
+        outer_color = rgb($hl_text)
+        inner_color = rgb($hl_surface)
+        font_color = rgb($hl_text)
         fade_on_empty = true
         placeholder_text = <i>Password...</i>
         position = 0, 120
@@ -100,7 +108,7 @@
     label {
         monitor =
         text = cmd[update:18000000] echo "<b>Feels like<big> $(curl -s 'wttr.in?format=%t' | tr -d '+') </big></b>"
-        color = rgb(6e738d)
+        color = rgb($hl_faint)
         font_size = 18
         font_family = $font
 
