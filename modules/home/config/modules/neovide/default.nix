@@ -43,7 +43,7 @@ in
           family = fontFamily;
           style = "Bold Italic";
         };
-        size = 13.0;
+        size = 11.0;
         hinting = "full";
         edging = "antialias";
       };

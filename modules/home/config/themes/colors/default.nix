@@ -155,7 +155,7 @@ let
       foreground = ${h r.text}
       cursor-color = ${h r.accent}
       cursor-text = ${h r.crust}
-      selection-background = ${h r.accent}
+      selection-background = ${h r.crust}
       selection-foreground = ${h r.crust}
       ${palette}
     '';

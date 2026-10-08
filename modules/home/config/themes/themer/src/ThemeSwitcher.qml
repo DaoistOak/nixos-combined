@@ -356,7 +356,10 @@ Item {
 
     Connections {
         target: ThemeDb
-        function onLoadedChanged() {
+        // `onLoadedChanged` only fires on the first successful parse, so a later
+        // reload that adds themes would never rebuild the list. `reloaded` fires
+        // on every finished load attempt.
+        function onReloaded() {
             if (root.open) {
                 root.syncCurrent();
                 root.refresh();

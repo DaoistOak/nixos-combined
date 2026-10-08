@@ -306,22 +306,22 @@ colors:
   banner_border: "#$ov0"
   prompt: "#$accent"
   input_rule: "#$accent"
-  ui_ok: "&$green"
-  ui_warn: "&$accent"
-  ui_error: "&$accent"
-  status_bar_bg: "&$mantle"
-  status_bar_text: "&$text"
-  status_bar_good: "&$green"
-  status_bar_warn: "&$accent"
-  status_bar_bad: "&$accent"
-  status_bar_critical: "&$accent"
-  diff_added: "&$green"
-  diff_removed: "&$accent"
-  diff_added_word: "&$green"
-  diff_removed_word: "&$accent"
-  syntax_string: "&$cyan"
-  syntax_number: "&$accent"
-  syntax_keyword: "&$magenta"
+  ui_ok: "#$green"
+  ui_warn: "#$accent"
+  ui_error: "#$accent"
+  status_bar_bg: "#$mantle"
+  status_bar_text: "#$text"
+  status_bar_good: "#$green"
+  status_bar_warn: "#$accent"
+  status_bar_bad: "#$accent"
+  status_bar_critical: "#$accent"
+  diff_added: "#$green"
+  diff_removed: "#$accent"
+  diff_added_word: "#$green"
+  diff_removed_word: "#$accent"
+  syntax_string: "#$cyan"
+  syntax_number: "#$accent"
+  syntax_keyword: "#$magenta"
   syntax_comment: "#$sub0"
   completion_menu_bg: "#$sf0"
   completion_menu_current_bg: "#$sf1"
@@ -342,7 +342,10 @@ EOF
 # at "theme-switcher"; see modules/home/config/modules/superfile.
 # hyprlock has no include/variable-from-env mechanism, so rewrite only the
 # `$hl_*=` variable lines in place. Everything else in hyprlock.conf (positions,
-# commands, fonts) is left byte-identical.
+# commands, fonts) is left byte-identical. Under home-manager hyprlock.conf is a
+# Nix store symlink, so this is normally a no-op; the build-time
+# `config.colors.active` variables in modules/home/.../hyprlock are what follow
+# the selection (the default `theme set` rebuild + activates home-manager).
 gen_hyprlock_theme() {
   local conf="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprlock.conf"
   [[ -f "$conf" ]] || return 0
@@ -554,7 +557,7 @@ EOF
     echo "foreground = #$fg"
     echo "cursor-color = #$accent"
     echo "cursor-text = #$(f '.crust')"
-    echo "selection-background = #$accent"
+    echo "selection-background = #$(f '.crust')"
     echo "selection-foreground = #$(f '.crust')"
     # Ghostty requires the explicit `N=#hex` index form (verified with
     # `ghostty +validate-config`); a bare `palette = #hex` is rejected.

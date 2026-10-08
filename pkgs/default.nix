@@ -27,6 +27,7 @@ let
     awww
     chafa
     cliphist
+    copilot-language-server
     flameshot
     gpu-screen-recorder
     inputs.hermes-agent.packages."x86_64-linux".default

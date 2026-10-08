@@ -21,7 +21,13 @@ Singleton {
     property string currentAccent: ""
     property bool loaded: false
     property bool applying: false
+    property bool loadQueued: false
     property var loadErrors: []
+
+    // Emitted after every finished load attempt. `loaded` only flips on the first
+    // successful parse, so listeners that rebuild a model must watch this instead:
+    // a reload that only adds themes leaves `loaded` at true and never signals.
+    signal reloaded
 
     // Index helpers for the UI model (themes = [{ key, title, variants:[{ key, title, polarity, accents:[{key,hex}] }] }])
     function variants(themeIdx) {
@@ -82,6 +88,12 @@ Singleton {
     }
 
     function reload() {
+        // Quickshell ignores `running = true` while the process is live, which
+        // would silently drop the reload; queue it for the next free run.
+        if (loadDb.running) {
+            root.loadQueued = true;
+            return;
+        }
         loadDb.running = true;
     }
 
@@ -101,6 +113,13 @@ Singleton {
         command: ["sh", "-lc",
             `cat "${root.dbPath}" 2>/dev/null; echo; echo "--STATE--"; cat "${root.statePath}" 2>/dev/null || true`
         ]
+        onRunningChanged: {
+            // Drain reloads that arrived while the process was live.
+            if (!running && root.loadQueued) {
+                root.loadQueued = false;
+                loadDb.running = true;
+            }
+        }
         stdout: StdioCollector {
             id: dbCollector
             onStreamFinished: {
@@ -117,21 +136,19 @@ Singleton {
                         const variants = [];
                         for (const vkey of Object.keys(th.flavors ?? {})) {
                             const f = th.flavors[vkey];
-const accents = Object.keys(f.accents ?? {})
-                        .filter(a => a !== "default")
-                        .map(a => ({ key: a, hex: "#" + (f.accents[a] ?? "#888888") }));
-                    variants.push({
-                        key: vkey,
-                        title: f.title ?? vkey,
-                        polarity: f.polarity ?? "dark",
-                        text: f.text ?? "",
-                        accents
-                    });
+                            const accents = Object.keys(f.accents ?? {})
+                                .filter(a => a !== "default")
+                                .map(a => ({ key: a, hex: "#" + (f.accents[a] ?? "#888888") }));
+                            variants.push({
+                                key: vkey,
+                                title: f.title ?? vkey,
+                                polarity: f.polarity ?? "dark",
+                                text: f.text ?? "",
+                                accents
+                            });
                         }
                         built.push({ key, title: th.title ?? key, variants });
                     }
-                    root.themes = built;
-                    root.loaded = built.length > 0;
 
                     const parts = stateText.split(/\s+/).filter(Boolean);
                     if (parts.length >= 2) {
@@ -143,10 +160,18 @@ const accents = Object.keys(f.accents ?? {})
                         root.currentVariant = "macchiato";
                         root.currentAccent = "mauve";
                     }
+
+                    // Assign the model last so `themesChanged` observers see a
+                    // fully populated selection state.
+                    root.themes = built;
+                    root.loaded = built.length > 0;
+                    root.loadErrors = [];
                 } catch (e) {
                     console.warn("themeswitcher db: parse error", e);
+                    root.loadErrors = [String(e)];
                     root.loaded = false;
                 }
+                root.reloaded();
             }
         }
     }
