@@ -48,11 +48,13 @@ in
     targets.kde.useWallpaper = false;
     targets.kde.decorations = "org.kde.klassy";
     targets.kde.decorationTheme = "klassy";
-    # Follows the selected flavor: kvantum-dark on every dark flavor,
-    # kvantum-light on latte/nord light/etc. Without this, light flavors
-    # render KDE dialogs with dark chrome.
+    # Plasma desktop theme (plasmarc [Theme] name). This is NOT the Kvantum
+    # widget style: setting it to "kvantum-dark" pointed Plasma at a desktop
+    # theme that does not exist, so its SVG/frame assets failed to load and the
+    # wallpaper/desktop settings misbehaved. Use the stock Breeze theme that
+    # follows the active color scheme instead.
     targets.kde.applicationStyle =
-      if config.colors.active.polarity == "light" then "kvantum-light" else "kvantum-dark";
+      if config.colors.active.polarity == "light" then "breeze-light" else "breeze-dark";
     targets.kde.widgetStyle = "qtcde";
     targets.noctalia-shell.enable = false;
     # Terminals/dotfiles are owned by the declarative modules under

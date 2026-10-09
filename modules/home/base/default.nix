@@ -123,10 +123,24 @@ in
   home.sessionVariables = {
     BROWSER = "firefox";
     TERMINAL = "ghostty";
-    QT_QPA_PLATFORMTHEME = lib.mkForce "qt6ct";
+    # Plasma/KDE QML apps (krunner, systemsettings, the wallpaper KCM, …)
+    # resolve their QtQuick Controls style through the platform theme. Forcing
+    # qt6ct here made them read qt6ct's kvantum widget style and fail with
+    # `module "kvantum" is not installed`, crashing every Kirigami app.
+    # plasma-integration's "kde" theme is the correct choice in a Plasma
+    # session and still honours kdeglobals/Qt_STYLE_OVERRIDE on Hyprland.
+    QT_QPA_PLATFORMTHEME = lib.mkForce "kde";
     QT_STYLE_OVERRIDE = lib.mkForce "kvantum";
     FLAKE_DIR = config.var.configDirectory;
   };
+
+  # The Qt home-manager module derives QT_QPA_PLATFORMTHEME from
+  # `qt.platformTheme.name` (stylix pins it to `qtct` → `qt5ct`) and emits it
+  # into systemd.user.sessionVariables, which is the environment Plasma's
+  # systemd-activated apps (plasma-krunner.service, app-systemsettings@…,
+  # the wallpaper KCM, …) actually inherit. Override it here as well, otherwise
+  # those units keep the broken qt5ct theme even though the shell env is fixed.
+  systemd.user.sessionVariables.QT_QPA_PLATFORMTHEME = lib.mkForce "kde";
 
   xdg.configFile.".gtkrc-2.0" = {
     force = true;

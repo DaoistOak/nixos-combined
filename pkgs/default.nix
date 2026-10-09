@@ -240,6 +240,7 @@ let
     bleachbit
     catppuccin-cursors.macchiatoLight
     catppuccin-kvantum
+    qt6Packages.qtstyleplugin-kvantum
     catppuccin-papirus-folders
     code-cursor-fhs
     dart-sass
