@@ -10,6 +10,10 @@ zstyle ':completion:*:*:*:*:*' menu select
 zstyle ':completion:*' special-dirs true
 zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
 
+# Load the completion listing UI before compinit (home-manager runs it later
+# via enableCompletion); `menu select` needs zsh/complist for the picker.
+zmodload zsh/complist
+
 # Global aliases (substitute anywhere in a command line).
 alias -g ls='eza --icons -a --color=always --group-directories-first'
 alias -g la='eza --icons -al --color=always --group-directories-first'
@@ -28,7 +32,6 @@ alias -g al='ollama run Alfred'
 alias -g nix-shell='nix-shell --run zsh'
 alias -g hm='home-manager switch --flake ~/.config/nixos#zeph'
 alias -g nix-init="~/bin/nix-shell-boilerplate.sh"
-alias -g vi='edit_file'
 alias -g wget='wget --hsts-file="$XDG_DATA_HOME/wget-hsts"'
 alias -g dosbox='dosbox -conf "$XDG_CONFIG_HOME"/dosbox/dosbox.conf'
 alias -g tabby_start='sudo tabby serve --model DeepSeekCoder-1.3B --chat-model Qwen3-4B --device rocm'
@@ -104,47 +107,64 @@ _autonotify_precmd() {
 add-zsh-hook preexec _autonotify_preexec
 add-zsh-hook precmd _autonotify_precmd
 
-# edit_file: nvim for writable files, sudoedit otherwise (or create).
-edit_file() {
-  if [[ -e "$1" ]]; then
-    if [[ -f "$1" ]]; then
-      if [[ -w "$1" ]]; then
-        echo "[Regular file] Editing: $1"
-        nvim "$1"
-      else
-        echo "[SU file] Editing as root: $1"
-        sudoedit "$1"
-      fi
-    else
-      echo "Error: '$1' is not a regular file."
-      return 1
-    fi
+# Open files in Neovim. Inside a Neovim :terminal, $NVIM holds that instance's
+# RPC socket, so reuse it instead of nesting another Neovim; otherwise start a
+# fresh one. Paths are passed absolute so the server resolves them against the
+# terminal's cwd, not its own.
+_nvim_open() {
+  if [[ -S "$NVIM" ]] && command -v nvim >/dev/null 2>&1; then
+    nvim --server "$NVIM" --remote "$@"
   else
-    echo "File '$1' does not exist. Create it? (Y/N)"
-    read -r response
-    if [[ "$response" =~ ^[Yy]$ ]]; then
-      dir=$(dirname "$1")
-      if [[ -w "$dir" ]]; then
-        touch "$1"
-        echo "File created: $1"
-        nvim "$1"
-      else
-        echo "No write permission. Create with sudo? (Y/N)"
-        read -r sudo_response
-        if [[ "$sudo_response" =~ ^[Yy]$ ]]; then
-          sudo touch "$1" && sudo chown "$USER:$USER" "$1"
-          echo "File created with sudo: $1"
-          sudoedit "$1"
-        else
-          echo "Aborted."
-          return 1
-        fi
-      fi
-    else
-      echo "Aborted."
-      return 1
-    fi
+    nvim "$@"
   fi
+}
+
+# vi: nvim wrapper for writable files, sudoedit otherwise (or create). Declared
+# as a function, not a global alias, so it only expands as a command word.
+vi() {
+  emulate -L zsh
+
+  if (( $# == 0 )); then
+    _nvim_open
+    return
+  fi
+
+  local file response
+  local -a open
+  for file in "$@"; do
+    if [[ ! -e "$file" ]]; then
+      print -r -- "File '$file' does not exist. Create it? (Y/N)"
+      read -r response
+      if [[ "$response" != [Yy]* ]]; then
+        print -r -- "Aborted."
+        continue
+      fi
+      if [[ -w "${file:h}" ]]; then
+        command touch -- "$file"
+        print -r -- "File created: $file"
+        open+=("${file:A}")
+      else
+        print -r -- "No write permission. Create with sudo? (Y/N)"
+        read -r response
+        if [[ "$response" != [Yy]* ]]; then
+          print -r -- "Aborted."
+          continue
+        fi
+        sudo touch -- "$file" && sudo chown -- "$USER" "$file"
+        print -r -- "File created with sudo: $file"
+        sudoedit "$file"
+      fi
+    elif [[ ! -f "$file" ]]; then
+      print -r -- "Error: '$file' is not a regular file."
+    elif [[ -w "$file" ]]; then
+      open+=("${file:A}")
+    else
+      print -r -- "[SU file] Editing as root: $file"
+      sudoedit "$file"
+    fi
+  done
+
+  (( ${#open} )) && _nvim_open "${open[@]}"
 }
 
 # chpwd hooks: run on every directory change.

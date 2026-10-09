@@ -53,42 +53,84 @@ in
       ai.copilot-chat.enable = true;
       lang.markdown.enable = true;
       lang.nix.enable = true;
+      # imported here (before user plugins) so LazyVim's import-order check
+      # passes; src/nvim/lua/plugins/kulala.lua layers kulala on top by name
+      util.rest.enable = true;
     };
 
     treesitterParsers = with pkgs.vimPlugins.nvim-treesitter-parsers; [
       cmake
       css
+      dockerfile
       fish
       git_config
       git_rebase
       gitattributes
       gitcommit
       gitignore
+      go
       graphql
       # also highlights kulala's http/rest buffers; kulala cannot install its
       # own parser here, see src/nvim/lua/plugins/kulala.lua
       http
       hyprlang
+      java
+      # LazyVim core does not ensure it, and runtime :TSInstall is disabled
+      # under Nix, so .cpp files would have no parser at all
+      cpp
       rasi
+      rust
+      scss
+      sql
     ];
 
+    # Binaries for the LSP servers listed in src/nvim/lua/plugins/lsp.lua.
+    # LazyVim only vim.lsp.enable()s servers that appear in its lspconfig
+    # opts.servers, and vim.lsp.enable() needs the cmd on $PATH at runtime.
     extraPackages = with pkgs; [
+      ansible-language-server
+      bash-language-server
+      clang-tools
+      cmake-language-server
       copilot-language-server
+      dockerfile-language-server
+      fish-lsp
       # octo.nvim shells out to gh for graphql/pickers
       gh
+      # gopls' root_dir detection runs `go env` before starting the server
+      go
+      gopls
+      hyprls
+      # jdtls needs a JVM on PATH; the nixpkgs package does not bundle one
+      jdk
+      jdt-language-server
       lua-language-server
+      marksman
       nixd
       nixfmt
+      pyright
+      rust-analyzer
+      sqls
       statix
       stylua
+      taplo
+      typescript-language-server
+      # provides cssls, jsonls and html on top of vim's built-in syntax
       vscode-langservers-extracted
+      yaml-language-server
+      zls
     ];
   };
 
   xdg.configFile."nvim/lua/theme".source = ./src/nvim/lua/theme;
   # The LazyVim module only deploys lua/config/{keymaps,options,autocmds}.lua out
-  # of configFiles, so any other lua/config module needs an explicit link.
+  # of configFiles, so any other lua/config module needs an explicit link. The
+  # same holds for any lua/ file outside lua/plugins — without a link here the
+  # activation prune below would delete them from ~/.config/nvim.
   xdg.configFile."nvim/lua/config/terminals.lua".source = ./src/nvim/lua/config/terminals.lua;
+  xdg.configFile."nvim/lua/config/lazy.lua".source = ./src/nvim/lua/config/lazy.lua;
+  xdg.configFile."nvim/lua/config/test_comment.lua".source = ./src/nvim/lua/config/test_comment.lua;
+  xdg.configFile."nvim/lua/matugen.lua".source = ./src/nvim/lua/matugen.lua;
 
   home.activation.nvimPruneStaleConfig =
     lib.hm.dag.entryAfter

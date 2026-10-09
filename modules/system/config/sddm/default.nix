@@ -19,12 +19,15 @@ let
 
   # Square avatar crop for the login circle: side = min(w,h), centered at
   # (w/2, h/2) — the canonical center square.
-  faceSq = pkgs.runCommand "face-square" {
-    nativeBuildInputs = [ pkgs.imagemagick ];
-  } ''
-    mkdir -p $out
-    magick '${face}' -auto-orient -crop '%[fx:min(w,h)]x%[fx:min(w,h)]+%[fx:(w-min(w,h))/2]+%[fx:(h-min(w,h))/2]' +repage -resize 512x512 "$out/face.png"
-  '';
+  faceSq =
+    pkgs.runCommand "face-square"
+      {
+        nativeBuildInputs = [ pkgs.imagemagick ];
+      }
+      ''
+        mkdir -p $out
+        magick '${face}' -auto-orient -crop '%[fx:min(w,h)]x%[fx:min(w,h)]+%[fx:(w-min(w,h))/2]+%[fx:(h-min(w,h))/2]' +repage -resize 512x512 "$out/face.png"
+      '';
 
   pixie =
     let

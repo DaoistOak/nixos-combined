@@ -11,16 +11,16 @@
 -- the list, `picker.hidden` is left alone because that would also pull dotfiles
 -- into fuzzy finders and buffers.
 return {
-	{
-		"folke/snacks.nvim",
-		opts = {
-			picker = {
-				sources = {
-					explorer = {
-						hidden = true,
-					},
-				},
-			},
-		},
-	},
+  {
+    "folke/snacks.nvim",
+    opts = {
+      picker = {
+        sources = {
+          explorer = {
+            hidden = true,
+          },
+        },
+      },
+    },
+  },
 }

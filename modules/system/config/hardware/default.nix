@@ -142,8 +142,9 @@ in
   # The AC change trigger (last rule) calls apply-ac-power from the service above.
   services.udev.extraRules = ''
     SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="ec:91:61:47:2d:13", NAME="wlan0"
-    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1ea7", ATTR{idProduct}=="0066", ATTR{power/control}="on"
     ACTION=="add", SUBSYSTEM=="usb", ATTR{authorized}=="1", ATTR{power/autosuspend}="1", ATTR{power/control}="auto"
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1ea7", ATTR{idProduct}=="0066", ATTR{power/control}="on"
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="275d", ATTR{idProduct}=="0ba6", ATTR{power/control}="on"
     ACTION=="change", KERNEL=="ACAD", SUBSYSTEM=="power_supply", RUN+="${applyAcPower}"
   '';
 }

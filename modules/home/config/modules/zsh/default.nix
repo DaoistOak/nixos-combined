@@ -35,7 +35,15 @@ in
       export ZSH_TMUX_AUTOSTART_ONC_ONCE=true
       export ZSH_TMUX_DEFAULT_SESSION_NAME=Base
       export NIX_LD_LIBRARY_PATH=$(nix eval --raw nixpkgs#glibc.outPath)/lib
-      export TERM=tmux-256color
+      # tmux-256color ONLY inside tmux. Forcing it unconditionally made every
+      # child process (nvim, other TUIs) run on the wrong terminfo outside
+      # tmux, losing the host terminal's capabilities (kitty keyboard
+      # protocol, cursor shapes, ...). tmux sets TERM itself from
+      # default-terminal; this only covers panes of servers started before
+      # that was configured.
+      if [[ -n $TMUX ]]; then
+        export TERM=tmux-256color
+      fi
       export NIXPKGS_ALLOW_UNFREE=1
     '';
 

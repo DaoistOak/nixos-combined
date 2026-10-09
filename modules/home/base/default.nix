@@ -24,10 +24,7 @@ in
     ../config/modules/herdr
     ../config/modules/crush
     ../config/modules/cava
-    # nvim is intentionally NOT managed by this config anymore: it is kept on
-    # disk at modules/home/config/modules/nvim but not imported, so rebuilds no
-    # longer touch ~/.config/nvim. Re-add this line to take management back.
-    # ../config/modules/nvim
+    ../config/modules/nvim
     ../config/modules/yazi
     ../config/modules/superfile
     ../config/modules/kitty

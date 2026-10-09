@@ -18,6 +18,7 @@
 
     extraConfig = ''
       # Terminal + kitty graphics protocol support
+      set -g default-terminal "tmux-256color"
       set-option -sa terminal-overrides ",xterm*:Tc"
       set-option -sa terminal-overrides ",konsole*:Tc"
       set-option -sa terminal-overrides ",kitty*:Tc"

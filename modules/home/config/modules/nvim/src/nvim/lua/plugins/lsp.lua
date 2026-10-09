@@ -1,34 +1,34 @@
--- Mason is disabled; mark servers so LazyVim calls vim.lsp.enable itself.
--- Executables come from programs.lazyvim.extraPackages.
-local function noMason(servers)
-	for name, config in pairs(servers) do
-		if name ~= "*" and type(config) == "table" then
-			config.mason = false
-		elseif name ~= "*" and config == true then
-			servers[name] = { mason = false }
-		end
-	end
-	return servers
-end
-
+-- Extra LSP servers beyond LazyVim's defaults (lua_ls, nixd, marksman from
+-- the lang.markdown extra, ...). LazyVim only enables servers that appear in
+-- its nvim-lspconfig opts.servers, so every server needs an entry here; the
+-- binaries themselves come from programs.lazyvim.extraPackages in the Nix
+-- module. rasi (rofi themes) has no LSP server at all — only its treesitter
+-- parser in treesitterParsers.
 return {
-	{
-		"neovim/nvim-lspconfig",
-		opts = function(_, opts)
-			opts.servers = noMason(opts.servers or {})
-			local function with_cmd(name, cmd)
-				local current = opts.servers[name]
-				if type(current) == "function" then
-					return
-				end
-				opts.servers[name] = vim.tbl_extend("force", type(current) == "table" and current or {}, {
-					mason = false,
-					cmd = cmd,
-				})
-			end
-			with_cmd("html", { "vscode-html-language-server", "--stdio" })
-			with_cmd("cssls", { "vscode-css-language-server", "--stdio" })
-			return opts
-		end,
-	},
+  {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        ansiblels = {},
+        bashls = {}, -- bash + sh
+        clangd = {}, -- c/c++
+        cmake = {},
+        cssls = {}, -- css + scss + less
+        dockerls = {},
+        fish_lsp = {},
+        gopls = {},
+        html = {},
+        hyprls = {},
+        jdtls = {},
+        jsonls = {},
+        pyright = {},
+        rust_analyzer = {},
+        sqls = {},
+        taplo = {}, -- toml
+        ts_ls = {}, -- javascript + typescript
+        yamlls = {},
+        zls = {}, -- zig
+      },
+    },
+  },
 }

@@ -12,25 +12,32 @@
 # home-manager session vars (PATH, etc.)
 source ~/.nix-profile/etc/profile.d/hm-session-vars.sh
 
+# Filename completion also offers dotfiles (e.g. `cd .<Tab>`). Must run AFTER
+# compinit: compinit resets _comp_options, and home-manager's enableCompletion
+# calls it earlier in this startup (order 500 vs this file's 1000).
+_comp_options+=(globdots)
+
 # Load private API keys from the untracked secrets file (zsh syntax) if present.
 [[ -f "$HOME/.config/nixos/secrets/secrets.zsh" ]] && source "$HOME/.config/nixos/secrets/secrets.zsh"
 
 # vi-mode: zsh-vi-mode (zvm plugin) replaces the manual bindkey -v + cursor
-# block. Keep BEFORE powerlevel10k is sourced: p10k wraps zle-keymap-select
-# and preserves pre-existing widgets. zvm handles vi editing, cursor shapes
-# and text objects. The package is symlinked into ${ZDOTDIR}/zsh-vi-mode by
+# block. Keep BEFORE powerlevel10k is sourced: p10k reads the keymap for its
+# vi_mode segment. zvm handles vi editing, cursor shapes and text objects.
+# The package is symlinked into ${ZDOTDIR}/zsh-vi-mode by
 # modules/home/config/modules/zsh/default.nix (like powerlevel10k).
 zvm_config() {
-  ZVM_READKEY_ENGINE=zle              # zle engine (NEX is still beta)
-  ZVM_KEYTIMEOUT=0.4                  # -> KEYTIMEOUT=40ms, matches the old value
+  ZVM_READKEY_ENGINE=zle     # zle engine (NEX is still beta)
+  # Init at source time. The default (deferred) mode runs zvm_init at the
+  # FIRST precmd, i.e. after this whole file, so zvm's bindings (Ctrl-R,
+  # etc.) would clobber the fzf/atuin bindings below — the old workaround
+  # re-ran `atuin init` via zvm_after_init_commands, which instead
+  # initialized atuin twice (duplicated ZSH_AUTOSUGGEST_STRATEGY + a second
+  # background search-index job per shell).
+  ZVM_INIT_MODE=sourcing
+  ZVM_KEYTIMEOUT=0.4                  # -> KEYTIMEOUT=40, i.e. 0.4s Esc window
   ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT # start each new line in insert mode
 }
 source ${ZDOTDIR:-$HOME/.config/zsh}/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
-# zvm re-binds keys during init (including ^R), so re-run atuin init right
-# after it so Ctrl-R stays atuin search (official zvm + atuin integration).
-zvm_after_init_commands+=(
-  'eval "$(atuin init zsh)"'
-)
 
 # Powerlevel10k theme (tracked via the powerlevel10k fetch source)
 source ${ZDOTDIR:-$HOME/.config/zsh}/powerlevel10k/powerlevel10k.zsh-theme
@@ -40,9 +47,11 @@ POWERLEVEL9K_MODE='nerdfont-complete'
 POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
 
 # FZF keybindings moved to Alt+ (frees Ctrl-T/Ctrl-R), plus Alt+F file search.
-[ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
+# home-manager's fzf module already ran `fzf --zsh` above (initContent order
+# 910 < 1000), so its widgets exist here.
 if [[ $options[zle] = on ]]; then
-  # Unbind fzf's default Ctrl-T/Ctrl-R so they can be reclaimed by other tools.
+  # Unbind fzf's default Ctrl-T/Ctrl-R. Ctrl-R is reclaimed by atuin below,
+  # Ctrl-T stays free (Alt+T is its replacement).
   for km in emacs vicmd viins; do
     bindkey -M "$km" -r '^T'
     bindkey -M "$km" -r '^R'
@@ -65,8 +74,9 @@ if [[ $options[zle] = on ]]; then
   done
 fi
 
-# Atuin (cross-shell history) + zoxide. Rerun after zvm so both history
-# systems see recorded commands.
+# Atuin (cross-shell history) + zoxide. Sourced once, after zvm has already
+# initialized above, so atuin's Ctrl-R / vicmd bindings win over zvm's and
+# ZSH_AUTOSUGGEST_STRATEGY is extended exactly once.
 eval "$(atuin init zsh)"
 eval "$(zoxide init zsh)"
 
