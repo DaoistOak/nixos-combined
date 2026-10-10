@@ -87,12 +87,11 @@ local function split(id, cmd)
   vim.cmd("startinsert")
 end
 
---- Toggles `id` in a float, leaving the shell running while it is hidden.
-local function float(id)
+--- Shows `id` in a float, creating the window only when it is not up yet.
+local function open_float(id)
   local s = session(id)
   if s.win and vim.api.nvim_win_is_valid(s.win) then
-    vim.api.nvim_win_close(s.win, true)
-    s.win = nil
+    vim.api.nvim_set_current_win(s.win)
     return
   end
 
@@ -112,6 +111,17 @@ local function float(id)
   vim.cmd("startinsert")
 end
 
+--- Toggles `id` in a float, leaving the shell running while it is hidden.
+local function float(id)
+  local s = session(id)
+  if s.win and vim.api.nvim_win_is_valid(s.win) then
+    vim.api.nvim_win_close(s.win, true)
+    s.win = nil
+    return
+  end
+  open_float(id)
+end
+
 --- Terminal in a horizontal split, focused if it is already open.
 function M.horizontal()
   split("horizontal", "split")
@@ -125,6 +135,26 @@ end
 --- Floating terminal, toggled by the same key that opened it.
 function M.float()
   float("float")
+end
+
+--- Shows the float without toggling it, whatever state the window is in.
+function M.show_float()
+  open_float("float")
+end
+
+--- Types `cmd` into the float session and brings it up.
+---
+--- The float owns a long-lived shell, so a run lands in the same buffer a
+--- manual shell uses: the output scrolls into that scrollback, and <leader>tf
+--- afterwards still toggles the window without disturbing the job. Nothing is
+--- interrupted first -- if the previous program is still running the new
+--- command is queued behind it, which is visible in the terminal rather than
+--- silently cancelled.
+---@param cmd string
+function M.run(cmd)
+  local s = session("float")
+  vim.api.nvim_chan_send(s.job, cmd .. "\r")
+  open_float("float")
 end
 
 return M

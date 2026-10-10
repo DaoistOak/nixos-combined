@@ -2,14 +2,16 @@
 -- because LazyVim's snacks spec is also a function, and a second `opts` table
 -- would be merged positionally over the sources table it already defines.
 --
--- LazyVim's defaults (`picker.sources.explorer`) are:
---   layout = { preset = "sidebar" }, cwd = true, hidden = false, ignored = true,
---   follow = false, show_hidden = false, ...
--- so the explorer opens as a right sidebar and dotfiles are filtered out. Only
--- `hidden` is changed here; `opts.picker.sources.explorer.hidden = true` feeds
--- `:Neotree`-style dotfile visibility into the explorer source and keeps them in
--- the list, `picker.hidden` is left alone because that would also pull dotfiles
--- into fuzzy finders and buffers.
+-- LazyVim only sets `layout = { preset = "sidebar" }` and `cwd` for
+-- `picker.sources.explorer`, and `hidden` is what makes dotfiles appear here.
+-- `ignored` is the one that decides whether gitignored files are listed, and
+-- leaving it unset means snacks' own source default, `ignored = false` --
+-- so `build/` and `bin/` stayed invisible until this was set to true.
+-- `picker.hidden` is left alone because that would also pull dotfiles into
+-- fuzzy finders and buffers.
+--
+-- `i` toggles it per session inside the explorer, so this is the persistent
+-- setting rather than the only way to see them.
 return {
   {
     "folke/snacks.nvim",
@@ -18,6 +20,7 @@ return {
         sources = {
           explorer = {
             hidden = true,
+            ignored = true,
           },
         },
       },

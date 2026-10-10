@@ -32,6 +32,13 @@
       url = "github:pfassina/lazyvim-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Neovim plugin, not packaged in nixpkgs and pure Lua, so the checkout is
+    # its own package and no build step is needed. Provides <leader>r's
+    # language -> command resolution; see modules/home/config/modules/nvim.
+    cook = {
+      url = "github:07CalC/cook.nvim";
+      flake = false;
+    };
     pixie-sddm.url = "github:xCaptaiN09/pixie-sddm";
     noctalia = {
       url = "github:noctalia-dev/noctalia-shell";
