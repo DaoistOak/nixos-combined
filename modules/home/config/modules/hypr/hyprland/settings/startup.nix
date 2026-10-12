@@ -55,6 +55,12 @@ in
       }
       {
         _args = [
+          "BROWSER"
+          "zen"
+        ];
+      }
+      {
+        _args = [
           "HYPRCURSOR_THEME"
           "catppuccin-macchiato-light-cursors"
         ];

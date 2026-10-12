@@ -76,7 +76,19 @@ in
   # notify; applying is `updt ext --apply` (bumps pins, rebuilds, switches).
   systemd.services.chromium-extensions-check = {
     description = "Check for Chromium extension updates";
-    wantedBy = [ "timers.target" ];
+    # Deliberately NOT wantedBy timers.target. The timer below is what should
+    # start this. WantedBy made the oneshot run on every boot *and* every
+    # `nixos-rebuild switch` -- and activation restarts NetworkManager, so the
+    # GitHub lookups ran with no DNS ("curl: (6) Could not resolve host
+    # api.github.com"), exited 1, and nixos-rebuild aborts the whole switch
+    # with exit 4. A failed check is only ever a notification-level event, so
+    # it must not sit on the activation path.
+    #
+    # network-online.target matters for the timer's Persistent = true: if the
+    # machine was off at Monday 04:17 the timer fires at the next boot, which
+    # is exactly when there is no connectivity yet.
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${pkgs.util-linux}/bin/runuser -u ${config.var.username} -- ${extCheckCommand}";

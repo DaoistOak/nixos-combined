@@ -20,6 +20,10 @@
 #       - tmux       ~/.config/theme-switcher/tmux-theme.conf
 #       - neovim     ~/.config/theme-switcher/nvim-base16.lua
 #                   (base16 palette, applied by nvim's lua/theme.lua)
+#   * CLI agents that ship their own theme file:
+#       - hermes     ~/.hermes/skins/theme-switcher.yaml (+ `hermes skin use`)
+#       - opencode  ~/.config/opencode/themes/theme-switcher.json, selected in
+#                   tui.jsonc
 #   * Apps that only accept a file path, rewritten in place on every switch:
 #       - herdr      [theme.custom] block in ~/.config/herdr/config.toml
 #       - superfile  ~/.config/superfile/theme/theme-switcher.toml
@@ -307,20 +311,20 @@ colors:
   prompt: "#$accent"
   input_rule: "#$accent"
   ui_ok: "#$green"
-  ui_warn: "#$accent"
-  ui_error: "#$accent"
+  ui_warn: "#$yellow"
+  ui_error: "#$red"
   status_bar_bg: "#$mantle"
   status_bar_text: "#$text"
   status_bar_good: "#$green"
-  status_bar_warn: "#$accent"
-  status_bar_bad: "#$accent"
-  status_bar_critical: "#$accent"
+  status_bar_warn: "#$yellow"
+  status_bar_bad: "#$red"
+  status_bar_critical: "#$red"
   diff_added: "#$green"
-  diff_removed: "#$accent"
+  diff_removed: "#$red"
   diff_added_word: "#$green"
-  diff_removed_word: "#$accent"
+  diff_removed_word: "#$red"
   syntax_string: "#$cyan"
-  syntax_number: "#$accent"
+  syntax_number: "#$yellow"
   syntax_keyword: "#$magenta"
   syntax_comment: "#$sub0"
   completion_menu_bg: "#$sf0"
@@ -329,8 +333,98 @@ colors:
   completion_menu_fg: "#$text"
   completion_menu_current_fg: "#$text"
 EOF
-  hermes config set display.skin theme-switcher 2>/dev/null || true
+  # `hermes skin use` is what actually flips the active skin (and applies it
+  # live); `hermes config set display.skin` only rewrites config.yaml and the
+  # running agent keeps rendering the previous skin.
+  hermes skin use theme-switcher >/dev/null 2>&1 \
+    || hermes config set display.skin theme-switcher >/dev/null 2>&1 || true
   notify-send "Theme" "Hermes skin updated to $(f '.title') / $(f '.accentName')" 2>/dev/null || true
+}
+
+# opencode's terminal client reads user themes from ~/.config/opencode/themes/
+# (v1 shape, auto-migrated to the v2 token tree) and picks one by name from
+# cli.json -- NOT from opencode.json/tui.json, which the TUI never reads for
+# theme selection. The structure is OpenCode's own Catppuccin Macchiato theme
+# (scripts/opencode-catppuccin-theme.json, vendored verbatim); only its colours
+# are rewritten, so every def comes from the theme-switcher palette and the
+# accent follows the selection.
+gen_opencode_theme() {
+  local dir="${XDG_CONFIG_HOME:-$HOME/.config}/opencode" base
+  base="$REPO_ROOT/scripts/opencode-catppuccin-theme.json"
+  [[ -f "$base" ]] || { echo "error: $base missing (opencode base theme)" >&2; return 1; }
+  [[ -d "$dir" ]] || return 0
+  mkdir -p "$dir/themes"
+  jq --argjson r "$RJSON" '
+    ($r) as $r |
+    {
+      "$schema": .["$schema"],
+      defs: {
+        macText: "#" + $r.text,
+        macSubtext1: "#" + $r.subtext1,
+        macSubtext0: "#" + $r.subtext0,
+        macOverlay2: "#" + $r.overlay2,
+        macOverlay1: "#" + $r.overlay1,
+        macOverlay0: "#" + $r.overlay0,
+        macSurface2: "#" + $r.surface2,
+        macSurface1: "#" + $r.surface1,
+        macSurface0: "#" + $r.surface0,
+        macBase: "#" + $r.base,
+        macMantle: "#" + $r.mantle,
+        macCrust: "#" + $r.crust,
+        macTeal: "#" + $r.named.teal,
+        macSapphire: "#" + $r.named.sapphire,
+        macSky: "#" + $r.named.sky,
+        macBlue: "#" + $r.named.blue,
+        macLavender: "#" + $r.named.lavender,
+        macGreen: "#" + $r.named.green,
+        macYellow: "#" + $r.named.yellow,
+        macRed: "#" + $r.named.red,
+        macMaroon: "#" + $r.named.maroon,
+        macMauve: "#" + $r.named.mauve,
+        macPeach: "#" + $r.base16.peach,
+        macFlamingo: "#" + $r.base16.flamingo,
+        macRosewater: "#" + $r.base16.rosewater,
+        # The upstream theme points the `accent` slot at pink; feed it the
+        # theme-switcher accent so the mode chip / focus accents follow.
+        macPink: "#" + $r.accent
+      },
+      theme: (
+        .theme
+        # diffLineNumber referenced a "textMuted" def that does not exist in the
+        # file; point it at the same overlay the textMuted slot uses.
+        | .diffLineNumber = { dark: "macOverlay2", light: "macOverlay2" }
+        # The upstream diff fills are hardcoded tints; use the overlay/surface
+        # roles instead so they track the palette.
+        | .diffAddedBg = { dark: "macMantle", light: "macMantle" }
+        | .diffRemovedBg = { dark: "macMantle", light: "macMantle" }
+        | .diffAddedLineNumberBg = { dark: "macSurface0", light: "macSurface0" }
+        | .diffRemovedLineNumberBg = { dark: "macSurface0", light: "macSurface0" }
+        # Upstream leaves 8 of its 26 defs unreferenced, and a few slots are
+        # louder than they need to be. Re-point them so every def is live and
+        # the emphasis/muted roles sit where a Catppuccin port expects them.
+        | .textMuted = { dark: "macSubtext1", light: "macSubtext1" }
+        | .diffContext = { dark: "macOverlay0", light: "macOverlay0" }
+        | .syntaxPunctuation = { dark: "macOverlay1", light: "macOverlay1" }
+        | .markdownBlockQuote = { dark: "macFlamingo", light: "macFlamingo" }
+        | .markdownEmph = { dark: "macMaroon", light: "macMaroon" }
+        | .markdownStrong = { dark: "macRosewater", light: "macRosewater" }
+        | .markdownLinkText = { dark: "macLavender", light: "macLavender" }
+        | .syntaxOperator = { dark: "macSapphire", light: "macSapphire" }
+      )
+    }' "$base" > "$dir/themes/theme-switcher.json"
+
+  # Select it. Theme selection belongs to the terminal client, which reads
+  # cli.json only; cli.json is strict about unknown keys, so merge into it and
+  # bail out rather than clobbering it if jq cannot parse what is there.
+  local cli="$dir/cli.json" tmp
+  [[ -f "$cli" ]] || printf '{\n  "$schema": "https://opencode.ai/v2/cli.json"\n}\n' > "$cli"
+  tmp="$cli.themeswitcher.tmp"
+  if jq '.theme = { name: "theme-switcher", mode: "system" }' "$cli" > "$tmp" 2>/dev/null; then
+    mv "$tmp" "$cli"
+  else
+    rm -f "$tmp"
+    echo "warn: could not select the opencode theme in $cli (unparsable JSON?)" >&2
+  fi
 }
 
 # herdr keeps its palette in a TOML config the app rewrites itself, so it is
@@ -1057,9 +1151,11 @@ apply() {
     noctalia msg templates-apply >/dev/null 2>&1 || true
   fi
   hyprctl reload >/dev/null 2>&1 || true
-  # Hermes Agent skin + the non-terminal apps that only accept a file path
-  # (herdr, superfile, rofi, hyprlock) follow the active theme-switcher palette.
+  # Hermes Agent + opencode skins and the non-terminal apps that only accept a
+  # file path (herdr, superfile, rofi, hyprlock) follow the active
+  # theme-switcher palette.
   gen_hermes_skin
+  gen_opencode_theme
   gen_herdr_theme_block
   gen_herdr_theme
   gen_superfile_theme

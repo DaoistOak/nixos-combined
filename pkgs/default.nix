@@ -193,7 +193,6 @@ let
     # Keypress visualization (from NUR, not in nixpkgs)
     nur.repos.milahu.keyviz
     playerctl
-    spotube
 
     # --- Network & Connectivity ---
     bluez-tools

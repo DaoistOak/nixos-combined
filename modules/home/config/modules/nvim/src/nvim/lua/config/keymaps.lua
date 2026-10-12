@@ -184,6 +184,12 @@ end, { desc = "Run Project" })
 vim.keymap.set("n", "<leader>rc", function()
   runner.file({ only = true })
 end, { desc = "Compile File" })
+vim.keymap.set("n", "<leader>rz", function()
+  runner.submit()
+end, { desc = "Submit to Judge" })
+vim.keymap.set("n", "<leader>rzN", function()
+  runner.submit({ nix = true })
+end, { desc = "Submit to Judge (nix)" })
 
 wk_group("<leader>rn", "nix shell", { icon = " ", color = "azure" })
 

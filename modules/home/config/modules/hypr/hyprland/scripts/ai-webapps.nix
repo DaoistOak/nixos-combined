@@ -13,8 +13,8 @@ in
     text = ''
       #!/usr/bin/env bash
       # Launch (or focus) one of the AI web apps in a standalone Chromium app
-      # window, each with its own profile dir. If the window already exists it
-      # is focused instead of spawning a duplicate.
+      # window using the default Chromium profile. If the window already exists
+      # it is focused instead of spawning a duplicate.
       # Usage: launch-ai.sh {gemini|chatgpt|perplexity|grok|claude}
       set -euo pipefail
 
@@ -34,8 +34,6 @@ in
       fi
 
       class="AI-$app"
-      profile="''${XDG_CONFIG_HOME:-$HOME/.config}/ai-webapps/$app"
-      mkdir -p "$profile"
 
       # Focus an already-open app window, else start one.
       if hyprctl clients -j 2>/dev/null | jq -e --arg c "$class" 'any(.[]; .class == $c)' >/dev/null 2>&1; then
@@ -43,13 +41,15 @@ in
         exit 0
       fi
 
+      # No --user-data-dir: the app window joins the default Chromium profile,
+      # so it inherits the main browser's extensions (Stylus), their stored
+      # data and cookies. Chromium hands the request to the already-running
+      # browser process when one is up.
       nohup chromium \
         --app="$url" \
-        --user-data-dir="$profile" \
         --class="$class" \
         --no-first-run \
-        --password-store=basic \
-         --disable-extensions >/dev/null 2>&1 &
+        --password-store=basic >/dev/null 2>&1 &
     '';
   };
 

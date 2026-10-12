@@ -457,4 +457,67 @@ function M.project(opts)
   dispatch(cmd)
 end
 
+--- The problem's URL, taken from a comment near the top of the buffer.
+---
+--- The template .competitest.lua points competitest at writes that line when a
+--- problem is received from the browser, which keeps each solution carrying its
+--- own submission target instead of relying on a value that has to be remembered
+--- or retyped per problem. Files that predate the template have no such line, so
+--- this can still come up empty.
+---@param bufnr integer
+---@return string?
+local function problem_url(bufnr)
+  for _, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, 10, false)) do
+    local url = line:match("(https?://%S+)")
+    if url then
+      return url
+    end
+  end
+  return nil
+end
+
+--- Submits the current file to its online judge with online-judge-tools.
+---
+--- oj keeps only a session cookie (XDG_STATE_HOME/online-judge-tools/cookie.jar)
+--- -- no password is written anywhere -- so login is a one-time `oj login <url>`
+--- done by hand. HackerRank is the service that implements submit_code; CS
+--- Academy's module only downloads samples, so a problem without an oj service
+--- will fail here and want a paste into the web editor instead.
+---@param opts? { nix?: boolean }
+function M.submit(opts)
+  opts = opts or {}
+  local bufnr = vim.api.nvim_get_current_buf()
+  local file = vim.api.nvim_buf_get_name(bufnr)
+  if file == "" then
+    return warn("no file name for this buffer")
+  end
+
+  local url = problem_url(bufnr)
+  if not url then
+    url = vim.fn.input("Problem URL: ")
+    if url == nil or url == "" then
+      return
+    end
+  end
+
+  -- oj reads the file off disk, so an unsaved buffer would submit the previous
+  -- version without saying so.
+  if vim.bo[bufnr].modified then
+    vim.api.nvim_buf_call(bufnr, function()
+      vim.cmd("write")
+    end)
+  end
+
+  -- -y skips oj's interactive confirmation; it opens the result page itself.
+  local cmd = ("oj submit -y %s %s"):format(q(url), q(file))
+  if opts.nix then
+    local wrapped = in_nix(M.root(), cmd)
+    if not wrapped then
+      return warn(("no flake.nix or shell.nix in %s"):format(M.root()))
+    end
+    cmd = wrapped
+  end
+  dispatch(cmd)
+end
+
 return M

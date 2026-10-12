@@ -98,11 +98,24 @@ in
     GTK_THEME=adw-gtk3
   '';
   xdg.dataFile."flatpak/overrides/global".force = true;
+  # No mimeapps.list in the XDG lookup path declares a default for http, and
+  # six browsers all register x-scheme-handler/http (brave, chromium, brave's
+  # app-id variant, firefox, qutebrowser, zen). With nothing declared, the
+  # default falls through to the MIME cache built from the desktop files, which
+  # handed it to brave-browser.desktop at random -- so links opened in Brave
+  # while xdg-settings and BROWSER both said firefox. Declaring it here makes
+  # the choice explicit and stops it drifting again after a rebuild.
+  # Keep this in sync with `BROWSER` below: xdg-settings honours $BROWSER ahead
+  # of this list, so a stale BROWSER silently wins and the declared default
+  # stops being what anything actually reports.
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
       "inode/directory" = "org.kde.dolphin.desktop";
       "application/pdf" = "org.kde.okular.desktop";
+      "x-scheme-handler/http" = "zen.desktop";
+      "x-scheme-handler/https" = "zen.desktop";
+      "text/html" = "zen.desktop";
     };
   };
 
@@ -121,7 +134,7 @@ in
   };
 
   home.sessionVariables = {
-    BROWSER = "firefox";
+    BROWSER = "zen";
     TERMINAL = "ghostty";
     # Plasma/KDE QML apps (krunner, systemsettings, the wallpaper KCM, …)
     # resolve their QtQuick Controls style through the platform theme. Forcing

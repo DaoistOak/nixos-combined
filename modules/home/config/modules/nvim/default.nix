@@ -177,7 +177,14 @@ in
 
   stylix.targets.neovim.enable = false;
 
-  home.packages = lib.mkDefault [
+  # Not lib.mkDefault: five other modules define home.packages as a plain list,
+  # and mkDefault sits at a lower priority, so the whole list was silently
+  # dropped -- stylua and lua-language-server included. List options still merge
+  # across modules at equal priority, so a plain definition is what is wanted.
+  home.packages = [
+    # `oj submit`, reached from <leader>rz. Keeps only a session cookie, never
+    # a password; see src/nvim/lua/config/runner.lua.
+    pkgs.online-judge-tools
     pkgs.stylua
     pkgs.lua-language-server
     pkgs.sqlite

@@ -94,6 +94,36 @@
       };
     };
 
+    # sesh pulls go-mockery in as a code-generation build tool and rebuilds it with
+    # buildGo127Module, because sesh itself is a buildGo127Module package:
+    #   nativeBuildInputs = [ (go-mockery.override { buildGoModule = buildGo127Module; }) ... ]
+    #   preBuild = "mockery";
+    # That override makes go-mockery compile with Go 1.27, and go-mockery's own
+    # checkPhase (doCheck = 1) then regenerates mocks via `go run .`, using the
+    # golang.org/x/tools version pinned in its go.mod. That x/tools predates Go
+    # 1.27's export data format v5, so the suite dies with:
+    #   cannot decode "context", export data version 5 is greater than maximum
+    #   supported version 4
+    # sesh: build with nixpkgs' default Go instead of Go 1.27.
+    # sesh pulls go-mockery in as a code-generation build tool and rebuilds it
+    # with its own Go version:
+    #   nativeBuildInputs = [ (go-mockery.override { buildGoModule = buildGo127Module; }) ... ]
+    #   preBuild = "mockery";
+    # sesh ships no generated mocks, so mockery is genuinely required to build
+    # it. With Go 1.27 that fails twice over: go-mockery's own checkPhase
+    # regenerates mocks with `go run .` using the golang.org/x/tools pinned in
+    # its go.mod, and so does sesh's preBuild -- but x/tools v0.49.0 (the same
+    # version in both go.mods) only decodes up to export data format v4, which
+    # is Go 1.26. Go 1.27 emits v5:
+    #   cannot decode "context", export data version 5 is greater than maximum
+    #   supported version 4
+    # Neither sesh nor mockery actually needs Go 1.27 -- sesh's go.mod declares
+    # `go 1.26.0` and mockery's declares `go 1.25.5`. nixpkgs' buildGo127Module
+    # here just forces an unbuildable combination. Swapping it for buildGoModule
+    # drops both to Go 1.26, which the pinned x/tools reads and writes fine, so
+    # mocks generate and both test suites still run -- nothing gets skipped.
+    sesh = prev.sesh.override { buildGo127Module = prev.buildGoModule; };
+
     # hypr-edgehover: forward edge-gap pointer motion to adjacent Hyprland windows.
     # Built against the flake Hyprland dev output (headers + hyprland.pc via
     # pkg-config). Its Requires deps come from hyprland's git-pinned ecosystem.
