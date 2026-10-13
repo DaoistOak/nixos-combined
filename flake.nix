@@ -25,7 +25,27 @@
       url = "github:nix-community/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    hyprland.url = "github:hyprwm/Hyprland/5c9377c15f85c50648f35ca5a213754f95b93ca0"; # v0.56.1 (has input.keyboard.key event AND activeWorkspace.id for noctalia)
+    hyprland = {
+      # v0.56.2 (efb50993), current stable. Revs below must move together with
+      # hypr-dynamic-cursors: the plugin pins an exact compositor commit, so a
+      # mismatched pair fails at load with "version mismatch!".
+      url = "github:hyprwm/Hyprland/efb50993780079460b0cbed1363e2166a2de1d9f";
+
+      # nixpkgs override (glaze). v0.56.2's CMakeLists does
+      # `find_package(glaze 7...<8 QUIET)` and falls back to FetchContent when
+      # that misses -- which always happens on Hyprland's default nixpkgs pin
+      # (e72e4f2, glaze 8.0.0), so the build dies in the sandbox with "could
+      # not find git for clone of glaze". nixpkgs' own hyprland package works
+      # around this with a postPatch, but that only helps the nixpkgs package:
+      # the plugin flakes (hypr-dynamic-cursors, hyprland-scroll-overview) build
+      # their OWN copy of Hyprland for its headers, and no downstream override
+      # reaches those. Pinning the input's nixpkgs instead fixes it at the
+      # source for every consumer, and drops the postPatch entirely.
+      # 61b7c44c is Hyprland's own v0.56.1 nixpkgs pin and ships glaze 7.9.0,
+      # which satisfies the constraint; v0.56.2 is a patch release on top of
+      # the v0.56.1 tree, so the rest of its deps are unchanged.
+      inputs.nixpkgs.url = "github:NixOS/nixpkgs/61b7c44c4073f0b827768aff0049561b5110ea5a";
+    };
     lazyvim = {
       # LazyVim home-manager module (programs.lazyvim). Plugin versions come
       # from nixpkgs; LazyVim itself is the nixpkgs vimPlugins.LazyVim package.
@@ -46,9 +66,11 @@
     };
     hyprpanel.url = "github:Jas-SinghFSU/HyprPanel";
     hypr-dynamic-cursors = {
-      # f5ba36c is the rev the plugin pins for v0.56.1 (5c9377c...) per its
-      # hyprpm.toml commit_pins; newer main targets v0.56.2+ and won't build.
-      url = "github:VirtCode/hypr-dynamic-cursors/f5ba36c7622098b53bf62ddb8ddf03b914abbdf8";
+      # 5a22428 is the rev hyprpm.toml pins for v0.56.2 (efb50993...); it is
+      # the "draw cursor on toplevel capture like hl" fix, required because
+      # 0.56.2 changed the renderSoftwareCursorsFor signature (#15638) and the
+      # 0.56.1 pin (f5ba36c) no longer resolves. Switch both together.
+      url = "github:VirtCode/hypr-dynamic-cursors/5a224284872208b5324759d535d65061043725de";
       inputs.hyprland.follows = "hyprland";
     };
     hyprland-scroll-overview = {
@@ -57,16 +79,18 @@
     };
     # No flake upstream; plain source, packaged manually in pkgs/hyprwinwrap.nix
     hyprwinwrap = {
-      # a72d3ee is the rev pinned for v0.56.0 in hyprwinwrap's hyprpm.toml
-      # commit_pins (highest pin; v0.56.1 is a patch on the same ABI line).
-      url = "github:gen3vra/hyprwinwrap/a72d3eeecfb0eaab64092c23410662ec907ca671";
+      # 3b6e337 is the single rev hyprpm.toml pins for v0.56.0, v0.56.1 AND
+      # v0.56.2 (the plugin needed no source change across those patches).
+      url = "github:gen3vra/hyprwinwrap/3b6e337b9ee934ee23179d1445cb8cacfc38af28";
       flake = false;
     };
     # No flake in this repo; plain source, packaged manually in pkgs/hypr-edgehover.nix
     hypr-edgehover = {
-      # Main (77b5e14): "adapt to Hyprland v0.56" — builds against v0.56.1
-      # headers (pre-#15779: desktop/view/Window.hpp still present).
-      url = "github:gfhdhytghd/hypr-edgehover/main";
+      # 77b5e14 (main, "adapt to Hyprland v0.56"): builds against v0.56.x
+      # headers. Still pre-#15779, so desktop/view/Window.hpp must exist —
+      # PR #15779 merged 2026-08-17, AFTER the v0.56.2 tag (2026-08-05), so
+      # v0.56.2 is safe. Bumping past v0.56.2 WILL break this plugin.
+      url = "github:gfhdhytghd/hypr-edgehover/77b5e1445361b3a1f7b6f03bb4bee15e91229c94";
       flake = false;
     };
     preload-ng.url = "github:miguel-b-p/preload-ng";

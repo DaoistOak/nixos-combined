@@ -14,6 +14,18 @@
   # You can change versions, add patches, set compilation flags, anything really.
   # https://nixos.wiki/wiki/Overlays
   modifications = final: prev: {
+    # lazyvim-nix resolves LazyVim's plugin specs with
+    # `pkgs.vimPlugins.${name} or null` (nix/lib/plugin-resolution.nix), but
+    # nixpkgs replaced this removed plugin with a `throw` alias
+    # (pkgs/.../plugins/aliases.nix, 2026-06-15). A `throw` *raises* instead of
+    # yielding null, so the `or null` fallback never fires and the entire
+    # home-manager config fails to evaluate. Nulling the attribute lets
+    # lazyvim-nix skip the plugin exactly as it would have if the attribute had
+    # never existed -- which is the pre-nixpkgs-change behaviour. Upstream
+    # deleted the typescript.nvim repository, so there is nothing to lose.
+    vimPlugins = prev.vimPlugins // {
+      typescript-nvim = null;
+    };
     # Lutris: wine/proton cannot find graphics libraries on NixOS because they
     # live in the nix store, outside Lutris's FHS library paths. Lutris
     # appends the inherited LD_LIBRARY_PATH to every game launch

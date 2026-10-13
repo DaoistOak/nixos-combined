@@ -133,6 +133,16 @@
           hl.dispatch(hl.dsp.window.resize())
         end, { mouse = true, description = "Resize window" })
 
+        -- 2. CLICK (no modifier): bring the clicked window to centre.
+        --    Hyprland's own click-focus path deliberately skips the scroll when
+        --    the target is already fully visible ("if we moved via non-kb, and
+        --    it's fully visible, ignore" in CScrollingAlgorithm::focusOnInput),
+        --    so a plain click never recentres an in-view window. The scrolling
+        --    layout's `center` layoutmsg has no such guard -- it unconditionally
+        --    centres the focused column -- so bind it explicitly.
+        --    Modifier-less, so it does not collide with SUPER-held drag above.
+        hl.bind("mouse:272", hl.dsp.layout("center"), { mouse = true, description = "Center clicked window" })
+
         -- --------------------
         -- Gestures configuration
         -- --------------------

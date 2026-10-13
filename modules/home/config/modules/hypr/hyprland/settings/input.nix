@@ -11,7 +11,11 @@
           kb_model = "";
           kb_options = "caps:escape_shifted_capslock";
           kb_rules = "";
-          follow_mouse = 0;
+          # 0 = disabled, 1 = full, 2 = loose. Focussing on hover is a *soft*
+          # focus reason (FOCUS_REASON_FFM is not in Desktop::isHardInputFocusReason),
+          # so scrolling:follow_focus / follow_min_visible decide whether the
+          # scrolling view reacts to it -- see settings/scrolling.nix.
+          follow_mouse = 1;
 
           touchpad = {
             natural_scroll = true;
