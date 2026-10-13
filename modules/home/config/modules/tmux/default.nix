@@ -14,6 +14,15 @@
     plugins = with pkgs.tmuxPlugins; [
       sensible
       vim-tmux-navigator
+      yank
+      fingers
+      fuzzback
+      extrakto
+      pain-control
+      copy-toolkit
+      tmux-which-key
+      vim-tmux-focus-events
+      tmux-floax
     ];
 
     extraConfig = ''
@@ -77,6 +86,70 @@
       # Keybinds
       bind-key v split-window -v -c "#{pane_current_path}"
       bind-key b split-window -h -c "#{pane_current_path}"
+
+      # Better pane navigation (vim-tmux-navigator handles vim-aware navigation)
+      bind-key -r h select-pane -L
+      bind-key -r j select-pane -D
+      bind-key -r k select-pane -U
+      bind-key -r l select-pane -R
+
+      # Resize panes
+      bind-key -r H resize-pane -L 5
+      bind-key -r J resize-pane -D 5
+      bind-key -r K resize-pane -U 5
+      bind-key -r L resize-pane -R 5
+
+      # Window navigation
+      bind-key -r C-h previous-window
+      bind-key -r C-l next-window
+
+      # Swap windows
+      bind-key -r "<" swap-window -t -1
+      bind-key -r ">" swap-window -t +1
+
+      # Kill pane/window/session
+      bind-key x kill-pane
+      bind-key X kill-window
+      bind-key C-x confirm-before -p "kill session #S? (y/n)" kill-session
+
+      # Reload config
+      bind-key R source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded!"
+
+      # Copy mode improvements
+      set -g mode-keys vi
+      bind-key -T copy-mode-vi v send-keys -X begin-selection
+      bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
+      bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
+      bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-selection-and-cancel
+
+      # tmux-floax: floating pane (prefix + F)
+      bind-key F run-shell "#{@floax-bind}"
+
+      # tmux-which-key: show keybindings
+      set -g @tmux-which-key-delay 0
+
+      # fingers: jump to text (prefix + g)
+      set -g @fingers-key g
+      set -g @fingers-copy-command "xclip -selection clipboard"
+      set -g @fingers-compact-hints 0
+
+      # fuzzback: fuzzy scrollback search (prefix + f)
+      set -g @fuzzback-popup 1
+      set -g @fuzzback-popup-size "90%"
+      set -g @fuzzback-bind "f"
+
+      # extrakto: fuzzy find text (prefix + e)
+      set -g @extrakto_key "e"
+      set -g @extrakto_popup_size "80%"
+      set -g @extrakto_filter_order "all line word path url quote"
+
+      # yank: clipboard integration
+      set -g @yank_selection_mouse "clipboard"
+      set -g @yank_action "copy-pipe-and-cancel"
+      set -g @yank_with_mouse on
+
+      # pain-control: already provides good bindings, ensure they're loaded
+      # copy-toolkit: provides additional copy mode tools
 
       # sesh, the smart tmux session manager. It names a new session after the git
       # remote or the directory, keeps the list ordered by zoxide frecency, and

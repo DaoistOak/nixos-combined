@@ -131,6 +131,10 @@ in
       custom_palette = "themeswapper";
       mode = if themeSel.r.polarity == "light" then "light" else "dark";
     };
+    # This lived only in a stale `noctalia config export` dump that sat in
+    # ~/.config/noctalia/ (Noctalia merges every *.toml in that dir, so the
+    # dump was silently overriding the managed config). Declared here instead.
+    settings.audio.enable_sounds = false;
   };
 
   home.sessionVariables = {
