@@ -18,8 +18,19 @@ return {
         local x = sections.lualine_x or {}
         local y_old = sections.lualine_y or {}
 
-        -- x/y/z are rearranged left-to-right: mode | diagnostics | search | sep
-        -- x is placed with the AI score, then the original x content follows.
+        -- Sections rearranged left-to-right: mode | diagnostics | search | sep
+        -- x gets the AI score; original x content goes to y, original y to z.
+        sections.lualine_a = {
+          {
+            "mode",
+            separator = {
+              left = vim.fn.nr2char(0xE0B6),
+              right = vim.fn.nr2char(0xE0B4),
+            },
+            padding = { left = 0, right = 0 },
+          },
+        }
+
         sections.lualine_x = {
           {
             function()
@@ -39,12 +50,8 @@ return {
             padding = { left = 1, right = 0 },
           },
         }
-        for _, comp in ipairs(x) do
-          table.insert(sections.lualine_x, comp)
-        end
-
-        sections.lualine_y = y_old
-        sections.lualine_z = {}
+        sections.lualine_y = x
+        sections.lualine_z = y_old
 
         -- Clear function-based z entries from LazyVim's defaults
         if sections.lualine_z then
@@ -55,17 +62,6 @@ return {
             end
           end
         end
-
-        sections.lualine_a = {
-          {
-            "mode",
-            separator = {
-              left = vim.fn.nr2char(0xE0B6),
-              right = vim.fn.nr2char(0xE0B4),
-            },
-            padding = { left = 0, right = 0 },
-          },
-        }
 
         table.insert(sections.lualine_z, {
           function()
