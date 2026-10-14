@@ -173,6 +173,21 @@
       ];
       doCheck = false;
     };
+
+    # SynthScan: pattern-based AI-generated code detector. Supports C/C++,
+    # Python, JS/TS, Go, Rust, and many other file types via regex patterns.
+    # Zero external dependencies, MIT, fully offline. Used for C++ files (.cpp,
+    # .cc, .h, .hpp, .cxx) where ai-slop-detector lacks parser support.
+    synthscan = prev.python3Packages.buildPythonPackage {
+      pname = "synthscan";
+      version = "2.0.1";
+      src = prev.fetchurl {
+        url = "https://files.pythonhosted.org/packages/33/44/b6150a8690fb0294974e44ad52d86a289edaf29ef37de999728bac8fde3c/synthscan-2.0.1-py3-none-any.whl";
+        hash = "sha256-5poiFmiNcsnpJB3hEAylY8xuFsGblipf5QUZyKzXqCg=";
+      };
+      format = "wheel";
+      doCheck = false;
+    };
   };
 
   # NUR (Nix User Repository) overlay

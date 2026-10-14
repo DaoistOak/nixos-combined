@@ -195,6 +195,9 @@ in
     # AI-SLOP Detector CLI — runs on BufWritePost via the autocmd in
     # config/ai-slop.lua to produce the lualine AI score + inline warnings.
     pkgs.ai-slop-detector
+    # SynthScan CLI — pattern-based AI code detector for C++ files
+    # (.cpp/.cc/.h/.hpp/.cxx) where ai-slop-detector lacks parser support.
+    pkgs.synthscan
   ];
 
   xdg.configFile."nvim/lua/config/nix.lua" = {
