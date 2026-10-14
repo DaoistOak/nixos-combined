@@ -41,6 +41,9 @@ let
     "xeluxee/competitest.nvim" = {
       package = "competitest-nvim";
     };
+    "ThePrimeagen/harpoon" = {
+      package = "harpoon2";
+    };
   };
 
   # Plugins that are not packaged in nixpkgs and come from a flake input
@@ -151,6 +154,7 @@ in
   xdg.configFile."nvim/lua/config/runner.lua".source = ./src/nvim/lua/config/runner.lua;
   xdg.configFile."nvim/lua/config/lazy.lua".source = ./src/nvim/lua/config/lazy.lua;
   xdg.configFile."nvim/lua/config/test_comment.lua".source = ./src/nvim/lua/config/test_comment.lua;
+  xdg.configFile."nvim/lua/config/ai-slop.lua".source = ./src/nvim/lua/config/ai-slop.lua;
   xdg.configFile."nvim/lua/matugen.lua".source = ./src/nvim/lua/matugen.lua;
 
   home.activation.nvimPruneStaleConfig =
@@ -188,6 +192,9 @@ in
     pkgs.stylua
     pkgs.lua-language-server
     pkgs.sqlite
+    # AI-SLOP Detector CLI — runs on BufWritePost via the autocmd in
+    # config/ai-slop.lua to produce the lualine AI score + inline warnings.
+    pkgs.ai-slop-detector
   ];
 
   xdg.configFile."nvim/lua/config/nix.lua" = {

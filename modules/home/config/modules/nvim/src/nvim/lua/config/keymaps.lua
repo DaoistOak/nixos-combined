@@ -113,16 +113,21 @@ local function move_prefix(from, to)
   relabel[from] = { live = true }
 end
 
--- <leader>b splits below, so the buffer keys move to <leader>B: the ones set
--- below plus the ones lazy.nvim's specs add (pick, pin, delete left/right).
-move_prefix("<leader>b", "<leader>B")
-wk_group("<leader>B", "buffers")
+-- <leader>b splits below, so the remaining buffer keys move to <leader>B.
+-- Harpoon takes over <leader>B and <leader>B1..<leader>B9 (see
+-- lua/plugins/harpoon.lua), so only the non-numeric buffer keys and
+-- <leader>Bn are moved here.
+move_prefix("<leader>bp", "<leader>Bp")
+move_prefix("<leader>bP", "<leader>BP")
+move_prefix("<leader>br", "<leader>Br")
+move_prefix("<leader>bl", "<leader>Bl")
+move_prefix("<leader>bj", "<leader>Bj")
+wk_group("<leader>B", "buffer/harpoon")
 
-for i = 1, 10 do
-  vim.keymap.set("n", ("<leader>B%d"):format(i == 10 and 0 or i), ("<cmd>BufferLineGoToIndex %d<cr>"):format(i), {
-    desc = ("Buffer %d"):format(i),
-  })
-end
+-- Harpoon handles <leader>B (open menu) and <leader>B1..<leader>B9
+-- (select buffer by position) via the keys in lua/plugins/harpoon.lua.
+-- The BufferLineGoToIndex number keys that used to live here are
+-- removed -- harpoon's list replaces the bufferline index navigation.
 
 vim.keymap.set("n", "<leader>Bn", "<cmd>enew<cr>", { desc = "New buffer" })
 

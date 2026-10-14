@@ -28,3 +28,7 @@ vim.api.nvim_create_autocmd("FileType", {
     end)
   end,
 })
+
+-- AI-SLOP Detector: run on save to update the lualine AI score and
+-- annotate the most AI-sloppy line in insert mode.
+require("config.ai-slop").setup()

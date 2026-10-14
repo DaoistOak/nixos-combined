@@ -153,6 +153,26 @@
     # install flow does not work in ungoogled-chromium). Exposes
     # chromiumExtensions.loadArg plus the individual extension packages.
     chromiumExtensions = import ../pkgs/chromium-extensions { pkgs = final; };
+
+    # AI-SLOP Detector: evidence-based static analyzer for AI-generated code
+    # slop patterns (empty functions, fake docs, inflated comments, etc.).
+    # Free, MIT, fully offline. Exposes the `slop-detector` CLI which the nvim
+    # config calls on BufWritePost to produce the lualine `AI-{score}` status
+    # and per-file inline diagnostics.
+    ai-slop-detector = prev.python3Packages.buildPythonPackage {
+      pname = "ai-slop-detector";
+      version = "3.10.1";
+      src = prev.fetchurl {
+        url = "https://files.pythonhosted.org/packages/61/1c/aa467a9b2e18495bb20c25ca010351bf19b379630e24884688daa91a6667/ai_slop_detector-3.10.1.tar.gz";
+        hash = "sha256-KFR11bsAtuU317qJFyK4lP61LumhNrpB6afxvdiW8O0=";
+      };
+      pyproject = true;
+      build-system = with prev.python3Packages; [ setuptools ];
+      propagatedBuildInputs = with prev.python3Packages; [
+        pyyaml radon jinja2 rich pydantic
+      ];
+      doCheck = false;
+    };
   };
 
   # NUR (Nix User Repository) overlay

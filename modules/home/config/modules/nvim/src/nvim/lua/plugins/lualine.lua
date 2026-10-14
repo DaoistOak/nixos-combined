@@ -18,9 +18,43 @@ return {
         local x = sections.lualine_x or {}
         local y_old = sections.lualine_y or {}
 
-        sections.lualine_x = {}
-        sections.lualine_y = x
-        sections.lualine_z = y_old
+        -- x/y/z are rearranged left-to-right: mode | diagnostics | search | sep
+        -- x is placed with the AI score, then the original x content follows.
+        sections.lualine_x = {
+          {
+            function()
+              local ai = require("config.ai-slop")
+              return ai.status()
+            end,
+            color = function()
+              local score = vim.g.ai_slop_score or 0
+              if score >= 70 then
+                return { fg = "#ff6b6b", bg = "#1e1e2e" }
+              elseif score >= 40 then
+                return { fg = "#f9e2af", bg = "#1e1e2e" }
+              else
+                return { fg = "#a6e3a1", bg = "#1e1e2e" }
+              end
+            end,
+            padding = { left = 1, right = 0 },
+          },
+        }
+        for _, comp in ipairs(x) do
+          table.insert(sections.lualine_x, comp)
+        end
+
+        sections.lualine_y = y_old
+        sections.lualine_z = {}
+
+        -- Clear function-based z entries from LazyVim's defaults
+        if sections.lualine_z then
+          local z = sections.lualine_z
+          for i = #z, 1, -1 do
+            if type(z[i]) == "function" then
+              table.remove(z, i)
+            end
+          end
+        end
 
         sections.lualine_a = {
           {
@@ -32,15 +66,6 @@ return {
             padding = { left = 0, right = 0 },
           },
         }
-
-        if sections.lualine_z then
-          local z = sections.lualine_z
-          for i = #z, 1, -1 do
-            if type(z[i]) == "function" then
-              table.remove(z, i)
-            end
-          end
-        end
 
         table.insert(sections.lualine_z, {
           function()
