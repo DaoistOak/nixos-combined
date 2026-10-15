@@ -50,6 +50,46 @@ M.status = function()
   return label
 end
 
+--- Read a JSON file using Lua-native I/O (safe in fast-event context).
+local function load_json(path)
+  local f = io.open(path, "r")
+  if not f then
+    return nil
+  end
+  local content = f:read("*a")
+  f:close()
+  if not content or content == "" then
+    return nil
+  end
+  return vim.json.decode(content)
+end
+
+--- Remove a directory and all its contents using Lua-native I/O.
+local function rmrf(path)
+  local handle = io.popen("rm -rf " .. vim.fn.shellescape(path))
+  if handle then
+    handle:read("*a")
+    handle:close()
+  end
+end
+
+--- Copy file contents to a destination using Lua-native I/O.
+local function copy_file(src, dst)
+  local f = io.open(src, "r")
+  if not f then
+    return false
+  end
+  local content = f:read("*a")
+  f:close()
+  local out = io.open(dst, "w")
+  if not out then
+    return false
+  end
+  out:write(content)
+  out:close()
+  return true
+end
+
 --- Run slop-detector on a Python file.
 M.run_python = function(bufnr, filepath)
   local tmpfile = vim.fn.tempname() .. ".json"
@@ -62,35 +102,34 @@ M.run_python = function(bufnr, filepath)
   }
 
   vim.system(cmd, { text = true }, function(result)
-    local data
-    pcall(function()
-      local raw = vim.fn.readfile(tmpfile)
-      data = vim.json.decode(table.concat(raw, "\n"))
-    end)
-    pcall(vim.fn.delete, tmpfile)
+    -- File I/O inside a system callback must be deferred to the main loop.
+    vim.schedule(function()
+      local data = load_json(tmpfile)
+      rmrf(tmpfile)
 
-    if not data then
-      return
-    end
-
-    local score = data.deficit_score or 0
-    vim.g.ai_slop_score = score
-
-    pcall(vim.api.nvim_buf_clear_namespace, bufnr, M.ns, 0, -1)
-
-    local findings = data.pattern_issues or {}
-    for _, f in ipairs(findings) do
-      local line = (f.line or 1) - 1
-      if line >= 0 then
-        local label = string.format("[AI:%s:%s]", f.severity or "?", f.pattern_id or "unknown")
-        pcall(vim.api.nvim_buf_set_extmark, bufnr, M.ns, line, 0, {
-          virt_text = { { label, "DiagnosticVirtualTextWarn" } },
-          virt_text_pos = "eol",
-        })
+      if not data then
+        return
       end
-    end
 
-    vim.cmd("redrawstatus")
+      local score = data.deficit_score or 0
+      vim.g.ai_slop_score = score
+
+      pcall(vim.api.nvim_buf_clear_namespace, bufnr, M.ns, 0, -1)
+
+      local findings = data.pattern_issues or {}
+      for _, f in ipairs(findings) do
+        local line = (f.line or 1) - 1
+        if line >= 0 then
+          local label = string.format("[AI:%s:%s]", f.severity or "?", f.pattern_id or "unknown")
+          pcall(vim.api.nvim_buf_set_extmark, bufnr, M.ns, line, 0, {
+            virt_text = { { label, "DiagnosticVirtualTextWarn" } },
+            virt_text_pos = "eol",
+          })
+        end
+      end
+
+      vim.cmd("redrawstatus")
+    end)
   end)
 end
 
@@ -99,21 +138,22 @@ end
 M.run_cpp = function(bufnr, filepath)
   -- Create a temp directory and copy the file into it.
   local tmpdir = vim.fn.tempname()
-  local tmpfile = tmpdir .. "/" .. vim.fn.fnamemodify(filepath, ":t")
+  local fname = vim.fn.fnamemodify(filepath, ":t")
+  local tmpfile = tmpdir .. "/" .. fname
   -- Name the report "synthscan-report.json" so SynthScan skips it in its
   -- own SKIP_FILES set (it would otherwise scan the report file too).
   local report = tmpdir .. "/synthscan-report.json"
 
   -- Ensure the temp directory exists
-  vim.fn.mkdir(tmpdir, "p")
+  vim.fn.mkdir(tmpdir, "p", "0755")
 
-  -- Copy the file contents to the temp directory.
-  local ok, lines = pcall(vim.fn.readfile, filepath)
+  -- Copy the file contents to the temp directory using Lua-native I/O
+  -- (vim.fn.readfile/writefile are unsafe in fast-event context).
+  local ok = copy_file(filepath, tmpfile)
   if not ok then
-    pcall(vim.fn.delete, tmpdir, "rf")
+    rmrf(tmpdir)
     return
   end
-  pcall(vim.fn.writefile, lines, tmpfile)
 
   local cmd = {
     "synthscan",
@@ -126,45 +166,42 @@ M.run_cpp = function(bufnr, filepath)
   }
 
   vim.system(cmd, { text = true }, function(result)
-    local data
-    pcall(function()
-      local raw = vim.fn.readfile(report)
-      data = vim.json.decode(table.concat(raw, "\n"))
-    end)
-    pcall(vim.fn.delete, tmpdir, "rf")
+    vim.schedule(function()
+      local data = load_json(report)
+      rmrf(tmpdir)
 
-    if not data then
-      return
-    end
+      if not data then
+        return
+      end
 
-    -- SynthScan reports synthetic_code_score (per 1k LOC), raw_score,
-    -- match_count, and lines_scanned. Convert to a 0-100 percentage by
-    -- normalizing the raw_score against lines_scanned, then scaling so
-    -- a match density of ~0.5 matches per line maps to ~100.
-    local raw_score = data.raw_score or 0
-    local lines = data.lines_scanned or 1
-    local score = math.min(100, (raw_score / math.max(1, lines - 1)) * 50)
-    vim.g.ai_slop_score = score
+      -- SynthScan reports synthetic_code_score (per 1k LOC), raw_score,
+      -- match_count, and lines_scanned. Convert to a 0-100 percentage by
+      -- normalizing the raw_score against lines_scanned, then scaling so
+      -- a match density of ~0.5 matches per line maps to ~100.
+      local raw_score = data.raw_score or 0
+      local lines = data.lines_scanned or 1
+      local score = math.min(100, (raw_score / math.max(1, lines - 1)) * 50)
+      vim.g.ai_slop_score = score
 
-    pcall(vim.api.nvim_buf_clear_namespace, bufnr, M.ns, 0, -1)
+      pcall(vim.api.nvim_buf_clear_namespace, bufnr, M.ns, 0, -1)
 
-    -- Add virtual text for each flagged line belonging to this file
-    local fname = vim.fn.fnamemodify(filepath, ":t")
-    local matches = data.matches or {}
-    for _, m in ipairs(matches) do
-      if m.file == fname then
-        local line = (m.line or 1) - 1
-        if line >= 0 then
-          local label = string.format("[AI:%s:%s]", m.severity or "?", m.pattern or "unknown")
-          pcall(vim.api.nvim_buf_set_extmark, bufnr, M.ns, line, 0, {
-            virt_text = { { label, "DiagnosticVirtualTextWarn" } },
-            virt_text_pos = "eol",
-          })
+      -- Add virtual text for each flagged line belonging to this file
+      local matches = data.matches or {}
+      for _, m in ipairs(matches) do
+        if m.file == fname or m.file == vim.fn.fnamemodify(filepath, ":p:t") then
+          local line = (m.line or 1) - 1
+          if line >= 0 then
+            local label = string.format("[AI:%s:%s]", m.severity or "?", m.pattern or "unknown")
+            pcall(vim.api.nvim_buf_set_extmark, bufnr, M.ns, line, 0, {
+              virt_text = { { label, "DiagnosticVirtualTextWarn" } },
+              virt_text_pos = "eol",
+            })
+          end
         end
       end
-    end
 
-    vim.cmd("redrawstatus")
+      vim.cmd("redrawstatus")
+    end)
   end)
 end
 
