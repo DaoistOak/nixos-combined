@@ -9,11 +9,9 @@
 --
 -- Language dispatch:
 --   .py  → slop-detector  (full AST analysis via ai-slop-detector)
---   .cpp/.cc/.h/.hpp/.cxx → synthscan (pattern-based, works on any file type)
+--   .cpp/.cc/.h/.hpp/.cxx/.c → synthscan (pattern-based, works on any file type)
 --
 -- Detection is heuristic and deterministic — no API keys, no network.
-
-local uv = vim.loop
 
 local M = {}
 
@@ -21,7 +19,7 @@ M.ns = vim.api.nvim_create_namespace("ai-slop")
 
 local CPP_EXTENSIONS = { "cpp", "cc", "h", "hpp", "cxx", "c" }
 
---- Check if a file extension is a C++ extension.
+--- Check if a file extension is a C/C++ extension.
 local function is_cpp(path)
   local ext = path:match("^.+%.([^/]+)$")
   if not ext then
@@ -96,13 +94,15 @@ M.run_python = function(bufnr, filepath)
   end)
 end
 
---- Run synthscan on a C++ file. SynthScan scans directories, so we copy
+--- Run synthscan on a C/C++ file. SynthScan scans directories, so we copy
 --- the file into a temp dir and scan just that.
 M.run_cpp = function(bufnr, filepath)
   -- Create a temp directory and copy the file into it.
   local tmpdir = vim.fn.tempname()
   local tmpfile = tmpdir .. "/" .. vim.fn.fnamemodify(filepath, ":t")
-  local report = tmpdir .. "/report.json"
+  -- Name the report "synthscan-report.json" so SynthScan skips it in its
+  -- own SKIP_FILES set (it would otherwise scan the report file too).
+  local report = tmpdir .. "/synthscan-report.json"
 
   -- Ensure the temp directory exists
   vim.fn.mkdir(tmpdir, "p")
@@ -137,22 +137,22 @@ M.run_cpp = function(bufnr, filepath)
       return
     end
 
-    -- SynthScan reports synthetic_code_score (per 1k LOC) and raw_score.
-    -- Convert to a 0-100 percentage based on match count and score.
-    local score = data.synthetic_code_score or 0
-    -- Clamp to 0-100 for lualine display
-    score = math.min(100, math.max(0, score))
+    -- SynthScan reports synthetic_code_score (per 1k LOC), raw_score,
+    -- match_count, and lines_scanned. Convert to a 0-100 percentage by
+    -- normalizing the raw_score against lines_scanned, then scaling so
+    -- a match density of ~0.5 matches per line maps to ~100.
+    local raw_score = data.raw_score or 0
+    local lines = data.lines_scanned or 1
+    local score = math.min(100, (raw_score / math.max(1, lines - 1)) * 50)
     vim.g.ai_slop_score = score
 
     pcall(vim.api.nvim_buf_clear_namespace, bufnr, M.ns, 0, -1)
 
-    -- Add virtual text for each flagged line
+    -- Add virtual text for each flagged line belonging to this file
+    local fname = vim.fn.fnamemodify(filepath, ":t")
     local matches = data.matches or {}
     for _, m in ipairs(matches) do
-      -- SynthScan reports file paths relative to the scan root; since we
-      -- copied a single file the basename matches.
-      local fname = vim.fn.fnamemodify(filepath, ":t")
-      if m.file == fname or m.file == vim.fn.fnamemodify(filepath, ":p:t") then
+      if m.file == fname then
         local line = (m.line or 1) - 1
         if line >= 0 then
           local label = string.format("[AI:%s:%s]", m.severity or "?", m.pattern or "unknown")
