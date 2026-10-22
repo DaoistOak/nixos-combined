@@ -15,6 +15,10 @@ in
       liberation_ttf
       dejavu_fonts
       jetbrains-mono
+      # The SDDM greeter runs as the `sddm` user and only sees system fonts, so
+      # the Nerd Font that draws the theme's session icons (U+F07C0) has to be
+      # installed here rather than in ~/.local/share/fonts.
+      nerd-fonts.jetbrains-mono
     ];
   };
 

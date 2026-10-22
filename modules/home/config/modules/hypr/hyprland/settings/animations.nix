@@ -5,6 +5,10 @@
 #   medium - balanced, unobtrusive (speed 3-6)
 #   smooth - fluid with subtle overshoot (speed 3-10)
 # Switch by editing the imported file below.
+#
+# The presets live in _presets/ because import-tree auto-loads every .nix in
+# this tree: the leading `_` is what keeps all four out of that sweep so only
+# the one imported here is active.
 {
   config,
   inputs,
@@ -13,6 +17,6 @@
 }:
 {
   imports = [
-    ./animations/smooth.nix
+    ./animations/_presets/smooth.nix
   ];
 }

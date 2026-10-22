@@ -16,7 +16,7 @@
 
     settings = {
       font = lib.generators.mkLuaInline "wezterm.font(\"JetBrainsMono Nerd Font\")";
-      font_size = 10.0;
+      font_size = 12.0;
       hide_tab_bar_if_only_one_tab = true;
       window_decorations = "RESIZE";
       default_prog = [ "zsh" ];
@@ -38,7 +38,7 @@
       max_fps = 60;
       animation_fps = 60;
 
-      # Ease curves mirror Hyprland's beziers (animations/fancy.nix):
+      # Ease curves mirror Hyprland's beziers (animations/_presets/fancy.nix):
       #   fade-in  -> emphasizedDecel -> CubicBezier(0.05, 0.7, 0.1, 1)
       #   fade-out -> emphasizedAccel -> CubicBezier(0.3, 0, 0.8, 0.15)
       cursor_blink_rate = 600;

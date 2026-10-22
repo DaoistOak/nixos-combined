@@ -6,7 +6,7 @@
 }:
 
 let
-  themeMod = import ../../../home/config/themes/colors/themes.nix { inherit lib; };
+  themeMod = import ../../../home/config/themes/colors/_themes.nix { inherit lib; };
   themeSel = themeMod.readSelection ../../../home/config/themes/colors/src/selection;
 in
 {

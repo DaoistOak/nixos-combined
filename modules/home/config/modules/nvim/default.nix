@@ -15,9 +15,6 @@ let
     "nvim-telescope/telescope.nvim" = {
       package = "telescope-nvim";
     };
-    "folke/base16-nvim" = {
-      package = "base16-nvim";
-    };
     # LazyVim v16 defaults to blink.cmp; the module only tracks it through the
     # coding.blink extra, so it is not in the dev path either.
     "saghen/blink.cmp" = {
@@ -153,9 +150,7 @@ in
   xdg.configFile."nvim/lua/config/terminals.lua".source = ./src/nvim/lua/config/terminals.lua;
   xdg.configFile."nvim/lua/config/runner.lua".source = ./src/nvim/lua/config/runner.lua;
   xdg.configFile."nvim/lua/config/lazy.lua".source = ./src/nvim/lua/config/lazy.lua;
-  xdg.configFile."nvim/lua/config/test_comment.lua".source = ./src/nvim/lua/config/test_comment.lua;
   xdg.configFile."nvim/lua/config/ai-slop.lua".source = ./src/nvim/lua/config/ai-slop.lua;
-  xdg.configFile."nvim/lua/matugen.lua".source = ./src/nvim/lua/matugen.lua;
 
   home.activation.nvimPruneStaleConfig =
     lib.hm.dag.entryAfter

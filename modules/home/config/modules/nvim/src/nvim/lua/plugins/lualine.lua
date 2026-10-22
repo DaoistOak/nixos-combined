@@ -18,8 +18,10 @@ return {
         local x = sections.lualine_x or {}
         local y_old = sections.lualine_y or {}
 
-        -- Sections rearranged left-to-right: mode | diagnostics | search | sep
-        -- x gets the AI score; original x content goes to y, original y to z.
+        -- Sections rearranged left-to-right: mode | diagnostics | search | sep.
+        -- The AI score is gone, so the x slot stays empty; original x content
+        -- still goes to y and original y to z, keeping the surface0 -> surface1
+        -- -> surface2 gradient the theme paints across c/y/z.
         sections.lualine_a = {
           {
             "mode",
@@ -31,25 +33,7 @@ return {
           },
         }
 
-        sections.lualine_x = {
-          {
-            function()
-              local ai = require("config.ai-slop")
-              return ai.status()
-            end,
-            color = function()
-              local score = vim.g.ai_slop_score or 0
-              if score >= 70 then
-                return { fg = "#ff6b6b", bg = "#1e1e2e" }
-              elseif score >= 40 then
-                return { fg = "#f9e2af", bg = "#1e1e2e" }
-              else
-                return { fg = "#a6e3a1", bg = "#1e1e2e" }
-              end
-            end,
-            padding = { left = 1, right = 0 },
-          },
-        }
+        sections.lualine_x = {}
         sections.lualine_y = x
         sections.lualine_z = y_old
 

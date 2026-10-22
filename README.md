@@ -79,7 +79,7 @@ Built on the dendritic pattern: `flake-parts` + `import-tree` for auto-discovery
 ## 🗂️ Layout
 
 - `flake.nix` — entry point; `import-tree ./flake-parts` + host composition
-- `modules/system/hosts/Lingnao.nix` — thin host composition (NixOS + home-manager)
+- `modules/system/hosts/_Lingnao.nix` — thin host composition (NixOS + home-manager); the `_` keeps it out of the auto-discovery sweep
 - `modules/system/` — NixOS modules (boot, network, desktop, sddm, themes, pkgs, users, services, misc)
 - `modules/home/` — home-manager modules (`base/` entry point, `config/modules/`, `config/themes/`)
 - `flake-parts/` — auto-discovered flake-parts modules

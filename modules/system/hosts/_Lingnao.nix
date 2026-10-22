@@ -3,20 +3,17 @@
   flake.nixosConfigurations.Lingnao = inputs.nixpkgs.lib.nixosSystem {
     system = "x86_64-linux";
     specialArgs = { inherit inputs; };
+    # Dendritic: every .nix under modules/system/ is auto-discovered by
+    # import-tree, so aspect modules must NOT be listed here. The leading `_`
+    # in this file's name is what keeps it (a flake-parts module, not a NixOS
+    # module) out of that tree -- import-tree skips any path containing `/_`.
+    # What stays listed: modules/shared (outside the tree, shared with the
+    # home config) and the upstream module sets, which are flake inputs and
+    # not files.
     modules = [
+      # `../.` because a bare `../` is not a valid Nix path literal.
+      (inputs.import-tree ../.)
       ../../shared/var.nix
-      ../boot/default.nix
-      ../config/network/default.nix
-      ../nix/default.nix
-      ../misc/default.nix
-      ../services/default.nix
-      ../users/zeph/default.nix
-      ../config/desktop/default.nix
-      ../config/pkgs/default.nix
-      ../config/browser/default.nix
-      ../config/sddm/default.nix
-      ../config/themes/default.nix
-      ../config/hardware
       inputs.home-manager.nixosModules.default
       {
         home-manager.extraSpecialArgs = { inherit inputs; };
@@ -43,7 +40,8 @@
         };
         extraSpecialArgs = { inherit inputs; };
         modules = [
-          ../../home/base/default.nix
+          (inputs.import-tree ../../home)
+          ../../shared/var.nix
           inputs.catppuccin.homeModules.catppuccin
           inputs.stylix.homeModules.stylix
         ];

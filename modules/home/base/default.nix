@@ -7,7 +7,7 @@
 }:
 
 let
-  themeMod = import ../config/themes/colors/themes.nix { inherit lib; };
+  themeMod = import ../config/themes/colors/_themes.nix { inherit lib; };
   themeSel = themeMod.readSelection ../config/themes/colors/src/selection;
   catppuccinAccent =
     if themeMod.themes.catppuccin.flavors.macchiato.accents ? ${themeSel.accentName} then
@@ -16,35 +16,10 @@ let
       "mauve";
 in
 {
+  # Every .nix under modules/home is auto-discovered by import-tree (wired in
+  # modules/system/hosts/_Lingnao.nix), so app modules must NOT be listed here.
+  # Only modules that live outside that tree are listed: flake inputs.
   imports = [
-    ../../shared/var.nix
-    ../config/modules/hypr/hyprland
-    ../config/modules/hypr/hypridle
-    ../config/modules/hypr/hyprlock
-    ../config/modules/herdr
-    ../config/modules/crush
-    ../config/modules/cava
-    ../config/modules/nvim
-    ../config/modules/yazi
-    ../config/modules/superfile
-    ../config/modules/kitty
-    ../config/modules/alacritty
-    ../config/modules/wezterm
-    ../config/modules/ghostty
-    ../config/modules/neovide
-    ../config/modules/tmux
-    ../config/modules/phone-bt-bridge
-    ../config/modules/keepassxc
-    ../config/modules/chromium
-    ../config/modules/qutebrowser
-    ../config/modules/rofi
-    ../config/modules/atuin
-    ../config/modules/updt
-    ../config/themes/colors
-    ../config/themes/themer
-    ../config/themes/theme
-    ../config/modules/zsh
-    ../config/pkgs
     inputs.noctalia.homeModules.default
   ];
 

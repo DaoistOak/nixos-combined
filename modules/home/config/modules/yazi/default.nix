@@ -583,6 +583,10 @@ in
   # transparent variant above. Keep catppuccin's syntax-highlight .tmTheme file.
   catppuccin.yazi.enable = false;
 
-  home.file."yazi/Catppuccin-macchiato.tmTheme".source =
+  # Must land in ~/.config/yazi/ (where mgr.syntect_theme above points), not
+  # ~/yazi/ — home.file keys are $HOME-relative, so the old bare "yazi/..." key
+  # shipped the file to a path yazi never reads and preview code highlighting
+  # silently fell back to the built-in theme.
+  xdg.configFile."yazi/Catppuccin-macchiato.tmTheme".source =
     "${config.catppuccin.sources.bat}/Catppuccin Macchiato.tmTheme";
 }

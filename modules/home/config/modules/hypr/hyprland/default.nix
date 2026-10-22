@@ -5,44 +5,8 @@
   ...
 }:
 {
-  imports = [
-    ./settings/animations.nix
-    ./settings/colors.nix
-    ./settings/decorations.nix
-    ./settings/displays.nix
-    ./settings/dynamic-cursors.nix
-    ./settings/edgehover.nix
-    ./settings/hyprwinwrap.nix
-    ./settings/input.nix
-    ./settings/keybinds.nix
-    ./settings/plugins.nix
-    ./settings/scrolling.nix
-    ./settings/scroll-overview.nix
-    ./settings/misc.nix
-    ./settings/startup.nix
-    ./settings/windowrules.nix
-    ./scripts/airplane-mode.nix
-    ./scripts/ai-webapps.nix
-    ./scripts/border-angle.nix
-    ./scripts/border-rotate.nix
-    ./scripts/brightness.nix
-    ./scripts/hyprlock.nix
-    ./scripts/cava-auto.nix
-    ./scripts/launch-bluetooth.nix
-    ./scripts/launch-network.nix
-    ./scripts/launch-terminal.nix
-    ./scripts/media-idle.nix
-    ./scripts/mic-mute.nix
-    ./scripts/noctalia-restart.nix
-    ./scripts/performance-mode.nix
-    ./scripts/session.nix
-    ./scripts/super-tap-launcher.nix
-    ./scripts/terminal-switcher
-    ./scripts/submap-bar.nix
-    ./scripts/submap-timeout.nix
-    ./scripts/volume.nix
-    ./scripts/widget-toggle.nix
-  ];
+  # settings/*.nix and scripts/*.nix are auto-discovered by import-tree (see
+  # modules/system/hosts/_Lingnao.nix) -- they must NOT be listed here.
   wayland.windowManager.hyprland = {
     enable = true;
     systemd.enable = false;

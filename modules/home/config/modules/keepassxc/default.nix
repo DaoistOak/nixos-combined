@@ -1,4 +1,9 @@
-{ ... }:
+{ config, ... }:
+let
+  # KeePassXC only offers classic/dark/light (no custom palettes), so polarity
+  # from the active selection is the whole story.
+  applicationTheme = if config.colors.active.polarity == "light" then "light" else "dark";
+in
 {
   xdg.configFile."keepassxc/keepassxc.ini" = {
     force = true;
@@ -16,7 +21,7 @@
       Enabled=true
 
       [GUI]
-      ApplicationTheme=classic
+      ApplicationTheme=${applicationTheme}
       ColorPasswords=true
       CompactMode=false
       HidePasswords=true

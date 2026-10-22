@@ -67,7 +67,7 @@ textbox-prompt-colon {
     str:                         "";
     padding:                     10px 13px;
     border-radius:               0px;
-    background-color:            @acccent;
+    background-color:            @accent;
     text-color:                  @background;
 }
 prompt {

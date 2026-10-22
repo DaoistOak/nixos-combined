@@ -14,7 +14,7 @@
 let
   # Reuse the shared theme DB to resolve the built-in Ghostty theme for the
   # currently tracked selection (matches what scripts/theme writes at runtime).
-  t = import ../../themes/colors/themes.nix { inherit lib; };
+  t = import ../../themes/colors/_themes.nix { inherit lib; };
   sel = t.readSelection ../../themes/colors/src/selection;
   selFlavor = t.themes.${sel.themeName}.flavors.${sel.flavorName};
   # Flavor-independent fallback: flavors with no upstream Ghostty builtin (Yoru,
@@ -31,7 +31,7 @@ in
     settings = {
       # Fonts
       font-family = "JetBrainsMono Nerd Font";
-      font-size = 10;
+      font-size = 12;
       font-thicken = true;
 
       # Cursor

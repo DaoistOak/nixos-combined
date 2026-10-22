@@ -24,7 +24,7 @@ let
   '';
 
   # Active theme selection (single source of truth, same as sddm/themer).
-  themeMod = import ../../../home/config/themes/colors/themes.nix { inherit lib; };
+  themeMod = import ../../../home/config/themes/colors/_themes.nix { inherit lib; };
   themeSel = themeMod.readSelection ../../../home/config/themes/colors/src/selection;
 
   # 16-color ANSI palette -> kernel vt.default_{red,grn,blu} args. NixOS injects
@@ -57,8 +57,6 @@ let
   '';
 in
 {
-  imports = [ ./hardware-configuration.nix ];
-
   # Do not power on bluetooth adapter at boot; user toggles it manually via keybind.
   hardware.bluetooth.powerOnBoot = false;
 

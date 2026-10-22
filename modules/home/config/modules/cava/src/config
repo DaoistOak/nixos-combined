@@ -22,18 +22,12 @@ method = noncurses
 style = stereo
 
 [color]
-theme = "noctalia"
-# Color gradient for bars using template variables
-gradient = 1
-gradient_count = 8
-gradient_color_1 = '#c8e3ff'
-gradient_color_2 = '#d0e0ff'
-gradient_color_3 = '#ccdbff'
-gradient_color_4 = '#b1c6ff'
-gradient_color_5 = '#aab9ff'
-gradient_color_6 = '#c2c9ff'
-gradient_color_7 = '#b9baff'
-gradient_color_8 = '#c4b7ee'
+# cava swaps the entire config ini for the theme file once `theme` is set
+# (config.c does iniparser_load(themeFile) and reads every [color] key from
+# it), so gradient keys placed here would be dead -- they live in the theme.
+# theme-switcher is shipped by the module as a build-time fallback (active
+# selection) and rewritten as a real file by scripts/theme on every `theme set`.
+theme = "theme-switcher"
 
 [smoothing]
 # Noise reduction (0-100) - higher = smoother but less responsive

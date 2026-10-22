@@ -31,12 +31,9 @@ local function paint(c)
     require("theme.groups." .. name)(c, hl)
   end
 
-  -- TEST: comments with no explicit fg (revert after testing).
-  require("config.test_comment")()
-
   hl.clear_strikethrough()
-  -- base16-nvim re-applies its groups from its own SIGUSR1 handler, which may
-  -- be queued after this paint; the deferred pass runs once that has settled.
+  -- Something applying highlights after this paint in the same tick would
+  -- otherwise leave strikethrough behind; the deferred pass catches it.
   vim.schedule(hl.clear_strikethrough)
 end
 

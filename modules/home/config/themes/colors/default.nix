@@ -8,8 +8,8 @@
 let
   inherit (lib) mkOption types mkIf;
 
-  # Shared theme database + resolvers (see themes.nix).
-  t = import ./themes.nix { inherit lib; };
+  # Shared theme database + resolvers (see _themes.nix).
+  t = import ./_themes.nix { inherit lib; };
   inherit (t) themes resolve toBase16;
   sel = t.readSelection ./src/selection;
 
@@ -222,12 +222,23 @@ let
       set -gq @thm_sapphire "${c named.sapphire}"
       set -gq @thm_sky "${c named.sky}"
       set -gq @thm_lavender "${c named.lavender}"
+      # tmux-floax popup colours. floax's scripts/utils.sh reads these with
+      # tmux showenv at popup time, so a theme switch recolours the pane
+      # without touching the plugin -- floax.tmux only seeds them from
+      # @floax-border-color/@floax-text-color once, when it loads.
+      setenv -g FLOAX_BORDER_COLOR "${c r.accent}"
+      setenv -g FLOAX_TEXT_COLOR "${c r.text}"
+      # sessionx fzf palette for prefix + s. @sessionx-additional-options is
+      # read with tmux show-option and handed to fzf verbatim, so it has to be
+      # literal hex here: a {@thm_*} reference would reach fzf unexpanded and
+      # be rejected.
+      set -gq @sessionx-additional-options "--color=bg:${c r.base},fg:${c r.text},hl:${c r.accent},fg+:${c r.text},bg+:${c r.surface0},hl+:${c r.accent},info:${c r.subtext0},pointer:${c r.accent},marker:${c named.red},spinner:${c r.accent},prompt:${c r.subtext1}"
     '';
 
   # --- neovim runtime theme file (base16 palette read by lua/theme.lua) -------
   # scripts/theme rewrites this file and sends SIGUSR1 to running instances, so
   # `theme set ...` recolors nvim without a rebuild. Slot order must match
-  # themes.nix `toBase16` (Stylix consumes the same mapping) and scripts/theme's
+  # _themes.nix `toBase16` (Stylix consumes the same mapping) and scripts/theme's
   # jq writer, which emits the same two blocks in the same order.
   nvimBase16 =
     let

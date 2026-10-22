@@ -7,7 +7,7 @@
 }:
 
 let
-  themeMod = import ../../../home/config/themes/colors/themes.nix { inherit lib; };
+  themeMod = import ../../../home/config/themes/colors/_themes.nix { inherit lib; };
   themeSel = themeMod.readSelection ../../../home/config/themes/colors/src/selection;
 
   # Login avatar. SDDM's greeter runs as the `sddm` user. We seed the profile
@@ -85,6 +85,28 @@ let
           s/font.pixelSize: 18\n\s*color: "white"/font.pixelSize: 18\n        color: config.textColor/;
           s/color: "white"\n\s*font.pixelSize: 32/color: container.baseColor\n        font.pixelSize: 32/
         ' Main.qml
+
+        # The two session icons are Nerd Font glyphs (U+F07C0) drawn by plain
+        # Text elements that declare no font.family, so they fall back to Qt's
+        # default font and render nothing — no installed font but a Nerd Font
+        # has that codepoint. Give just those two the Nerd Font; body text is
+        # untouched, it asks for activeFontRegular (JetBrains Mono) explicitly.
+        # (A root-level font.family is not an option: Qt Quick's Item and
+        # Rectangle have no font property at all — only Text and friends do.)
+        perl -0777 -pi -e 's/( *)text: "󰟀"\n/$1text: "󰟀"\n$1font.family: "JetBrainsMono Nerd Font"\n/g' Main.qml
+
+        # The session pill's label had no font.family, so it rendered in Qt's
+        # default rather than the configured text font. The user label directly
+        # above already asks for activeFontRegular; match it.
+        perl -0777 -pi -e 's/(font\.pixelSize: 13\n)( *)font\.weight: Font\.Medium/$1$2font.family: activeFontRegular\n$2font.weight: Font.Medium/' Main.qml
+
+        # The pill was a fixed 180px wide, so a long session name ("Hyprland
+        # (uwsm-managed)") spilled past its rounded border — the name read as
+        # far too large for the box holding it. Size the pill from its own
+        # content instead, the way the user label does with
+        # userNameLabel.width + 40 above.
+        perl -0777 -pi -e 's/( *)Layout\.preferredWidth: 180/$1Layout.preferredWidth: sessionPillRow.implicitWidth + 32/' Main.qml
+        perl -0777 -pi -e 's/RowLayout \{\n( *)anchors\.centerIn: parent\n( *)spacing: 8/RowLayout {\n$1id: sessionPillRow\n$1anchors.centerIn: parent\n$2spacing: 8/' Main.qml
       '';
     });
 in

@@ -28,8 +28,8 @@ local strike_only = {
 }
 
 --- Strip the strikethrough attribute from every highlight group.
---- Callers outside this theme (base16-nvim, Neovim's runtime defaults) set it
---- again, so this runs after every repaint and once at VeryLazy.
+--- Callers outside this theme (Neovim's runtime defaults) set it again, so
+--- this runs after every repaint and once at VeryLazy.
 function M.clear_strikethrough()
   for name, spec in pairs(vim.api.nvim_get_hl(0, {})) do
     if not spec.link and (spec.strikethrough or (spec.cterm and spec.cterm.strikethrough)) then

@@ -113,23 +113,38 @@ local function move_prefix(from, to)
   relabel[from] = { live = true }
 end
 
--- <leader>b splits below, so the remaining buffer keys move to <leader>B.
--- Harpoon takes over <leader>B and <leader>B1..<leader>B9 (see
--- lua/plugins/harpoon.lua), so only the non-numeric buffer keys and
--- <leader>Bn are moved here.
-move_prefix("<leader>bp", "<leader>Bp")
-move_prefix("<leader>bP", "<leader>BP")
-move_prefix("<leader>br", "<leader>Br")
-move_prefix("<leader>bl", "<leader>Bl")
-move_prefix("<leader>bj", "<leader>Bj")
-wk_group("<leader>B", "buffer/harpoon")
-
--- Harpoon handles <leader>B (open menu) and <leader>B1..<leader>B9
--- (select buffer by position) via the keys in lua/plugins/harpoon.lua.
--- The BufferLineGoToIndex number keys that used to live here are
--- removed -- harpoon's list replaces the bufferline index navigation.
-
-vim.keymap.set("n", "<leader>Bn", "<cmd>enew<cr>", { desc = "New buffer" })
+-- <leader>b is only the split and <leader>B is only the picker, so everything
+-- either prefix used to carry is deleted rather than moved: moved onto
+-- <leader>B it would give the leaf a tail to wait out, and left on <leader>b
+-- it would do the same to the split while keeping which-key calling it a
+-- group. Deleting is also what lazy checks before re-creating a mapping, so a
+-- plugin reload cannot bring these back.
+--
+-- The BufferLine five become picker actions in lua/plugins/harpoon.lua
+-- instead. So do LazyVim's own buffer defaults: the picker replaces the
+-- switch, delete becomes a picker action, and buffer-only / info /
+-- delete-and-window lose their home rather than delay the split.
+--
+-- The BufferLineGoToIndex number keys that used to live here are gone for the
+-- same reason: harpoon's list replaces the bufferline index navigation.
+for _, mode in ipairs({ "n", "x" }) do
+  for _, lhs in ipairs({
+    -- bufferline: pin / delete-unpinned / close right / close left / pick
+    "<leader>bp",
+    "<leader>bP",
+    "<leader>br",
+    "<leader>bl",
+    "<leader>bj",
+    -- LazyVim's buffer defaults: switch / delete / only / info / delete+win
+    "<leader>bb",
+    "<leader>bd",
+    "<leader>bo",
+    "<leader>bi",
+    "<leader>bD",
+  }) do
+    pcall(vim.keymap.del, mode, lhs)
+  end
+end
 
 -- LazyVim's default split keys give way to these two.
 for _, lhs in ipairs({ "<leader>|", "<leader>-" }) do
@@ -138,6 +153,12 @@ end
 
 vim.keymap.set("n", "<leader>v", "<cmd>vsplit<cr>", { desc = "Split Right" })
 vim.keymap.set("n", "<leader>b", "<cmd>split<cr>", { desc = "Split Below" })
+
+-- LazyVim still labels <leader>b as the buffer group with expand.buf(),
+-- which now describes nothing underneath it; re-stating it as a plain mapping
+-- swaps that group for the split's own description (see the relabel note at
+-- the top of this file).
+relabel["<leader>b"] = { live = true }
 
 -- Two LazyVim mappings that only exist to change what the theme-switcher owns.
 --
@@ -276,7 +297,6 @@ for _, entry in ipairs({
   vim.keymap.set("n", entry[1], competitest(entry[2], entry[4]), { desc = entry[3] })
 end
 
-
 vim.keymap.set("n", "<leader>cc", "<cmd>CopilotChat<cr>", { desc = "CopilotChat" })
 vim.keymap.set("n", "<leader>co", "<cmd>CopilotChatOpen<cr>", { desc = "CopilotChatOpen" })
 vim.keymap.set("n", "<leader>cq", "<cmd>CopilotChatClose<cr>", { desc = "CopilotChatClose" })
@@ -317,8 +337,7 @@ local function relabel_spec()
 
   local spec = {}
   for lhs, entry in pairs(relabel) do
-    spec[#spec + 1] = entry.group
-      and { lhs, group = entry.group, icon = entry.icon }
+    spec[#spec + 1] = entry.group and { lhs, group = entry.group, icon = entry.icon }
       or { lhs, desc = live_desc(lhs) or ("unmapped " .. lhs) }
   end
   wk.add(spec)

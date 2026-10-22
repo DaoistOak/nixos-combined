@@ -11,6 +11,13 @@
     escapeTime = 0;
     mouse = true;
 
+    # Home-manager emits each plugin's `extraConfig` immediately before its
+    # `run-shell`, and the whole plugin block before the global `extraConfig`
+    # at the bottom of this file. An option a plugin reads while binding its
+    # keys -- floax's @floax-bind, sessionx's @sessionx-bind -- therefore has
+    # to be set in that plugin's own extraConfig: written into `extraConfig`
+    # below it would arrive one step too late and the plugin would keep its
+    # default binding.
     plugins = with pkgs.tmuxPlugins; [
       sensible
       vim-tmux-navigator
@@ -22,7 +29,27 @@
       copy-toolkit
       tmux-which-key
       vim-tmux-focus-events
-      tmux-floax
+      {
+        plugin = tmux-floax;
+        extraConfig = ''
+          # prefix + Space toggles the floating pane. floax binds this itself
+          # in floax.tmux, so there is no bind to write out here -- only the
+          # key it should claim.
+          set -g @floax-bind "Space"
+        '';
+      }
+      {
+        plugin = tmux-sessionx;
+        extraConfig = ''
+          # prefix + s opens the session picker in place of tmux's choose-tree.
+          set -g @sessionx-bind "s"
+
+          # floax's floating pane runs in a session of its own (floax.sh ends
+          # in `attach-session -t scratch`), which is a scratch surface rather
+          # than somewhere to switch to, so keep it out of the picker.
+          set -g @sessionx-filtered-sessions "scratch"
+        '';
+      }
     ];
 
     extraConfig = ''
@@ -122,8 +149,10 @@
       bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
       bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-selection-and-cancel
 
-      # tmux-floax: floating pane (prefix + F)
-      bind-key F run-shell "#{@floax-bind}"
+      # tmux-floax: floating pane is bound by floax.tmux from @floax-bind
+      # (prefix + Space) -- see the plugin entry above. The old
+      # `bind-key F run-shell "#{@floax-bind}"` is gone: it expanded to the
+      # option's value and then handed that string to the shell as a command.
 
       # tmux-which-key: show keybindings
       set -g @tmux-which-key-delay 0

@@ -6,7 +6,7 @@
 }:
 
 let
-  t = import ../colors/themes.nix { inherit lib; };
+  t = import ../colors/_themes.nix { inherit lib; };
   sel = t.readSelection ../colors/src/selection;
 in
 {
