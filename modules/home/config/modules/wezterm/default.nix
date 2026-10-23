@@ -16,7 +16,7 @@
 
     settings = {
       font = lib.generators.mkLuaInline "wezterm.font(\"JetBrainsMono Nerd Font\")";
-      font_size = 12.0;
+      font_size = 11.0;
       hide_tab_bar_if_only_one_tab = true;
       window_decorations = "RESIZE";
       default_prog = [ "zsh" ];

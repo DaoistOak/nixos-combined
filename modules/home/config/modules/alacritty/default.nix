@@ -29,7 +29,7 @@
         bold_italic = {
           family = "JetBrainsMono Nerd Font";
         };
-        size = 12;
+        size = 11;
         builtin_box_drawing = true;
       };
 

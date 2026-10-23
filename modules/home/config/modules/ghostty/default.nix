@@ -31,7 +31,7 @@ in
     settings = {
       # Fonts
       font-family = "JetBrainsMono Nerd Font";
-      font-size = 12;
+      font-size = 11;
       font-thicken = true;
 
       # Cursor
