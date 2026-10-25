@@ -24,6 +24,7 @@
       "seat"
       "docker"
       "tty"
+      "input"
     ];
     subUidRanges = [
       {
