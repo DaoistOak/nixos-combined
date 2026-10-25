@@ -143,6 +143,7 @@ in
     ACTION=="add", SUBSYSTEM=="usb", ATTR{authorized}=="1", ATTR{power/autosuspend}="1", ATTR{power/control}="auto"
     ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1ea7", ATTR{idProduct}=="0066", ATTR{power/control}="on"
     ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="275d", ATTR{idProduct}=="0ba6", ATTR{power/control}="on"
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1c4f", ATTR{idProduct}=="0048", ATTR{power/control}="on"
     ACTION=="change", KERNEL=="ACAD", SUBSYSTEM=="power_supply", RUN+="${applyAcPower}"
   '';
 }

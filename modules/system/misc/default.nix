@@ -31,6 +31,8 @@
     SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", MODE="0660", OWNER="${config.var.username}", GROUP="users", TAG+="uaccess"
   '';
 
+  hardware.uinput.enable = true;
+
   # kernelParams (kvm.ignore_msrs=1) are owned by ../config/hardware/default.nix (single mkForce).
 
   hardware.ksm.enable = true;

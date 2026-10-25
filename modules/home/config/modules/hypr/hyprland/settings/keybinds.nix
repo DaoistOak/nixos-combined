@@ -204,12 +204,22 @@
         hl.bind(mod .. " + SHIFT + ALT + 0", hl.dsp.window.move({ workspace = 10, follow = false }), { description = "Send window to workspace 10 (silent)" })
         hl.bind(mod .. " + mouse_down", function()
           superTap.armed = false
-          hl.dispatch(hl.dsp.focus({ workspace = "e-1" }))
-        end, { description = "Previous workspace (scroll)" })
-        hl.bind(mod .. " + mouse_up", function()
-          superTap.armed = false
           hl.dispatch(hl.dsp.focus({ workspace = "e+1" }))
         end, { description = "Next workspace (scroll)" })
+        hl.bind(mod .. " + mouse_up", function()
+          superTap.armed = false
+          hl.dispatch(hl.dsp.focus({ workspace = "e-1" }))
+        end, { description = "Previous workspace (scroll)" })
+        -- mouse:275 = BTN_SIDE (back), mouse:276 = BTN_EXTRA (forward); swap
+        -- the two binds if the physical buttons come out reversed on this mouse.
+        hl.bind(mod .. " + mouse:276", function()
+          superTap.armed = false
+          hl.dispatch(hl.dsp.focus({ workspace = "e-1" }))
+        end, { mouse = true, description = "Previous workspace (mouse forward)" })
+        hl.bind(mod .. " + mouse:275", function()
+          superTap.armed = false
+          hl.dispatch(hl.dsp.focus({ workspace = "e+1" }))
+        end, { mouse = true, description = "Next workspace (mouse backward)" })
 
         -- 5. FOCUS (SUPER)
         hl.bind(mod .. " + left", hl.dsp.focus({ direction = "l" }), { description = "Focus left" })

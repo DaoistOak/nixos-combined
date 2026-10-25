@@ -12,8 +12,15 @@
     wantedBy = [ "multi-user.target" ];
     after = [ "multi-user.target" ];
     serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.bash}/bin/bash -c '${pkgs.powertop}/bin/powertop --auto-tune &'";
+      # Type=simple (not oneshot): multi-user still starts this asynchronously,
+      # but the unit stays active while powertop runs, so systemd does not
+      # cgroup-kill it mid-calibration (the old `oneshot + &` exited instantly
+      # and orphaned powertop into a killed cgroup — it never applied anything,
+      # nmi_watchdog stayed 1). powertop then stomps the udev USB power rules
+      # (every device -> control=auto), so re-fire the usb add rules
+      # afterwards to re-apply the exemptions in hardware/default.nix.
+      Type = "simple";
+      ExecStart = "${pkgs.bash}/bin/bash -c '${pkgs.coreutils}/bin/timeout 300 ${pkgs.powertop}/bin/powertop --auto-tune; ${pkgs.systemd}/bin/udevadm trigger --action=add --subsystem-match=usb'";
     };
   };
 

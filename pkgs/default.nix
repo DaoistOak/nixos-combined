@@ -259,6 +259,7 @@ let
     times-newer-roman
     wl-clipboard
     xclip
+    makima
   ];
 in
 {
