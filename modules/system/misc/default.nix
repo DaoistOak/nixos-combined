@@ -64,7 +64,11 @@
     };
   };
 
-  systemd.services.docker.wantedBy = lib.mkForce [ ];
+  services.udev.packages = [ pkgs.game-devices-udev-rules ];
+
+  # gamepad access: grant user-grade permissions for controllers
+  # (the game-devices-udev-rules package provides the udev rules; the
+  #  generic usb device rules live in services.udev.extraRules above)
   systemd.services.libvirtd.postStart = ''
         # Ensure the default NAT network exists (on-demand creation).
         if ! ${pkgs.libvirt}/bin/virsh net-info default >/dev/null 2>&1; then
