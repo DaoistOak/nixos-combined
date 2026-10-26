@@ -33,7 +33,7 @@ let
     #   295 BTN_BASE2    = R1
     [remap]
     # South (cross) -> accent + left click
-    BTN_THUMB2 = ["KEY_LEFTSHIFT", "BTN_LEFT"]
+    BTN_THUMB2 = ["KEY_ENTER", "BTN_LEFT"]
     # East (circle) -> decline / close
     BTN_THUMB = ["KEY_ESC"]
     # L1 / R1 -> previous / next tab in the focused app
