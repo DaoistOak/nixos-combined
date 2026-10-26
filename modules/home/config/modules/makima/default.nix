@@ -40,10 +40,10 @@ let
     BTN_BASE  = ["KEY_LEFTCTRL", "KEY_LEFTSHIFT", "KEY_TAB"]
     BTN_BASE2 = ["KEY_LEFTCTRL", "KEY_TAB"]
     # L2 / R2 -> F13 / F14; Hyprland turns tap into focus left/right and
-    # hold into move window left/right.
-    BTN_TOP2   = ["KEY_META", "KEY_F13"]
-    BTN_PINKIE = ["KEY_META","KEY_F14"]
 
+    # L2 / R2 -> focus left / right in the Hyprland layout
+    BTN_TOP2   = ["KEY_LEFTMETA", "KEY_LEFT"]
+    BTN_PINKIE = ["KEY_LEFTMETA", "KEY_RIGHT"]
     [movements]
     # North (triangle) / west (square) -> scroll down / up
     BTN_TRIGGER = "SCROLL_DOWN"
