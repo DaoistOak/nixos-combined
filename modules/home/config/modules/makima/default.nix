@@ -44,10 +44,17 @@ let
     # L2 / R2 -> focus left / right in the Hyprland layout
     BTN_TOP2   = ["KEY_LEFTMETA", "KEY_LEFT"]
     BTN_PINKIE = ["KEY_LEFTMETA", "KEY_RIGHT"]
+    BTN_DPAD_UP = ["KEY_UP"] #directional pad up
+    BTN_DPAD_RIGHT = ["KEY_RIGHT"] #directional pad right
+    BTN_DPAD_DOWN = ["KEY_DOWN"] #directional pad down
+    BTN_DPAD_LEFT = ["KEY_LEFT"] #directional pad left
+    RSTICK_UP = ["KEY_UP"] #right analog stick up
+    RSTICK_DOWN = ["KEY_DOWN"] #right analog stick down
     [movements]
     # North (triangle) / west (square) -> scroll down / up
     BTN_TRIGGER = "SCROLL_DOWN"
     BTN_TOP     = "SCROLL_UP"
+
 
     [settings]
     LSTICK = "cursor"           # left stick moves the cursor
