@@ -18,6 +18,36 @@
         end, { timeout = 600, type = "repeat" })
         spaceTapTimer:set_enabled(false)
 
+        -- Gamepad L2/R2 tap/hold. Makima sends F13/F14. Native long_press
+        -- cannot distinguish a short tap because the normal bind fires
+        -- immediately, so track the release here instead.
+        local gamepadHoldMs = 500
+        local gamepadHolds = {}
+        local function bind_tap_hold(keys, short_dsp, long_dsp, label)
+          hl.bind(keys, function()
+            local press = { long = false }
+            gamepadHolds[keys] = press
+            press.timer = hl.timer(function()
+              if gamepadHolds[keys] ~= press then
+                return
+              end
+              press.long = true
+              hl.dispatch(long_dsp)
+            end, { timeout = gamepadHoldMs, type = "oneshot" })
+          end, { description = label .. " (tap)" })
+          hl.bind(keys, function()
+            local press = gamepadHolds[keys]
+            if not press then
+              return
+            end
+            gamepadHolds[keys] = nil
+            press.timer:set_enabled(false)
+            if not press.long then
+              hl.dispatch(short_dsp)
+            end
+          end, { release = true, description = label .. " (release)" })
+        end
+
         -- Remembered window state: pseudo/floating is kept per window CLASS in a
         -- state file and re-applied as window rules, so the state survives layout
         -- switches, window close/reopen and restarts. Toggled from the WINDOWS
@@ -230,6 +260,10 @@
         hl.bind(mod .. " + J", hl.dsp.focus({ direction = "d" }), { description = "Focus down (vim)" })
         hl.bind(mod .. " + K", hl.dsp.focus({ direction = "u" }), { description = "Focus up (vim)" })
         hl.bind(mod .. " + L", hl.dsp.focus({ direction = "r" }), { description = "Focus right (vim)" })
+
+        -- Gamepad L2/R2: tap focuses left/right, hold moves the window left/right.
+        bind_tap_hold("F13", hl.dsp.focus({ direction = "l" }), hl.dsp.layout("swapcol l"), "Gamepad L2")
+        bind_tap_hold("F14", hl.dsp.focus({ direction = "r" }), hl.dsp.layout("swapcol r"), "Gamepad R2")
 
         -- 6. WINDOW MOVE (SUPER)
         hl.bind(mod .. " + SHIFT + left", hl.dsp.layout("swapcol l"), { description = "Move window left (swap column)" })

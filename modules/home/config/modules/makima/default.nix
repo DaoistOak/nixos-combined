@@ -1,105 +1,121 @@
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   makima = pkgs.makima;
+
+  enable = true;
+
+  # makima matches a config file against the device name reported by evdev
+  # EXACTLY — `associated_device_name == device.name()` in src/udev_monitor.rs,
+  # with no trimming. This Logitech gamepad reports " USB Gamepad          "
+  # (leading space + trailing padding). Naming the file "USB Gamepad.toml" makes
+  # makima print "No matching devices found" and exit.
+  deviceName = " USB Gamepad          ";
+
+  # Desktop control mode — the default layout, used for every window that has
+  # no app-specific config. makima reads [settings] ONLY from this main file.
+  desktopConfig = ''
+    # Desktop control mode (default layout for every window)
+    #
+    # This is a PantherLord PS2-to-USB adapter (0810:0001). Its real evdev names:
+    #   288 BTN_TRIGGER  = Triangle (North)
+    #   289 BTN_THUMB    = Circle   (East)
+    #   290 BTN_THUMB2   = Cross    (South)
+    #   291 BTN_TOP      = Square   (West)
+    #   292 BTN_TOP2     = L2
+    #   293 BTN_PINKIE   = R2
+    #   294 BTN_BASE     = L1
+    #   295 BTN_BASE2    = R1
+    [remap]
+    # South (cross) -> accent + left click
+    BTN_THUMB2 = ["KEY_LEFTSHIFT", "BTN_LEFT"]
+    # East (circle) -> decline / close
+    BTN_THUMB = ["KEY_ESC"]
+    # L1 / R1 -> previous / next tab in the focused app
+    BTN_BASE  = ["KEY_LEFTCTRL", "KEY_LEFTSHIFT", "KEY_TAB"]
+    BTN_BASE2 = ["KEY_LEFTCTRL", "KEY_TAB"]
+    # L2 / R2 -> F13 / F14; Hyprland turns tap into focus left/right and
+    # hold into move window left/right.
+    BTN_TOP2   = ["KEY_META", "KEY_F13"]
+    BTN_PINKIE = ["KEY_META","KEY_F14"]
+
+    [movements]
+    # North (triangle) / west (square) -> scroll down / up
+    BTN_TRIGGER = "SCROLL_DOWN"
+    BTN_TOP     = "SCROLL_UP"
+
+    [settings]
+    LSTICK = "cursor"           # left stick moves the cursor
+    LSTICK_SENSITIVITY = "12"   # higher = slower; was 6
+    LSTICK_DEADZONE = "5"
+    RSTICK = "disabled"
+    RSTICK_SENSITIVITY = "0"
+    RSTICK_DEADZONE = "64"
+    SCROLL_SPEED = "12"         # emits REL_WHEEL_HI_RES (v120) units; ~10 notches/s
+    GRAB_DEVICE = "false"       # keep raw input flowing to apps (games need it)
+  '';
+
+  # Gaming mode — pass-through. No [remap]/[movements] means makima emits no
+  # remapped events, so the window sees a normal gamepad.
+  gamingConfig = ''
+    # Gaming mode: pass-through for this window class.
+    [settings]
+    GRAB_DEVICE = "false"
+  '';
+
+  # Window classes (hyprctl clients -> class) that should get gaming mode.
+  # To add another game: hyprctl clients -j | jq -r '.[] | "\(.class)\t\(.title)"'
+  gameClasses = [
+    "net.lutris.Lutris" # Lutris game window
+    "gamescope" # nested gamescope game window
+    "gamescope-wl"
+    ".gamescope-wrapped" # current gamescope wrapper class (Elden Ring)
+    "steam" # Steam client / games without an app id
+    "steam_app_1245620" # Elden Ring (Steam)
+    "org.prismlauncher.PrismLauncher" # Minecraft (Prism Launcher)
+    "Minecraft"
+    "minecraft"
+    "com.mojang.minecraft"
+    "org.tlauncher.TLauncher"
+    "tlauncher"
+    "heroic" # Heroic Games Launcher
+    "org.libretro.RetroArch" # RetroArch
+  ];
 in
 {
-  # Add makima to home-manager's package list
-  home.packages = [ makima ];
+  home.packages = lib.optionals enable [ makima ];
 
-  # Systemd user service for makima
-  # Run as a user service so it can use the user's $HOME and XDG env.
-  systemd.user.services.makima = {
-    description = "Makima gamepad remapper daemon";
-    after = [ "default.target" ];
-    serviceConfig = {
+  # User service: makima needs $HOME (for ~/.config/makima) and the Hyprland
+  # socket (for per-app bindings). Unit/Service/Install are the systemd section
+  # names — home-manager's systemd module has no legacy `description`/`serviceConfig`.
+  systemd.user.services.makima = lib.mkIf enable {
+    Unit = {
+      Description = "Makima gamepad remapping daemon";
+      After = [ "default.target" ];
+    };
+    Service = {
       Type = "simple";
       ExecStart = "${makima}/bin/makima";
       Restart = "on-failure";
       RestartSec = "5s";
-      # Makima needs access to /dev/input/event*; the udev rules
-      # (game-devices-udev-rules) grant user-grade permissions.
-      # Also ensure no login manager restricts access.
-      MemoryDenyWriteExecute = false;
     };
-    # Bring in the user's environment + udev uaccess
-    userResources = pkgs.writeText "makima-user-resources" ''
-      # Makefile-style PATH for makima (not strictly needed, but harmless)
-    '';
+    Install = {
+      WantedBy = [ "default.target" ];
+    };
   };
 
-  # ── Desktop control mode configuration ──────────────────────────────
-  # Default config: used when no game window is active.
-  # - BTN_NORTH & BTN_WEST → scroll up/down
-  # - BTN_SOUTH            → accent (left shift) + left click
-  # - BTN_EAST             → decline/close (ESC)
-  # - LSTICK               → control and move mouse
-  # - L1/R1                → swap tabs
-  xdg.configFile."makima/USB Gamepad.toml".text = ''
-    # Desktop control mode for Logitech USB Gamepad
-    # (default config; used when no game window is active)
-    [remap]
-    # Button -> key combos for desktop control
-    # BTN_SOUTH -> accent (left shift) + left click
-    BTN_SOUTH = ["KEY_LEFTSHIFT", "BTN_LEFT"]
-    # BTN_EAST  -> decline/close (ESC)
-    BTN_EAST = ["KEY_ESC"]
-    # L1 (BTN_THUMBL)  -> previous tab
-    BTN_THUMBL = ["KEY_LEFTALT", "KEY_TAB"]
-    # R1 (BTN_THUMBR)  -> next tab
-    BTN_THUMBR = ["KEY_LEFTCTRL", "KEY_TAB"]
-
-    [movements]
-    # BTN_NORTH -> scroll up
-    BTN_NORTH = "SCROLL_UP"
-    # BTN_WEST  -> scroll down
-    BTN_WEST = "SCROLL_DOWN"
-
-    [settings]
-    LSTICK = "cursor"                      # left stick controls cursor
-    LSTICK_SENSITIVITY = "6"
-    LSTICK_DEADZONE = "5"
-    RSTICK_SENSITIVITY = "6"
-    RSTICK_DEADZONE = "64"
-    GRAB_DEVICE = "false"
-  '';
-
-  # ── App-specific configurations (gaming mode pass-throughs) ─────────
-  # When a game or app from the gaming list is active, these configs
-  # replace the desktop control mode with a pass-through so the controller
-  # works normally for that app.
-
-  xdg.configFile."makima/USB Gamepad::com.mitchellh.ghostty.toml".text = ''
-    # Gaming mode pass-through for Ghostty (TUI terminal)
-    # Only minimal bindings; main input passes through to the app.
-    [settings]
-    LSTICK = "cursor"
-    LSTICK_SENSITIVITY = "6"
-    LSTICK_DEADZONE = "5"
-    RSTICK_SENSITIVITY = "6"
-    RSTICK_DEADZONE = "64"
-    GRAB_DEVICE = "false"
-  '';
-
-  xdg.configFile."makima/USB Gamepad::chrome-gemini.google.com__-Default.toml".text = ''
-    # Gaming mode pass-through for Chrome
-    [settings]
-    LSTICK = "cursor"
-    LSTICK_SENSITIVITY = "6"
-    LSTICK_DEADZONE = "5"
-    RSTICK_SENSITIVITY = "6"
-    RSTICK_DEADZONE = "64"
-    GRAB_DEVICE = "false"
-  '';
-
-  xdg.configFile."makima/USB Gamepad::zen.toml".text = ''
-    # Gaming mode pass-through for Zen Browser
-    [settings]
-    LSTICK = "cursor"
-    LSTICK_SENSITIVITY = "6"
-    LSTICK_DEADZONE = "5"
-    RSTICK_SENSITIVITY = "6"
-    RSTICK_DEADZONE = "64"
-    GRAB_DEVICE = "false"
-  '';
+  xdg.configFile = lib.mkMerge [
+    (lib.mkIf enable {
+      "makima/${deviceName}.toml".text = desktopConfig;
+    })
+    (lib.genAttrs' gameClasses (cls: {
+      name = "makima/${deviceName}::${cls}.toml";
+      value.text = gamingConfig;
+    }))
+  ];
 }

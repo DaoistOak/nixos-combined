@@ -1,0 +1,114 @@
+--- a/src/udev_monitor.rs
++++ b/src/udev_monitor.rs
+@@ -15,6 +15,41 @@
+     Class(String),
+ }
+ 
++impl Client {
++    pub fn matches(&self, other: &Client) -> bool {
++        match (self, other) {
++            (Client::Class(pattern), Client::Class(class)) => match_wildcard(pattern, class),
++            _ => self == other,
++        }
++    }
++}
++
++fn match_wildcard(pattern: &str, text: &str) -> bool {
++    if !pattern.contains('*') {
++        return pattern == text;
++    }
++    let parts: Vec<&str> = pattern.split('*').collect();
++    let mut pos = 0;
++    for (index, part) in parts.iter().enumerate() {
++        if part.is_empty() {
++            continue;
++        }
++        if index == 0 {
++            if !text.starts_with(part) {
++                return false;
++            }
++            pos = part.len();
++        } else if index == parts.len() - 1 {
++            return text[pos..].ends_with(part);
++        } else if let Some(found) = text[pos..].find(part) {
++            pos += found + part.len();
++        } else {
++            return false;
++        }
++    }
++    true
++}
++
+ #[derive(Clone)]
+ pub enum Server {
+     Connected(String),
+--- a/src/active_client.rs
++++ b/src/active_client.rs
+@@ -22,7 +22,7 @@
+                             Client::Class(reply["class"].to_string().replace("\"", ""));
+                         if let Some(_) = config
+                             .iter()
+-                            .find(|&x| x.associations.client == active_window)
++                            .find(|&x| x.associations.client.matches(&active_window))
+                         {
+                             active_window
+                         } else {
+@@ -51,7 +51,7 @@
+                     };
+                     if let Some(_) = config
+                         .iter()
+-                        .find(|&x| x.associations.client == active_window)
++                        .find(|&x| x.associations.client.matches(&active_window))
+                     {
+                         active_window
+                     } else {
+@@ -70,7 +70,7 @@
+                             Client::Class(reply["app_id"].to_string().replace("\"", ""));
+                         if let Some(_) = config
+                             .iter()
+-                            .find(|&x| x.associations.client == active_window)
++                            .find(|&x| x.associations.client.matches(&active_window))
+                         {
+                             active_window
+                         } else {
+@@ -124,7 +124,7 @@
+                     };
+                     if let Some(_) = config
+                         .iter()
+-                        .find(|&x| x.associations.client == active_window)
++                        .find(|&x| x.associations.client.matches(&active_window))
+                     {
+                         active_window
+                     } else {
+@@ -160,7 +160,7 @@
+                             Client::Class(std::str::from_utf8(class).unwrap().to_string());
+                         if let Some(_) = config
+                             .iter()
+-                            .find(|&x| x.associations.client == active_window)
++                            .find(|&x| x.associations.client.matches(&active_window))
+                         {
+                             active_window
+                         } else {
+--- a/src/event_reader.rs
++++ b/src/event_reader.rs
+@@ -1346,7 +1346,7 @@
+                 *active_layout += 1
+             };
+             if let Some(_) = self.config.iter().find(|&x| {
+-                x.associations.layout == *active_layout && x.associations.client == active_window
++                x.associations.layout == *active_layout && x.associations.client.matches(&active_window)
+             }) {
+                 break;
+             };
+@@ -1368,7 +1368,10 @@
+                 client: active_window,
+                 layout: active_layout,
+             };
+-            match self.config.iter().find(|&x| x.associations == associations) {
++            match self.config.iter().find(|&x| {
++                x.associations.layout == associations.layout
++                    && x.associations.client.matches(&associations.client)
++            }) {
+                 Some(config) => {
+                     let mut current_config = self.current_config.lock().await;
+                     *current_config = config.clone();

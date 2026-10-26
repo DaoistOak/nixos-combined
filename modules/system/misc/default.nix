@@ -33,6 +33,19 @@
 
   hardware.uinput.enable = true;
 
+  # makima creates virtual input devices through /dev/uinput, which hardware.uinput
+  # leaves as root:uinput 0660. A running session's supplementary groups are fixed
+  # at login, so adding the user to a group does not reach a session that is already
+  # up — grant an ACL instead (re-applied on every udev trigger), and set the group
+  # to `input` so it also works after a re-login.
+  users.groups.uinput.members = [ config.var.username ];
+  services.udev.packages = [
+    pkgs.game-devices-udev-rules
+    (pkgs.writeTextDir "etc/udev/rules.d/99-makima.rules" ''
+      SUBSYSTEM=="misc", KERNEL=="uinput", MODE="0660", GROUP="input", TAG+="uaccess", RUN+="${pkgs.acl}/bin/setfacl -m u:${config.var.username}:rw /dev/uinput"
+    '')
+  ];
+
   # kernelParams (kvm.ignore_msrs=1) are owned by ../config/hardware/default.nix (single mkForce).
 
   hardware.ksm.enable = true;
@@ -64,11 +77,8 @@
     };
   };
 
-  services.udev.packages = [ pkgs.game-devices-udev-rules ];
-
-  # gamepad access: grant user-grade permissions for controllers
-  # (the game-devices-udev-rules package provides the udev rules; the
-  #  generic usb device rules live in services.udev.extraRules above)
+  # gamepad access: the game-devices-udev-rules package is listed in
+  # services.udev.packages above (alongside the makima uinput rule).
   systemd.services.libvirtd.postStart = ''
         # Ensure the default NAT network exists (on-demand creation).
         if ! ${pkgs.libvirt}/bin/virsh net-info default >/dev/null 2>&1; then
