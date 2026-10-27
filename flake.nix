@@ -46,6 +46,20 @@
       # the v0.56.1 tree, so the rest of its deps are unchanged.
       inputs.nixpkgs.url = "github:NixOS/nixpkgs/61b7c44c4073f0b827768aff0049561b5110ea5a";
     };
+
+    # hyprland-guiutils: Hyprland GUI utilities (successor to hyprland-qtutils).
+    # Built against the flake Hyprland dev output with deps from the
+    # hyprland-packages overlay (matches how hyprwinwrap / hypr-edgehover are
+    # built). Available as pkgs.hyprland-guiutils for downstream packages
+    # (e.g. hypridle + custom tools that link against it).
+    hyprland-guiutils = {
+      url = "github:hyprwm/hyprland-guiutils/d038577531e3ab6646b13a82d17e610be34c30cc";
+      # Pinned ahead of the main HEAD so a bump to a post-v0.56.x revision
+      # cannot silently change the ABI of the C libs we link against.
+      # Bump together with the pinned Hyprland rev + hyprwinwrap/hypr-edgehover
+      # revs if the Hyprland ecosystem API changes.
+      flake = true;
+    };
     lazyvim = {
       # LazyVim home-manager module (programs.lazyvim). Plugin versions come
       # from nixpkgs; LazyVim itself is the nixpkgs vimPlugins.LazyVim package.

@@ -11,6 +11,7 @@
     gpu-screen-recorder
     inputs.hermes-agent.packages."x86_64-linux".default
     hypridle
+    hyprland-guiutils
     hyprlock
     hyprnome
 
