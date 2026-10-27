@@ -78,6 +78,12 @@
       set -g status-left-length 100
       set -g status-right-length 400
 
+      # Current window: remove the tmux built-in `underscore` on
+      # window-status-current-style (the compiled-in default draws an
+      # underline under the active window name). The per-segment colours in
+      # window-status-current-format override this base style.
+      set -g window-status-current-style "fg=#{@thm_surface_0},bg=#{@thm_bg}"
+
       # Window list (left). Both active and inactive get pill styling so the
       # tabs read as themed blocks instead of plain text.
       #
@@ -186,6 +192,17 @@
       # now dropped; sesh reuses the same sesh picker binary).
       bind -N "smart session picker (sesh)" s display-popup -E -h 90% -w 50% "${pkgs.sesh}/bin/sesh picker -i"
       bind -N "smart session picker (sesh)" T display-popup -E -h 90% -w 50% "${pkgs.sesh}/bin/sesh picker -i"
+
+      # Sesh popup: theme the floating picker window's background and
+      # foreground. The default popup style is a neutral grey/white pair
+      # that clashes with the status bar.
+      set -g popup-style "fg=#cad3f5,bg=#24273a"
+      set -g popup-border-style "fg=#8087a2,bg=#24273a"
+
+      # The default window-status-current-style is "underscore", so tmux
+      # underlines the current window's name in the left window list. Drop
+      # the underline so the tab reads clean.
+      set -g window-status-current-style "none"
 
       # sesh replaces the built-in last-session command, which cannot find the
       # previous session once detach-on-destroy is off (below) and a session was
