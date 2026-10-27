@@ -14,7 +14,7 @@
     # Home-manager emits each plugin's `extraConfig` immediately before its
     # `run-shell`, and the whole plugin block before the global `extraConfig`
     # at the bottom of this file. An option a plugin reads while binding its
-    # keys -- floax's @floax-bind, sessionx's @sessionx-bind -- therefore has
+    # keys -- floax's @floax-bind -- therefore has
     # to be set in that plugin's own extraConfig: written into `extraConfig`
     # below it would arrive one step too late and the plugin would keep its
     # default binding.
@@ -36,18 +36,6 @@
           # in floax.tmux, so there is no bind to write out here -- only the
           # key it should claim.
           set -g @floax-bind "Space"
-        '';
-      }
-      {
-        plugin = tmux-sessionx;
-        extraConfig = ''
-          # prefix + s opens the session picker in place of tmux's choose-tree.
-          set -g @sessionx-bind "s"
-
-          # floax's floating pane runs in a session of its own (floax.sh ends
-          # in `attach-session -t scratch`), which is a scratch surface rather
-          # than somewhere to switch to, so keep it out of the picker.
-          set -g @sessionx-filtered-sessions "scratch"
         '';
       }
     ];
@@ -193,6 +181,10 @@
       # zoxide directory), ctrl-o toggles the preview, ` opens the alias view and
       # `#` numbers the rows, all without the nested $(...) quoting an fzf
       # pipeline needs inside a tmux binding.
+      #
+      # prefix + s also opens the sesh picker (was sessionx's @sessionx-bind "s",
+      # now dropped; sesh reuses the same sesh picker binary).
+      bind -N "smart session picker (sesh)" s display-popup -E -h 90% -w 50% "${pkgs.sesh}/bin/sesh picker -i"
       bind -N "smart session picker (sesh)" T display-popup -E -h 90% -w 50% "${pkgs.sesh}/bin/sesh picker -i"
 
       # sesh replaces the built-in last-session command, which cannot find the

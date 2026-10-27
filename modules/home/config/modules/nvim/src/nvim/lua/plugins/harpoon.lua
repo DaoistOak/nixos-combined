@@ -111,8 +111,73 @@ local function open_harpoon_picker()
       Snacks.bufdelete(item.buf)
     end
   end
+
+  -- Add a brand-new buffer. It is put at the top of the list and the picker
+  -- closes with the buffer made current so the user can name and save it
+  -- immediately. The buffer source re-reads `nvim_list_bufs()` on the next
+  -- open, so the new buffer is picked up in the list too.
+  actions.buffer_add = function(picker)
+    local buf = vim.api.nvim_create_buf(false, {buflisted = true, swapfile = false})
+    local item = {
+      buf = buf,
+      name = "",
+      file = "",
+      buftype = "",
+      filetype = "",
+      flags = "",
+      text = "",
+      info = { hidden = 0, windows = {} },
+    }
+    local list = picker.list
+    list.topk:clear()
+    for i, v in ipairs(list.items) do
+      if v == item then
+        table.remove(list.items, i)
+        break
+      end
+    end
+    table.insert(list.items, 1, item)
+    list.target = nil
+    list:update()
+    list:move(1, true)
+    picker:close()
+    vim.api.nvim_set_current_buf(buf)
+    vim.cmd("startinsert!")
+  end
+
+  -- Mark the highlighted buffer to the top of the list. Remove it from the
+  -- buffer order and re-insert it at index 1, then re-render so the cursor is
+  -- on the top item. Pressing it again while it is already at the top leaves
+  -- it there.
+  actions.buffer_top = function(picker)
+    local item = picker:current()
+    if not item or not item.buf then return end
+    local list = picker.list
+    list.topk:clear()
+    for i, v in ipairs(list.items) do
+      if v == item then
+        table.remove(list.items, i)
+        break
+      end
+    end
+    table.insert(list.items, 1, item)
+    list.target = nil
+    list:update()
+    list:move(1, true)
+  end
+
+  -- Delete the highlighted buffer with dd. `buffer_delete` resolves to
+  -- snacks' own `bufdelete`, so the modified-buffer prompt is handled for us.
   input_keys["d"] = { "buffer_delete", mode = "n" }
+  input_keys["dd"] = { "buffer_delete", mode = "n" }
   list_keys["d"] = "buffer_delete"
+  list_keys["dd"] = "buffer_delete"
+
+  -- Create a new buffer (a).
+  list_keys["a"] = "buffer_add"
+
+  -- Mark the highlighted buffer to the top of the list (space).
+  list_keys["<Space>"] = "buffer_top"
 
   Snacks.picker.buffers({
     title = "Harpoon Buffers",
