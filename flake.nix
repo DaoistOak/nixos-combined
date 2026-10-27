@@ -64,7 +64,6 @@
       url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    hyprpanel.url = "github:Jas-SinghFSU/HyprPanel";
     hypr-dynamic-cursors = {
       # 5a22428 is the rev hyprpm.toml pins for v0.56.2 (efb50993...); it is
       # the "draw cursor on toplevel capture like hl" fix, required because

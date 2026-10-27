@@ -1,13 +1,13 @@
 # Aggregated package definitions.
+# Single source of truth: `pkgs/default.nix` (edit `system-packages` / `user-packages` there).
 # system-pkgs → environment.systemPackages (NixOS)
-# home-pkgs → home.packages (home-manager)
-# Define new packages in the relevant list in default.nix.
+# home-pkgs   → home.packages (home-manager)
 { pkgs, inputs, ... }:
 
 let
-  pkgs' = import ./default.nix { inherit pkgs inputs; };
+  manifest = import ./default.nix { inherit pkgs inputs; };
 in
 {
-  system-pkgs = pkgs'.system-packages;
-  home-pkgs = pkgs'.user-packages;
+  system-pkgs = manifest.system-packages;
+  home-pkgs = manifest.user-packages;
 }

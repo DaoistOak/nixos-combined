@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+# Fuzzy search nixpkgs and append to home (user-packages.nix) or system (system-packages.nix)
+# Usage: nix-add [--home|--system] [query]
+
+set -euo pipefail
+
+FLAKE_DIR="${FLAKE_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/nixos}"
+PKG_DIR="$FLAKE_DIR/pkgs"
+USER_FILE="$PKG_DIR/user-packages.nix"
+SYS_FILE="$PKG_DIR/system-packages.nix"
+
+TARGET=""
+QUERY="${*:-}"
+
+# Parse args
+ARGS=()
+for arg in "$@"; do
+  case "$arg" in
+    --home) TARGET="home" ;;
+    --system|--sys) TARGET="system" ;;
+    *) ARGS+=("$arg") ;;
+  esac
+done
+if ((${#ARGS[@]} > 0)); then
+  QUERY="${ARGS[*]}"
+fi
+
+# Ensure required tools
+for cmd in fzf nix-search-tv nixfmt git; do
+  command -v "$cmd" >/dev/null 2>&1 || { echo "Missing: $cmd" >&2; exit 1; }
+done
+
+# Get search results from nix-search-tv (try to use its output format)
+# nix-search-tv typically outputs lines we can parse; fallback to just search
+TMPFILE=$(mktemp)
+trap 'rm -f "$TMPFILE"' EXIT
+
+# Try to get results - use ns if available or nix-search-tv directly
+if command -v ns >/dev/null 2>&1; then
+  # ns may run interactively; better to use nix-search-tv directly with fzf
+  :
+fi
+
+# Get package list via nix-search-tv
+# Some versions support different flags; try common patterns
+nix-search-tv --help 2>&1 | grep -q json && JSON_FLAG="--json" || JSON_FLAG=""
+# Fallback: use nix-search-tv to dump and filter
+if [ -n "$JSON_FLAG" ]; then
+  nix-search-tv "$JSON_FLAG" 2>/dev/null | jq -r '.[].package_attr_name // empty' 2>/dev/null | head -20000 > "$TMPFILE" || true
+fi
+
+# If empty, use a different approach - run interactively via fzf with preview
+# Simpler: use nix-search-tv's interactive mode piped differently isn't straightforward
+# Alternative: use `nix search nixpkgs` output style parsed
+if [ ! -s "$TMPFILE" ]; then
+  # Use nix search as fallback
+  if [ -n "$QUERY" ]; then
+    nix search nixpkgs "$QUERY" 2>&1 | grep -E '^  ' | sed -n 's/.*\*\s\+\([^[:space:]]\+\).*/\1/p' | head -5000 > "$TMPFILE"
+  else
+    nix search nixpkgs "" 2>&1 | grep -E '^  ' | sed -n 's/.*\*\s\+\([^[:space:]]\+\).*/\1/p' | head -10000 > "$TMPFILE"
+  fi
+fi
+
+if [ ! -s "$TMPFILE" ]; then
+  echo "No results found. Try: nix-add <search term>" >&2
+  exit 1
+fi
+
+# Fuzzy select
+SELECTED=$(cat "$TMPFILE" | fzf --prompt="nixpkgs> " --height=40% --reverse --border)
+
+[ -z "$SELECTED" ] && exit 0
+
+# Determine target
+if [ -z "$TARGET" ]; then
+  echo ""
+  echo "Add '$SELECTED' to:"
+  echo "  1) home (user-packages.nix)"
+  echo "  2) system (system-packages.nix)"
+  echo "  3) cancel"
+  read -rp "Choice [1/2/3]: " choice
+  case "$choice" in
+    1) TARGET="home" ;;
+    2) TARGET="system" ;;
+    *) exit 0 ;;
+  esac
+fi
+
+# Choose file
+if [ "$TARGET" = "home" ]; then
+  FILE="$USER_FILE"
+  NAME="user"
+else
+  FILE="$SYS_FILE"
+  NAME="system"
+fi
+
+# Check if already present
+if grep -qE "^[[:space:]]*${SELECTED//./\\.}[[:space:]]*$" "$FILE" 2>/dev/null || grep -qE "^\s*${SELECTED//./\\.}\b" "$FILE"; then
+  echo "Package '$SELECTED' already in $NAME packages." >&2
+  exit 0
+fi
+
+# Append before the final closing ]
+# Find last line with just spaces and ]
+# Insert with proper indentation (4 spaces)
+TMPFILE2=$(mktemp)
+trap 'rm -f "$TMPFILE" "$TMPFILE2"' EXIT
+
+# Use python for reliable insertion
+python3 - "$FILE" "$SELECTED" << 'PY'
+import sys
+
+path = sys.argv[1]
+pkg = sys.argv[2]
+
+with open(path) as f:
+    content = f.read()
+
+# Find the last ']' that closes the list
+# Look for pattern: spaces followed by ] at end of file or before certain patterns
+# Simple approach: find last occurrence of '\n  ]' or '\n]'
+# Try to be smart about indentation
+lines = content.rstrip().splitlines()
+# Find last line that is just whitespace followed by ]
+for i in range(len(lines)-1, -1, -1):
+    stripped = lines[i].strip()
+    if stripped == ']':
+        # Check indentation
+        indent = len(lines[i]) - len(lines[i].lstrip())
+        # Insert before this line
+        insert_indent = ' ' * (indent if indent >= 4 else 4)
+        lines.insert(i, insert_indent + pkg)
+        break
+else:
+    # Couldn't find closing bracket, just append
+    lines.append('    ' + pkg)
+    lines.append('  ]')
+
+new_content = '\n'.join(lines)
+if not new_content.endswith('\n'):
+    new_content += '\n'
+
+with open(path, 'w') as f:
+    f.write(new_content)
+PY
+
+echo "Added '$SELECTED' to $FILE"
+
+# Format
+if command -v nixfmt >/dev/null 2>&1; then
+  nixfmt "$FILE" 2>/dev/null || true
+fi
+
+echo "Done. Rebuild with: $( [ "$TARGET" = "home" ] && echo 'home-manager switch --flake .#zeph' || echo 'nh os switch .#nixosConfigurations.Lingnao' )"

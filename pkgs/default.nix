@@ -1,4 +1,6 @@
-# Custom packages, that can be defined similarly to ones from nixpkgs
+# PACKAGES MANIFEST - Single source of truth for all packages.
+# Edit `system-packages.nix` (NixOS/system-wide) and `user-packages.nix` (home-manager/user).
+# Keep home and system packages intentionally separated.
 # You can build them using 'nix build .#example'
 { pkgs, inputs, ... }:
 
@@ -20,249 +22,24 @@ let
         ]
         (builtins.readFile "${pkgs.nix-search-tv.src}/nixpkgs.sh");
   };
-  user-packages = with pkgs; [
-    ns
-    atuin
-    avizo
-    awww
-    chafa
-    cliphist
-    copilot-language-server
-    flameshot
-    gpu-screen-recorder
-    inputs.hermes-agent.packages."x86_64-linux".default
-    hypridle
-    hyprlock
-    hyprnome
-    inputs.hyprpanel.packages."x86_64-linux".default
-    hyprpicker
-    hyprpolkitagent
-    hyprprop
-    hyprshot
-    hyprsunset
-    hyprwhspr-rs
-    jrnl
-    jujutsu
-    kdePackages.qqc2-desktop-style
-    kdePackages.qtstyleplugin-kvantum
-    klassy
-    mew
-    neovide
-    pay-respects
-    quickshell
-    socat
-    (pkgs.writeShellApplication {
-      name = "phone-idle-inhibitor";
-      text = builtins.readFile ../scripts/phone-idle-inhibitor;
-    })
-  ];
 
-  system-packages = with pkgs; [
-    # --- Desktop Environment & Wayland Compositor ---
-    ags
-    swayidle
+  nix-add = pkgs.writeShellApplication {
+    name = "nix-add";
+    runtimeInputs = with pkgs; [
+      fzf
+      nix-search-tv
+      nixfmt
+      git
+      jq
+      python3
+    ];
+    text = builtins.readFile ../scripts/nix-add;
+  };
 
-    # --- Web Browsers & Communication ---
-    brave
-    ferdium
-    firefox
-    inputs.zen-browser.packages."x86_64-linux".default
-    kdePackages.kdeconnect-kde
-    qutebrowser
-    thunderbird
-    # ungoogled-chromium refuses extension installs from outside the Chrome Web
-    # Store (ExtensionManagement::IsOffstoreInstallAllowed is false unless the
-    # ExtensionInstallSources policy is set), so the Web Store just tells you to
-    # switch to Chrome. That flag re-enables off-store/CRX installs and makes
-    # .crx downloads prompt for installation.
-    #
-    # The store's own install flow is a dead end though: Google serves extension
-    # payloads through a signed-blob flow ungoogled cannot complete, and the CRX
-    # update endpoint answers 204/404 for nearly every extension. So the four
-    # extensions we actually use are packaged as unpacked directories from
-    # upstream release assets (see pkgs/chromium-extensions) and loaded from the
-    # store -- Chromium honours --load-extension in non-Google builds as long as
-    # no ExtensionInstallTypeBlocklist::command_line policy is set (it isn't).
-    # `updt ext` bumps the upstream pins.
-    (ungoogled-chromium.override {
-      commandLineArgs = "${chromiumExtensions.loadArg} --extension-mime-request-handling=always-prompt-for-install";
-    })
-    vesktop
-
-    # --- Development Tools & Compilers ---
-    automake
-    binutils
-    bintools
-    cargo
-    cmake
-    devenv
-    direnv
-    gcc
-    gdb
-    git
-    gnumake
-    jq
-    lazygit
-    luarocks
-    nil
-    ninja
-    nodejs
-    nixfmt
-    nixfmt-tree
-    opencode
-    patchelf
-    pkg-config
-    python3
-    vscode-fhs
-
-    # --- Text Editors & Terminal Utilities ---
-    bat
-    copyq
-    eza
-    fish
-    neovim
-    pcmanfm
-    sesh
-    superfile
-    vim
-    yazi
-    zellij
-    zoxide
-    zsh
-    kdePackages.kate
-    kdePackages.yakuake
-
-    # --- System Administration, Monitoring & Power ---
-    amdgpu_top
-    auto-cpufreq
-    brightnessctl
-    btop
-    cpufrequtils
-    kdePackages.kpmcore
-    lact
-    lm_sensors
-    networkmanager_dmenu
-    networkmanagerapplet
-    nh
-    nix-ld
-    nix-output-monitor
-    nix-search-tv
-    nvd
-    pciutils
-    powertop
-    radeontop
-    ryzenadj
-    appimage-run
-
-    # --- Virtualization & Containers ---
-    distrobox
-    lazydocker
-    spice
-    spice-gtk
-    virt-manager
-
-    # --- Gaming & Compatibility ---
-    gamescope
-    goverlay
-    lutris
-    mangohud
-    scrcpy
-    vkd3d
-    vkd3d-proton
-    winboat
-    wineWow64Packages.stable
-
-    # --- Media, Graphics & CAD ---
-    blender
-    cava
-    drawy
-    ffmpeg-full
-    grim
-    grimblast
-    # Screenshot/color helpers: slurp (region select for grim), swappy and
-    # satty (annotate/editor backends). hyprpicker lives in user-packages.
-    slurp
-    swappy
-    satty
-    # Wayland screen recording + ImageMagick (`magick`) for conversions
-    wl-screenrec
-    imagemagick
-    kdePackages.dragon
-    kicad-small
-    mpv
-    # Keypress visualization (from NUR, not in nixpkgs)
-    nur.repos.milahu.keyviz
-    playerctl
-
-    # --- Network & Connectivity ---
-    bluez-tools
-    curl
-    dnsmasq
-    freerdp
-    gnirehtet
-    picocom
-    proton-vpn
-    qbittorrent
-    screen
-    wget
-
-    # --- Security, Storage & Document Viewers ---
-    busybox
-    fuse3
-    keepassxc
-    kdePackages.okular
-    ntfs3g
-    p7zip
-    rpi-imager
-    # OCR
-    tesseract
-    unzip
-    wpsoffice
-    zathura
-
-    # --- AI, CLI Toys & Novelty ---
-    hollywood
-    ollama
-    tgpt
-
-    # --- Graphics Drivers, Codecs & Display Libraries ---
-    dxvk
-    mesa-demos
-    vulkan-hdr-layer-kwin6
-    vulkan-tools
-    vulkan-validation-layers
-
-    # --- System Libraries, Themes & Fonts ---
-    adi1090x-plymouth-themes
-    adwaita-icon-theme
-    alsa-utils
-    bleachbit
-    catppuccin-cursors.macchiatoLight
-    catppuccin-kvantum
-    qt6Packages.qtstyleplugin-kvantum
-    catppuccin-papirus-folders
-    code-cursor-fhs
-    dart-sass
-    # Provides the gio command (used by syncthing for mime/open handling); the
-    # gvfs daemons themselves come via services.gvfs.enable.
-    glib
-    jre
-    killall
-    libnotify
-    lohit-fonts.devanagari
-    openjfx
-    # Open Sound Control command-line client
-    osc
-    papirus-folders
-    qalculate-qt
-    terminus_font
-    times-newer-roman
-    wl-clipboard
-    xclip
-    makima
-  ];
+  user-packages-list = (import ./user-packages.nix { inherit pkgs inputs; }) ++ [ ns nix-add ];
+  system-packages-list = import ./system-packages.nix { inherit pkgs inputs; };
 in
 {
-  user-packages = user-packages;
-  system-packages = system-packages;
+  user-packages = user-packages-list;
+  system-packages = system-packages-list;
 }

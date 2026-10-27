@@ -119,6 +119,24 @@
           opacity = "0.9 override 0.9 override",
         })
 
+        -- AI agents (launch-ai.sh + opencode/hermes binds) open in the
+        -- special (scratchpad) workspace, so SUPER+W, S surfaces them together.
+        hl.window_rule({
+          match = {
+            class = "^(AI-(gemini|chatgpt|perplexity|grok|claude)|opencode|hermes)$",
+          },
+          workspace = "scratchpad",
+        })
+
+        -- All windows in the special workspace never go fullscreen, even when
+        -- a single app is present (unlike the other workspaces).
+        hl.window_rule({
+          match = {
+            onworkspace = "^(scratchpad)$",
+          },
+          fullscreen = false,
+        })
+
         local function transReadMode()
           -- true = transparent (.90 for the whitelist); false = fully opaque.
           local f = io.open(transStateFile, "r")
@@ -182,6 +200,11 @@
         -- tab (window switcher) lives on the space gestures: SUPER+SHIFT+SPACE
         -- and three quick SUPER+SPACE taps.
         hl.bind(mod .. " + SHIFT + SPACE", hl.dsp.exec_cmd("noctalia msg window-switcher"), { description = "Window switcher (tab)" })
+        hl.bind(mod .. " + o", hl.dsp.exec_cmd("opencode"),
+          { description = "OpenCode (GUI)" })
+        hl.bind(mod .. " + h", hl.dsp.exec_cmd("hermes dashboard --no-open && chromium --app=http://127.0.0.1:9119 --class=hermes"),
+          { description = "Hermes Dashboard (Chromium)" })
+
         hl.bind(mod .. " + SPACE", function()
           spaceTap.count = spaceTap.count + 1
           if spaceTap.count >= 3 then

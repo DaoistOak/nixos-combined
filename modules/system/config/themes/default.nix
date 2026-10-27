@@ -23,9 +23,10 @@ in
     allowUnfree = true;
     allowUnsupportedSystem = true;
     allowAliases = false;
+    # Insecure packages - required for specific apps; review periodically
     permittedInsecurePackages = [
-      "electron-40.10.5"
-      "pnpm-10.29.2"
+      "electron-40.10.5" # required by some electron apps
+      "pnpm-10.29.2" # required by specific tooling
     ];
   };
 

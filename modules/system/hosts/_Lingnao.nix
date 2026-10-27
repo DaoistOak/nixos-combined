@@ -16,6 +16,9 @@
       ../../shared/var.nix
       inputs.home-manager.nixosModules.default
       {
+        # Home Manager NixOS integration is imported but not actively configured.
+        # Primary home config is standalone via flake.homeConfigurations."zeph"
+        # (see below) for use with `home-manager switch --flake .#zeph`.
         home-manager.extraSpecialArgs = { inherit inputs; };
       }
       inputs.stylix.nixosModules.stylix

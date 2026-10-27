@@ -11,11 +11,19 @@
       dates = [ "weekly" ];
     };
     settings = {
+      auto-optimise-store = true;
+      builders-use-substitutes = true;
       experimental-features = [
         "nix-command"
         "flakes"
       ];
       use-xdg-base-directories = true;
+      trusted-users = [
+        "root"
+        "@wheel"
+      ];
+      # Avoid noisy "Git tree is dirty" warnings on local edits
+      warn-dirty = false;
       max-jobs = "auto";
       min-free = 3221225472;
       max-free = 6442450944;
