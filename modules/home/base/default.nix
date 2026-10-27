@@ -96,11 +96,9 @@ in
 
   programs.noctalia = {
     enable = true;
-    package =
-      (inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default).overrideAttrs
-        (old: {
-          patches = (old.patches or [ ]) ++ [ ../noctalia-shadow-offset-blur.patch ];
-        });
+    # Default noctalia package (stale shadow-offset-blur patch backed up to
+    # .bak); patch no longer applied.
+    package = (inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default);
     settings.theme = lib.mkForce {
       source = "custom";
       custom_palette = "themeswapper";
