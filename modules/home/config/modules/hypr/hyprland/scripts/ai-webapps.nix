@@ -70,11 +70,15 @@ in
         exit 0
       fi
 
-      # Kill any stale opencode server on the port, then start a fresh one.
-      if command -v lsof >/dev/null 2>&1; then
-        lsof -ti:4096 2>/dev/null | xargs -r kill 2>/dev/null || true
-      elif command -v fuser >/dev/null 2>&1; then
-        fuser -k 4096/tcp 2>/dev/null || true
+      # Kill any stale opencode server on the port (opencode process only),
+      # then start a fresh one. NOTE: `lsof -ti:4096` on this host emits a full
+      # lsof transcript per process, so piping it to `xargs -r kill` ends up
+      # running `kill 0`, which SIGTERMs the entire script process group --
+      # including the Hyprland compositor -- taking the session down. pkill -f
+      # with the exact command string avoids that; only the opencode server is
+      # touched.
+      if command -v pkill >/dev/null 2>&1; then
+        pkill -f 'opencode web --port 4096' 2>/dev/null || true
       fi
       sleep 0.5
 
