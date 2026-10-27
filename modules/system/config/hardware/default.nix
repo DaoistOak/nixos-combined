@@ -102,7 +102,6 @@ in
     themePackages = [ nixosLoadingTheme ];
   };
   boot.consoleLogLevel = 3;
-  boot.initrd.verbose = false;
 
   # Lenovo IdeaPad Slim 5 hardware tweaks
   #

@@ -171,12 +171,20 @@ vi() {
 autoload -Uz add-zsh-hook
 
 # Re-source the theme-switcher's p10k overrides on every prompt so a
-# mid-session `./theme set ...` recolors POWERLEVEL9K_DIR_BACKGROUND (and any
+# mid-session ./theme set ... recolors POWERLEVEL9K_DIR_BACKGROUND (and any
 # future p10k overrides) on the next render.
 theme_p10k_sync() {
   [[ -f "$HOME/.config/theme-switcher/p10k-theme.zsh" ]] && source "$HOME/.config/theme-switcher/p10k-theme.zsh"
 }
 add-zsh-hook precmd theme_p10k_sync
+
+# Re-source the theme-switcher's fzf theme on every prompt so a mid-session
+# ./theme set ... keeps fzf on the current Catppuccin palette. fzf-theme.zsh
+# always re-exports FZF_DEFAULT_OPTS, so child processes (e.g. ns) see it too.
+fzf_theme_sync() {
+  [[ -r "$HOME/.config/theme-switcher/fzf-theme.zsh" ]] && source "$HOME/.config/theme-switcher/fzf-theme.zsh"
+}
+add-zsh-hook precmd fzf_theme_sync
 
 # 1) List directory contents after every cd (mirrors the `ls` alias).
 chpwd_ls() {

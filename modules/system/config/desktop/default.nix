@@ -2,6 +2,7 @@
   config,
   pkgs,
   inputs,
+  lib,
   ...
 }:
 
@@ -32,6 +33,11 @@
       in
       stock // { override = _: stock; };
   };
+
+  # Fix security wrapper for Hyprland: the wrapper script created by nix wraps
+  # bin/Hyprland (a shell script), but the security wrapper requires an ELF.
+  # Point it to the actual binary.
+  security.wrappers.Hyprland.source = lib.mkForce "${inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland.override { stdenv = pkgs.stdenv; }}/bin/.Hyprland-wrapped";
 
   services.desktopManager.plasma6.enable = true;
 

@@ -340,8 +340,12 @@ colors:
   status_bar_critical: "#$red"
   diff_added: "#$green"
   diff_removed: "#$red"
-  diff_added_word: "#$green"
-  diff_removed_word: "#$red"
+  # The "word" colours must differ from the background colours so that the
+  # added/removed text stays legible. `$green`/`$red` are light (Catppuccin),
+  # so use darkened shades for the foreground; these stay constant across
+  # theme switches so add/remove highlighting is always readable.
+  diff_added_word: "#248a3d"
+  diff_removed_word: "#cf222e"
   syntax_string: "#$cyan"
   syntax_number: "#$yellow"
   syntax_keyword: "#$magenta"

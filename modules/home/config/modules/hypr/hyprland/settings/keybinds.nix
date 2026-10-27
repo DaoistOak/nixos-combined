@@ -128,11 +128,12 @@
           workspace = "scratchpad",
         })
 
-        -- All windows in the special workspace never go fullscreen, even when
-        -- a single app is present (unlike the other workspaces).
+        -- All windows in the special (scratchpad) workspace never go fullscreen,
+        -- even when a single app is present (unlike the other workspaces).
         hl.window_rule({
           match = {
-            onworkspace = "^(scratchpad)$",
+            class = "^(AI-(gemini|chatgpt|perplexity|grok|claude)|opencode|hermes)$",
+            workspace = "^(scratchpad)$",
           },
           fullscreen = false,
         })
