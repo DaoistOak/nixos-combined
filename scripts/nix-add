@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Fuzzy search nixpkgs and append to home (user-packages.nix) or system (system-packages.nix)
-# Usage: nix-add [--home|--system] [query]
+# Fuzzy search nixpkgs and append to home or system
+# Usage: nix-add [--home|--system|--sys] [query]
 
 set -euo pipefail
 
@@ -9,15 +9,15 @@ PKG_DIR="$FLAKE_DIR/pkgs"
 USER_FILE="$PKG_DIR/user-packages.nix"
 SYS_FILE="$PKG_DIR/system-packages.nix"
 
-TARGET=""
-QUERY="${*:-}"
-
 # Parse args
+TARGET=""
+QUERY=""
+HAS_TARGET=0
 ARGS=()
 for arg in "$@"; do
   case "$arg" in
-    --home) TARGET="home" ;;
-    --system|--sys) TARGET="system" ;;
+    --home) TARGET="home"; HAS_TARGET=1 ;;
+    --system|--sys) TARGET="system"; HAS_TARGET=1 ;;
     *) ARGS+=("$arg") ;;
   esac
 done
@@ -30,61 +30,53 @@ for cmd in fzf nix-search-tv nixfmt git; do
   command -v "$cmd" >/dev/null 2>&1 || { echo "Missing: $cmd" >&2; exit 1; }
 done
 
-# Get the package list. nix-search-tv has no --json flag, so the old JSON path
-# was dead code. Its `print` command dumps the indexed package list as
-# `nixpkgs/ <attrpath>`. Keep the nixpkgs namespace, strip the prefix, and let
-# fzf fuzzy-filter on the query (fzf does the matching, not grep). Picked
-# entries stream straight into TMPFILE.
+# Step 1: Target selection (only if no target flag was given)
+if [ "$HAS_TARGET" -eq 0 ]; then
+  TARGET=$(echo -e "home\nsystem" | fzf --prompt="target> " --height=20% --border --no-multi --reverse)
+  if [ -z "$TARGET" ]; then
+    exit 0
+  fi
+  if [ "$TARGET" = "home" ]; then
+    FILE="$USER_FILE"
+    NAME="home"
+  else
+    FILE="$SYS_FILE"
+    NAME="system"
+  fi
+else
+  if [ "$TARGET" = "home" ]; then
+    FILE="$USER_FILE"
+    NAME="home"
+  else
+    FILE="$SYS_FILE"
+    NAME="system"
+  fi
+fi
+
+# Step 2: Package list
 TMPFILE=$(mktemp)
 trap 'rm -f "$TMPFILE"' EXIT
 
 if command -v nix-search-tv >/dev/null 2>&1; then
   if [ -n "$QUERY" ]; then
-    nix-search-tv print 2>/dev/null | grep '^nixpkgs/' | sed 's/^nixpkgs\/ //' | fzf --query="$QUERY" --height=40% --reverse --border --prompt="nixpkgs> " --no-multi > "$TMPFILE"
+    nix-search-tv print 2>/dev/null | grep '^nixpkgs/' | sed 's/^nixpkgs\///' | fzf --query="$QUERY" --height=40% --reverse --border --prompt="nixpkgs> " --no-multi > "$TMPFILE"
   else
-    nix-search-tv print 2>/dev/null | grep '^nixpkgs/' | sed 's/^nixpkgs\/ //' | fzf --height=40% --reverse --border --prompt="nixpkgs> " --no-multi > "$TMPFILE"
+    nix-search-tv print 2>/dev/null | grep '^nixpkgs/' | sed 's/^nixpkgs\///' | fzf --height=40% --reverse --border --prompt="nixpkgs> " --no-multi > "$TMPFILE"
   fi
   [ -s "$TMPFILE" ] || { rm -f "$TMPFILE"; exit 0; }
 fi
 SELECTED=$(<"$TMPFILE")
 
-# Determine target
-if [ -z "$TARGET" ]; then
-  echo ""
-  echo "Add '$SELECTED' to:"
-  echo "  1) home (user-packages.nix)"
-  echo "  2) system (system-packages.nix)"
-  echo "  3) cancel"
-  read -rp "Choice [1/2/3]: " choice
-  case "$choice" in
-    1) TARGET="home" ;;
-    2) TARGET="system" ;;
-    *) exit 0 ;;
-  esac
-fi
-
-# Choose file
-if [ "$TARGET" = "home" ]; then
-  FILE="$USER_FILE"
-  NAME="user"
-else
-  FILE="$SYS_FILE"
-  NAME="system"
-fi
-
 # Check if already present
-if grep -qE "^[[:space:]]*${SELECTED//./\\.}[[:space:]]*$" "$FILE" 2>/dev/null || grep -qE "^\s*${SELECTED//./\\.}\b" "$FILE"; then
+if grep -qE "^[[:space:]]*${SELECTED//./\\.}[[:space:]]*$" "$FILE" 2>/dev/null || grep -qE "^\s*${SELECTED//./\.}\b" "$FILE"; then
   echo "Package '$SELECTED' already in $NAME packages." >&2
   exit 0
 fi
 
 # Append before the final closing ]
-# Find last line with just spaces and ]
-# Insert with proper indentation (4 spaces)
 TMPFILE2=$(mktemp)
 trap 'rm -f "$TMPFILE" "$TMPFILE2"' EXIT
 
-# Use python for reliable insertion
 python3 - "$FILE" "$SELECTED" << 'PY'
 import sys
 
@@ -94,23 +86,15 @@ pkg = sys.argv[2]
 with open(path) as f:
     content = f.read()
 
-# Find the last ']' that closes the list
-# Look for pattern: spaces followed by ] at end of file or before certain patterns
-# Simple approach: find last occurrence of '\n  ]' or '\n]'
-# Try to be smart about indentation
 lines = content.rstrip().splitlines()
-# Find last line that is just whitespace followed by ]
 for i in range(len(lines)-1, -1, -1):
     stripped = lines[i].strip()
     if stripped == ']':
-        # Check indentation
         indent = len(lines[i]) - len(lines[i].lstrip())
-        # Insert before this line
         insert_indent = ' ' * (indent if indent >= 4 else 4)
         lines.insert(i, insert_indent + pkg)
         break
 else:
-    # Couldn't find closing bracket, just append
     lines.append('    ' + pkg)
     lines.append('  ]')
 
@@ -124,7 +108,6 @@ PY
 
 echo "Added '$SELECTED' to $FILE"
 
-# Format
 if command -v nixfmt >/dev/null 2>&1; then
   nixfmt "$FILE" 2>/dev/null || true
 fi
