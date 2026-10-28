@@ -11,7 +11,8 @@
     gpu-screen-recorder
     inputs.hermes-agent.packages."x86_64-linux".default
     hypridle
-    hyprlandGuiutils
+    # hyprlandGuiutils  # disabled: hyprtoolkit build fails (needs hyprutils >=0.14.2, pinned is 0.14.0)
+    # hyprlandGuiutils
     hyprlock
     hyprnome
 

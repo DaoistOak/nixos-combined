@@ -189,58 +189,8 @@
       doCheck = false;
     };
 
-    # hyprland-guiutils: Hyprland GUI utilities (successor to hyprland-qtutils).
-    # Inlined here (no separate file) so it is a home package via
-    # pkgs/hyprland-guiutils, built against hyprland's git-pinned ecosystem
-    # (hyprland-packages overlay) so the versions match the running Hyprland
-    # binary. If you prefer a separate file, move this block to a file under
-    # pkgs/ and restore the `import ../pkgs/...` form.
-    hyprlandGuiutils = let
-      pinned = import inputs.nixpkgs {
-        system = "x86_64-linux";
-        overlays = [ inputs.hyprland.overlays.hyprland-packages ];
-      };
-    in
-    pinned.stdenv.mkDerivation {
-      pname = "hyprland-guiutils";
-      version = "0.2.2";
-      src = inputs.hyprland-guiutils;
-
-      nativeBuildInputs = [
-        pinned.cmake
-        pinned.pkg-config
-      ];
-
-      # Deps resolved from hyprland's git-pinned ecosystem (hyprland.pc
-      # Requires: aquamarine, hyprcursor, hyprgraphics, hyprlang, hyprutils,
-      # hyprtoolkit, libdrm, egl, cairo, xkbcommon, ...). Listed exactly as
-      # hyprland-guiutils's CMakeLists.txt resolves them via pkg_check_modules
-      # (hyprlang>=0.6.0 hyprutils>=0.10.2 hyprtoolkit>=0.4.0 pixman-1 xkbcommon
-      # libdrm) plus the UI toolkits the bundled screens use (cairo/pango).
-      buildInputs = [
-        pinned.aquamarine
-        pinned.cairo
-        pinned.hyprgraphics
-        pinned.hyprlang
-        pinned.hyprutils
-        # NOTE: pinned.hyprutils resolves to 0.14.0 from inputs.hyprland's nixpkgs (61b7c44c).
-        # To fully bump, either update inputs.hyprland.inputs.nixpkgs.url or provide hyprutils from system nixpkgs.
-        pinned.hyprtoolkit
-        pinned.libdrm
-        pinned.libGL
-        pinned.libxkbcommon
-        pinned.pango
-        pinned.pixman
-      ];
-
-      meta = {
-        homepage = "https://github.com/hyprwm/hyprland-guiutils";
-        description = "Hyprland GUI utilities (successor to hyprland-qtutils)";
-        platforms = pinned.lib.platforms.linux;
-      };
-    };
+      # hyprland-guiutils disabled (see above)
   };
-
   # NUR (Nix User Repository) overlay
   nur = inputs.nur.overlays.default;
 }
