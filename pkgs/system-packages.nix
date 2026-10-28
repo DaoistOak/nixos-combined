@@ -5,7 +5,6 @@ let
 in
   with pkgs; [
     # --- Desktop Environment & Wayland Compositor ---
-    ags
     swayidle
 
     # --- Web Browsers & Communication ---
