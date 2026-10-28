@@ -13,6 +13,23 @@ let
       allBlu = builtins.concatStringsSep "," (builtins.map (c: "0x${builtins.substring 4 2 c}") themeSel.r.ansi);
     in
       [ allRed allGrn allBlu ];
+
+  # Plymouth boot splash. The stock nixos-loading-white theme is copied and
+  # recolored to the theme-changer accent at build time. The theme path
+  # is provided by the nixos-loading-plymouth input (patched with the
+  # desired accent). The white variant ships transparent-bg PNG frames of
+  # the wordmark + lambda arms; -colorize swaps white to the accent while
+  # keeping the anti-aliased luminance ramp and the theme's own dark
+  # gradient background.
+  nixosLoadingTheme = pkgs.runCommand "plymouth-nixos-loading-${themeSel.r.accent}" { } ''
+    themeDir="$out/share/plymouth/themes/nixos-loading-white"
+    mkdir -p "$themeDir"
+    cp -r ${inputs.nixos-loading-plymouth.packages.${pkgs.stdenv.hostPlatform.system}.nixos-loading-white}/share/plymouth/themes/nixos-loading-white/* "$themeDir/"
+    for f in "$themeDir"/frame-*.png; do
+      chmod u+w "$f"
+      ${pkgs.imagemagick}/bin/magick "$f" -fill '#${themeSel.r.accent}' -colorize 100 "$f"
+    done
+  '';
 in
 {
   # Do not power on bluetooth adapter at boot; user toggles it manually via keybind.
@@ -39,4 +56,18 @@ in
     "amdgpu.sg_display=0"
     "resume=UUID=c90cb3d2-feba-424e-a25b-146d24f9bd0d"
   ];
+
+  # Plymouth boot splash. The stock nixos-loading-white theme is copied and
+  # recolored to the theme-changer accent at build time. The theme path
+  # is provided by the nixos-loading-plymouth input (patched with the
+  # desired accent). The white variant ships transparent-bg PNG frames of
+  # the wordmark + lambda arms; -colorize swaps white to the accent while
+  # keeping the anti-aliased luminance ramp and the theme's own dark
+  # gradient background.
+  boot.plymouth = {
+    theme = "nixos-loading-white";
+    themePackages = [ nixosLoadingTheme ];
+  };
+  boot.consoleLogLevel = 3;
+
 }
