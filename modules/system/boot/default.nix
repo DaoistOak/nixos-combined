@@ -1,83 +1,10 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}:
-
-let
-  # Re-enable zram swap after hibernate; the swap header is wiped by the
-  # sleep cycle, so recreate it when swapon fails.
-  reenableZram = "-${pkgs.runtimeShell} -c '${pkgs.util-linux}/bin/swapon -p 100 /dev/zram0 2>/dev/null || { ${pkgs.util-linux}/bin/mkswap /dev/zram0 >/dev/null 2>&1 && ${pkgs.util-linux}/bin/swapon -p 100 /dev/zram0; }'";
-  # 2/5 of RAM, ~5.3G here). Under memory pressure the snapshot needs more
-  # preallocated pages than that, so hibernation dies with "Error -12 creating
-  # image". Unset the cap so the kernel sizes the image to what is actually
-  # needed (the 30G swap partition has room to spare).
-  allowFullImage = "-${pkgs.runtimeShell} -c '${pkgs.coreutils}/bin/echo 0 > /sys/power/image_size'";
-  hibernatePre = [
-    allowFullImage
-    "-${pkgs.coreutils}/bin/sync"
-    "-${pkgs.runtimeShell} -c 'echo 3 > /proc/sys/vm/drop_caches'"
-    "-${pkgs.util-linux}/bin/swapoff /dev/zram0"
-  ];
-  hibernatePost = [ reenableZram ];
-in
+{ config, pkgs, lib, ... }:
 {
   boot = {
     resumeDevice = "/dev/disk/by-uuid/c90cb3d2-feba-424e-a25b-146d24f9bd0d";
     # kernelParams are owned by ../config/hardware/default.nix (single mkForce).
     extraModulePackages = [ ];
-    kernelPackages = lib.mkForce pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto;
-
-    # Out-of-tree patches for that kernel. These have to go through
-    # boot.kernelPatches: nixpkgs re-derives the kernel via
-    # `override (args: { ... })`, which *replaces* the whole argument set, so
-    # anything set on the kernel derivation directly is silently dropped.
-    #
-    # Stock 7.2.4 drm/ttm leaves a per-VM bulk_move cursor dangling when a
-    # swapped buffer object is closed; the next add on that cursor corrupts the
-    # manager LRU and soft-locks the machine in amdgpu_cs_ioctl ~40s after
-    # resuming from hibernation.
-    kernelPatches = [
-      {
-        name = "ttm-bulk-move-dangling-cursor";
-        patch = ../../../pkgs/kernel-patches/ttm-bulk-move-dangling-cursor.patch;
-      }
-    ];
-
+    # systemd-boot bootloader.
     loader.systemd-boot.enable = true;
   };
-
-  zramSwap = {
-    enable = true;
-    # Keep zram small: compressed swap lives in RAM, so everything swapped to
-    # zram is folded into the hibernation image. With a 30G disk swap
-    # partition available, a 1.3G zram still absorbs bursty swap pressure
-    # without inflating the image from under-pressure sleep cycles.
-    memoryPercent = 10;
-    algorithm = "zstd";
-    priority = 100;
-  };
-
-  systemd.services = {
-    "systemd-hibernate".serviceConfig = {
-      ExecStartPre = hibernatePre;
-      ExecStartPost = hibernatePost;
-    };
-    "systemd-suspend-then-hibernate".serviceConfig = {
-      ExecStartPre = hibernatePre;
-      ExecStartPost = hibernatePost;
-    };
-  };
-
-  services.logind = {
-    settings.Login = {
-      HandlePowerKey = "hibernate";
-      HandlePowerKeyLongPress = "poweroff";
-      HandleLidSwitch = "hibernate";
-      HandleLidSwitchExternalPower = "suspend";
-    };
-  };
-
-  powerManagement.cpuFreqGovernor = "schedutil";
 }
