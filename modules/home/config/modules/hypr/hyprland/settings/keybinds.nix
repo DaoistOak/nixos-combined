@@ -45,7 +45,7 @@
                       (builtins.readFile ./WORKSPACES__SUPER.lua)
 
           ]
-      in
+      ; in
       map (s: s) _segs
     );
 }
