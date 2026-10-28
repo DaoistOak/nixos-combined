@@ -82,7 +82,7 @@ in
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
-      ExecStart = "$${applyAcPower}";
+      ExecStart = "${applyAcPower}";
     };
   };
 
