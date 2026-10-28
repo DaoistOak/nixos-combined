@@ -1,0 +1,19 @@
+{ config, pkgs, ... }:
+{
+  wayland.windowManager.hyprland.extraConfig = ''
+    hl.bind("XF86PowerOff", hl.dsp.exec_cmd("noctalia msg panel-toggle session"), { locked = true, description = "Power menu" })
+    hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(scripts .. "/volume.sh up"), { locked = true, repeating = true, submap_universal = true, description = "Volume up (wpctl, up to 150%)" })
+    hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(scripts .. "/volume.sh down"), { locked = true, repeating = true, submap_universal = true, description = "Volume down" })
+    hl.bind("XF86AudioMute", hl.dsp.exec_cmd(scripts .. "/volume.sh mute"), { locked = true, repeating = true, submap_universal = true, description = "Toggle mute" })
+    hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd(scripts .. "/mic-mute.sh"), { locked = true, repeating = true, description = "Toggle mic mute" })
+    hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(scripts .. "/brightness.sh up"), { locked = true, repeating = true, description = "Brightness up" })
+    hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(scripts .. "/brightness.sh down"), { locked = true, repeating = true, description = "Brightness down" })
+    hl.bind("XF86KbdBrightnessUp", hl.dsp.exec_cmd("noctalia msg keyboard-backlight-up"), { locked = true, repeating = true, description = "Keyboard backlight up" })
+    hl.bind("XF86KbdBrightnessDown", hl.dsp.exec_cmd("noctalia msg keyboard-backlight-down"), { locked = true, repeating = true, description = "Keyboard backlight down" })
+    hl.bind("XF86AudioNext", hl.dsp.exec_cmd("noctalia msg media next"), { locked = true, description = "Next track" })
+    hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("noctalia msg media toggle"), { locked = true, description = "Play/pause" })
+    hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("noctalia msg media previous"), { locked = true, description = "Previous track" })
+    hl.bind("XF86RFKill", hl.dsp.exec_cmd(scripts .. "/airplane-mode.sh"), { locked = true, description = "Toggle airplane mode" })
+    hl.bind("XF86SelectiveScreenshot", hl.dsp.exec_cmd("noctalia msg screenshot-region"), { locked = true, description = "Screenshot region (snip key)" })
+  '';
+}

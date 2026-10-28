@@ -1,0 +1,19 @@
+{ config, pkgs, ... }:
+{
+  wayland.windowManager.hyprland.extraConfig = ''
+    hl.define_submap("terminal-apps", "reset", function()
+      hl.bind("RETURN", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh tmux"), { description = "Open terminal (T)" })
+      hl.bind("B", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh btop"), { description = "btop monitor" })
+      hl.bind("C", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh " .. scripts .. "/cava-auto.sh"), { description = "cava visualizer" })
+      hl.bind("N", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh tmux new-session -A -s nvim nvim"), { description = "Neovim" })
+      hl.bind("H", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh tmux new-session -A -s herdr herdr"), { description = "herdr" })
+      hl.bind("D", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh"), { description = "Default terminal" })
+      hl.bind("S", hl.dsp.exec_cmd("qs ipc -c terminal-switcher call terminal-switcher toggle"), { description = "Switch default terminal" })
+      hl.bind("F", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh nix run nixpkgs#fastfetch"), { description = "fastfetch (nix run)" })
+      hl.bind("O", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh --cwd $HOME/.config/nixos"), { description = "Shell in nixos config" })
+      hl.bind("A", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh --cwd $HOME opencode"), { description = "OpenCode" })
+      hl.bind("I", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh --hold hyprctl info"), { description = "Hyprland info" })
+      hl.bind("escape", hl.dsp.submap("reset"), { description = "Exit terminal-apps mode" })
+    end)
+  '';
+}
