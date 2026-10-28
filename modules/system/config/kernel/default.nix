@@ -16,7 +16,7 @@
   boot.kernelPatches = [
     {
       name = "ttm-bulk-move-dangling-cursor";
-      patch = ../../../pkgs/kernel-patches/ttm-bulk-move-dangling-cursor.patch;
+      patch = ../../../../pkgs/kernel-patches/ttm-bulk-move-dangling-cursor.patch;
     }
   ];
 }

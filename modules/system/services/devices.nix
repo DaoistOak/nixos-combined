@@ -10,6 +10,6 @@
     pkgs.game-devices-udev-rules
     (pkgs.writeTextDir "etc/udev/rules.d/99-makima.rules" ''
       SUBSYSTEM=="misc", KERNEL=="uinput", MODE="0660", GROUP="input", TAG+="uaccess", RUN+="${pkgs.acl}/bin/setfacl -m u:${config.var.username}:rw /dev/uinput"
-    ''')
+    '')
   ];
 }
