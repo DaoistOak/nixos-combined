@@ -20,7 +20,6 @@
           # (FOCUS_REASON_FFM is not a "hard" input reason). At 1.0 a hovered
           # window never moves the tape unless it is 100% off-screen, while
           # clicks and keybinds bypass this check entirely and still center.
-          # This is what keeps hover from dragging the view around.
           follow_min_visible = 1.0;
           explicit_column_widths = "0.2 ,0.4, 0.5, 0.8, 1.0";
           wrap_focus = false;

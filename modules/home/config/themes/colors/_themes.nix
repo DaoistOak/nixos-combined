@@ -1910,7 +1910,6 @@ let
       builtins.split " " (builtins.replaceStrings [ "\n" ] [ "" ] s)
     );
 
-  # The home-manager catppuccin module (and therefore the accent name
   # scripts/theme writes into src/selection for Stylix) uses catppuccin/nvim's
   # accent list, which names one color differently from the database above.
   # Resolve those aliases to the same hex instead of falling through to the
@@ -2005,7 +2004,6 @@ let
       base0E = h (a "mauve" (a "purple" (ansi 5)));
       base0F = h (a "flamingo" (a "maroon" (ansi 9)));
 
-      # The named roles are emitted alongside the base16 slots so consumers can
       # layer backgrounds by name. base16 collapses the 4-step neutral ramp
       # (crust/mantle/base/surface0) onto base00..base02, which leaves no way to
       # give the editor, the bufferline bar and the file explorer distinct

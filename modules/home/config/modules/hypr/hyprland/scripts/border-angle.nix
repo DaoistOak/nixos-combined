@@ -12,16 +12,13 @@
       # points at the cursor (end-4's dots style). Background daemon launched
       # from hyprland.start; it lives for the whole session.
       #
-      # The active border is a 2-colour gradient (theme secondary -> primary)
       # written to ~/.config/theme-switcher/hyprland-theme.lua by scripts/theme
       # and applied by colors.nix. While the cursor moves we poll it at ~20 Hz,
       # normalise its offset to the focused window's half-size (so the angle
       # reflects the cursor's position *within* the active window rather than
       # absolute screen pixels) and push a new gradient angle via hl.config.
-      # The existing `border` fade animation eases each small change, so the
       # border rotates smoothly instead of snapping.
       #
-      # The built-in `borderangle` animation is intentionally NOT used: with
       # `loop` the gradient never stops spinning even when the cursor is idle,
       # and `once` adds a full turn on every push — both fight the cursor
       # tracking. Using hl.config for the partial `general.col` update keeps the

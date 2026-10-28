@@ -54,7 +54,6 @@
 
       # Report the active window name as the terminal title. For TUI sessions
       # this is the running app (e.g. "herdr"), "zsh"/"bash" for plain shells.
-      # The Hyprland session-save script keys off this to restore TUI apps and
       # skip pure tmux-only sessions.
       set -g set-titles on
       set -g set-titles-string "#W"
@@ -87,15 +86,12 @@
       # Window list (left). Both active and inactive get pill styling so the
       # tabs read as themed blocks instead of plain text.
       #
-      # The active pill is the prefix-pending indicator: client_prefix is 1 for
       # exactly as long as tmux waits for the second key of the prefix sequence,
       # so pressing the prefix paints the current tab in the theme red and the
       # next key (or the prefix timeout) puts it straight back to @thm_accent.
       # Nothing else is needed, and no key table is taken over for it.
       #
-      # The condition sits inside each colour value rather than around the whole
       # span: #{?a,b,c} splits its arguments on every comma that is not inside
-      # #{...}, so a branch carrying a #[fg=..,bg=..] span loses everything from
       # that comma on. Selecting the colour keeps the spans byte for byte.
       set -g window-status-separator " "
       set -g window-status-format "#[fg=#{@thm_overlay_1},bg=#{@thm_bg}]#[fg=#{@thm_bg},bg=#{@thm_overlay_1}]#{window_index} #[fg=#{@thm_fg},bg=#{@thm_surface_0}] #{=40:#{window_name}}#[fg=#{@thm_surface_0},bg=#{@thm_bg}]"
@@ -199,7 +195,6 @@
       set -g popup-style "fg=#cad3f5,bg=#24273a"
       set -g popup-border-style "fg=#8087a2,bg=#24273a"
 
-      # The default window-status-current-style is "underscore", so tmux
       # underlines the current window's name in the left window list. Drop
       # the underline so the tab reads clean.
       set -g window-status-current-style "none"

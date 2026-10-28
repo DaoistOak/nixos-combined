@@ -21,7 +21,6 @@
     # hyprland's own overlay, so plugins keep matching store paths.
     # MUST stay byte-identical to modules/home/.../hyprland/default.nix or the
     # session package and the home-manager package diverge.
-    # The v0.56.2 glaze problem is solved upstream of here, by pinning the
     # hyprland input's own nixpkgs in flake.nix -- do NOT add a postPatch here,
     # it would not reach the plugins' private Hyprland builds.
     package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland.override {

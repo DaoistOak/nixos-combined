@@ -40,7 +40,6 @@ let
         2
       ];
 
-  # NixOS snowflake plymouth theme, recolored to match the theme-changer
   # accent. The "white" variant ships transparent-bg PNG frames of the wordmark
   # + lambda arms; -colorize swaps white → accent while keeping the anti-aliased
   # luminance ramp (and the theme's own dark gradient background).
@@ -70,7 +69,6 @@ in
   # got written) — this IdeaPad never had it applied before. Leave it out.
   #
   # Fix GPU soft lockups: enable runtime PM, disable recovery loop, disable unsafe MMIO
-  # The previous config had runpm=0 (GPU never sleeps) and gpu_recovery=1 (lockup→recovery→lockup loop)
   # which caused progressive soft lockups escalating 26s→48s→74s→82s until system freeze.
   boot.kernelParams = lib.mkForce [
     "vt.default_red=${builtins.elemAt vtChannels 0}"
@@ -136,7 +134,6 @@ in
   };
 
   # USB device-specific power management + MAC-based interface naming.
-  # The AC change trigger (last rule) calls apply-ac-power from the service above.
   services.udev.extraRules = ''
     SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="ec:91:61:47:2d:13", NAME="wlan0"
     ACTION=="add", SUBSYSTEM=="usb", ATTR{authorized}=="1", ATTR{power/autosuspend}="1", ATTR{power/control}="auto"

@@ -118,7 +118,6 @@ in
       jdt-language-server
       lua-language-server
       marksman
-      # The lang.markdown extra asks for all three: conform formats markdown
       # with prettier and markdownlint-cli2, and nvim-lint lints with
       # markdownlint-cli2 and markdown-toc. Mason is disabled here, so without
       # these they are never installed and conform fails with ENOENT the moment
@@ -143,7 +142,6 @@ in
   };
 
   xdg.configFile."nvim/lua/theme".source = ./src/nvim/lua/theme;
-  # The LazyVim module only deploys lua/config/{keymaps,options,autocmds}.lua out
   # of configFiles, so any other lua/config module needs an explicit link. The
   # same holds for any lua/ file outside lua/plugins — without a link here the
   # activation prune below would delete them from ~/.config/nvim.

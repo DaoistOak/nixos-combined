@@ -25,21 +25,18 @@ in
       enter_accept = true;
       # Own 8-color theme instead of catppuccin's fixed
       # "catppuccin-<flavor>-<accent>" (which never followed `theme set`).
-      # The file ships below as a build-time fallback and scripts/theme
       # rewrites it in place on every switch; atuin reads config+theme on each
       # TUI start, so no reload is needed.
       theme.name = "theme-switcher";
     };
   };
 
-  # The catppuccin target pins settings.theme.name and ships its own theme
   # file; both lose to the layer above (see qutebrowser for the same pattern).
   catppuccin.atuin.enable = false;
 
   xdg.configFile."atuin/themes/theme-switcher.toml" = {
     force = true;
     text = ''
-      # Generated at build time from src/selection — scripts/theme rewrites
       # this file on every `theme set` (rm -f first, it starts as this store
       # link).
       [theme]

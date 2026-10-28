@@ -16,7 +16,6 @@
       show_image_preview = true
 
       # Map common text extensions to nvim so Enter opens them in the editor.
-      # The file path is appended as the last argument. Must be the last table.
       [open_with]
       txt = "nvim"
       md = "nvim"

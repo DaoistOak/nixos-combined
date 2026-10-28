@@ -77,7 +77,6 @@ let
         # and it falls back to assets/avatar.jpg. Accept .icon URLs too.
         sed -i 's@\.(jpg|jpeg|png|bmp|webp|svg)\$@\.(jpg|jpeg|png|bmp|webp|svg|icon)$@' Main.qml
 
-        # The four fallback "white" texts (user label, session name, password,
         # login button) sit on different backgrounds, so match by pixelSize.
         perl -0777 -pi -e '
           s/color: "white"\n\s*font.pixelSize: 24/color: config.textColor\n        font.pixelSize: 24/;
@@ -86,7 +85,6 @@ let
           s/color: "white"\n\s*font.pixelSize: 32/color: container.baseColor\n        font.pixelSize: 32/
         ' Main.qml
 
-        # The two session icons are Nerd Font glyphs (U+F07C0) drawn by plain
         # Text elements that declare no font.family, so they fall back to Qt's
         # default font and render nothing — no installed font but a Nerd Font
         # has that codepoint. Give just those two the Nerd Font; body text is
@@ -95,12 +93,10 @@ let
         # Rectangle have no font property at all — only Text and friends do.)
         perl -0777 -pi -e 's/( *)text: "󰟀"\n/$1text: "󰟀"\n$1font.family: "JetBrainsMono Nerd Font"\n/g' Main.qml
 
-        # The session pill's label had no font.family, so it rendered in Qt's
         # default rather than the configured text font. The user label directly
         # above already asks for activeFontRegular; match it.
         perl -0777 -pi -e 's/(font\.pixelSize: 13\n)( *)font\.weight: Font\.Medium/$1$2font.family: activeFontRegular\n$2font.weight: Font.Medium/' Main.qml
 
-        # The pill was a fixed 180px wide, so a long session name ("Hyprland
         # (uwsm-managed)") spilled past its rounded border — the name read as
         # far too large for the box holding it. Size the pill from its own
         # content instead, the way the user label does with

@@ -83,7 +83,6 @@
     printing.enable = true;
     upower.enable = true;
 
-    # NixOS-specific prefixes: treat /nix/store as live files (only pruned
     # GC paths are dropped).
     preload-ng = {
       enable = true;

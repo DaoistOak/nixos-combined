@@ -34,7 +34,6 @@ let
     mv "$manifest.tmp" "$manifest"
   '';
 
-  # The weekly check runs as a system unit (home-manager's systemd.user.timers
   # option types reject plain values), so drop to the user session to get a bus
   # for notify-send. Check mode only reads the flake, it never writes.
   extCheckCommand = pkgs.writeShellScript "chromium-extensions-check" ''

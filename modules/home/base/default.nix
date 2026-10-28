@@ -104,7 +104,6 @@ in
       custom_palette = "themeswapper";
       mode = if themeSel.r.polarity == "light" then "light" else "dark";
     };
-    # This lived only in a stale `noctalia config export` dump that sat in
     # ~/.config/noctalia/ (Noctalia merges every *.toml in that dir, so the
     # dump was silently overriding the managed config). Declared here instead.
     settings.audio.enable_sounds = false;
@@ -124,7 +123,6 @@ in
     FLAKE_DIR = config.var.configDirectory;
   };
 
-  # The Qt home-manager module derives QT_QPA_PLATFORMTHEME from
   # `qt.platformTheme.name` (stylix pins it to `qtct` → `qt5ct`) and emits it
   # into systemd.user.sessionVariables, which is the environment Plasma's
   # systemd-activated apps (plasma-krunner.service, app-systemsettings@…,

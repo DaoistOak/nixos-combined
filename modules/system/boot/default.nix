@@ -9,7 +9,6 @@ let
   # Re-enable zram swap after hibernate; the swap header is wiped by the
   # sleep cycle, so recreate it when swapon fails.
   reenableZram = "-${pkgs.runtimeShell} -c '${pkgs.util-linux}/bin/swapon -p 100 /dev/zram0 2>/dev/null || { ${pkgs.util-linux}/bin/mkswap /dev/zram0 >/dev/null 2>&1 && ${pkgs.util-linux}/bin/swapon -p 100 /dev/zram0; }'";
-  # The kernel caps the hibernation image at /sys/power/image_size (default
   # 2/5 of RAM, ~5.3G here). Under memory pressure the snapshot needs more
   # preallocated pages than that, so hibernation dies with "Error -12 creating
   # image". Unset the cap so the kernel sizes the image to what is actually

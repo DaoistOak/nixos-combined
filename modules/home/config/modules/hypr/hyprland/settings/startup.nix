@@ -5,7 +5,6 @@
   ...
 }:
 let
-  # The KDE polkit agent's QtQuick dialog must NOT inherit QT_STYLE_OVERRIDE=
   # kvantum (the Kvantum QtQuick QML module isn't installed, so it crashes and
   # pkexec auto-denies). Instead we point its dialog at KDE's "org.kde.desktop"
   # QtQuick style (qqc2-desktop-style) so it renders with the catppuccin color

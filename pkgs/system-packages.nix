@@ -21,7 +21,6 @@ in
     # switch to Chrome. That flag re-enables off-store/CRX installs and makes
     # .crx downloads prompt for installation.
     #
-    # The store's own install flow is a dead end though: Google serves extension
     # payloads through a signed-blob flow ungoogled cannot complete, and the CRX
     # update endpoint answers 204/404 for nearly every extension. So the four
     # extensions we actually use are packaged as unpacked directories from

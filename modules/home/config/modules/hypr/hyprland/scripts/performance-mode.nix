@@ -36,7 +36,6 @@
           },
           animations = { enabled = false },
         })'
-        # The whitelist transparency (SUPER+W,T) is a runtime window rule, not
         # a plain option; force it off so every window is fully opaque.
         hyprctl eval 'hyprTrans.force(false)'
       }

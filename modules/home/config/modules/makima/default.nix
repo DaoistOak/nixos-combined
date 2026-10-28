@@ -22,7 +22,6 @@ let
   desktopConfig = ''
     # Desktop control mode (default layout for every window)
     #
-    # This is a PantherLord PS2-to-USB adapter (0810:0001). Its real evdev names:
     #   288 BTN_TRIGGER  = Triangle (North)
     #   289 BTN_THUMB    = Circle   (East)
     #   290 BTN_THUMB2   = Cross    (South)

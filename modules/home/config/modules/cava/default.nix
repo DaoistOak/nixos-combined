@@ -27,7 +27,6 @@ in
   xdg.configFile."cava/themes/theme-switcher" = {
     force = true;
     text = ''
-      # Generated at build time from src/selection — scripts/theme rewrites
       # this file on every `theme set`. cava derives gradient_count from the
       # consecutive gradient_color_N keys and reads background from the
       # terminal ("default").

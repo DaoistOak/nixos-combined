@@ -9,7 +9,6 @@
     text = ''
       #!/usr/bin/env bash
       # Toggle a desktop widget: close if running, launch if not.
-      # The widget opens in a fullscreen transparent-background terminal
       # rendered as a live wallpaper via hyprwinwrap.
       # Usage: widget-toggle.sh <class> [COMMAND...]
       set -euo pipefail
