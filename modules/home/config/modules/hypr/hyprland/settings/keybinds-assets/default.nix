@@ -1,45 +1,43 @@
 { config, pkgs, lib, ... }:
 let
-  modules = [
-    ./modules.nix
-    ./global/keys.nix
-    ./global/binding/mouse.nix
-    ./global/gestures.nix
-    ./global/binding/workspace.nix
-    ./global/binding/focus.nix
-    ./global/binding/window-move.nix
-    ./global/binding/resize.nix
-    ./mode/terminal-apps.nix
-    ./mode/shell/shell.nix
-    ./mode/shell/shell-bluetooth.nix
-    ./mode/shell/shell-network.nix
-    ./mode/shell/shell-widgets.nix
-    ./mode/messaging/messaging.nix
-    ./mode/messaging/messaging-viber.nix
-    ./mode/messaging/messaging-whatsapp.nix
-    ./mode/windows/windows.nix
-    ./mode/launch/file-manager.nix
-    ./mode/launch/web-browser.nix
-    ./mode/launch/ai.nix
-    ./mode/apps-bin.nix
-    ./mode/apps-bin/apps-vm.nix
-    ./mode/apps-bin/apps-editor.nix
-    ./mode/apps-bin/apps-file-open.nix
-    ./mode/apps-bin/apps-media.nix
-    ./mode/apps-bin/apps-games.nix
-    ./special/keys.nix
-    ./special/tools.nix
-    ./special/launcher.nix
-    ./special/system.nix
-    ./special/passthrough.nix
+  modeFiles = [
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/global/binding/focus.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/global/binding/mouse.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/global/binding/window-move.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/global/binding/resize.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/global/binding/workspace.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/global/gestures.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/global/keys.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/terminal-apps.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/apps-bin.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/apps-bin/apps-vm.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/apps-bin/apps-editor.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/apps-bin/apps-file-open.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/apps-bin/apps-games.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/apps-bin/apps-media.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/messaging/messaging.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/messaging/messaging-viber.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/messaging/messaging-whatsapp.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/shell/shell.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/shell/shell-bluetooth.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/shell/shell-network.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/shell/shell-widgets.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/windows/windows.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/launch/file-manager.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/launch/web-browser.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/mode/launch/ai.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/special/keys.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/special/tools.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/special/launcher.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/special/system.nix
+    /home/zeph/.config/nixos/modules/home/config/modules/hypr/hyprland/settings/keybinds/special/passthrough.nix
   ];
-
+  importedModules = map (m: import m) modeFiles;
+  moduleResults =
+    map (m: m { config = config; pkgs = pkgs; }) importedModules;
   allConfigs =
     lib.concatStringsSep "\n" (
-      map (m: (m { config, pkgs, lib, ... }).wayland.windowManager.hyprland.extraConfig) modules
+      map (m: m.wayland.windowManager.hyprland.extraConfig) moduleResults
     );
-in {
-  wayland.windowManager.hyprland.extraConfig = '';
-    ${allConfigs}
-  '';
-}
+in
+{ wayland.windowManager.hyprland.extraConfig = '';${allConfigs}''; }
