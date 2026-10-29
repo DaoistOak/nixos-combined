@@ -1,6 +1,5 @@
 { config, pkgs, lib, ... }:
 let
-  keybindsModule =
-    import ./keybinds { inherit config pkgs lib; };
+  keybindsAssets = import /home/zeph/.config/nixos/modules/home/config/keybinds-assets;
 in
-keybindsModule
+keybindsAssets { inherit config pkgs lib; }
