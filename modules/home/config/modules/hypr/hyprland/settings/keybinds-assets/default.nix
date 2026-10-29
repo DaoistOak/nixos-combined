@@ -1,6 +1,7 @@
 { config, pkgs, lib, ... }:
 let
   modeFiles = [
+      ../keybinds/global/binding/snippet.nix
       ../keybinds/global/binding/focus.nix
       ../keybinds/global/binding/mouse.nix
       ../keybinds/global/binding/window-move.nix
