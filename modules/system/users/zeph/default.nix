@@ -67,6 +67,9 @@
     GRADLE_USER_HOME = "$XDG_DATA_HOME/gradle";
     CODEX_HOME = "$XDG_CONFIG_HOME/codex";
     DOTNET_CLI_HOME = "$XDG_DATA_HOME/dotnet";
+    CLAUDE_CONFIG_DIR = "$XDG_CONFIG_HOME/claude";
+    HERMES_HOME = "$XDG_DATA_HOME/hermes";
+    HISTFILE = "$XDG_STATE_HOME/bash/history";
     SCREENDIR = "$XDG_RUNTIME_DIR/screen";
     PLATFORMIO_CORE_DIR = "$XDG_DATA_HOME/platformio";
     SCIHOME = "$XDG_STATE_HOME/scilab";

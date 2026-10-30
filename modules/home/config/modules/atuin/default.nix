@@ -21,8 +21,10 @@ in
   programs.atuin = {
     enable = true;
     enableZshIntegration = false;
+    forceOverwriteSettings = true;
     settings = {
       enter_accept = true;
+      logs.dir = "${config.xdg.stateHome}/atuin/logs";
       # Own 8-color theme instead of catppuccin's fixed
       # "catppuccin-<flavor>-<accent>" (which never followed `theme set`).
       # rewrites it in place on every switch; atuin reads config+theme on each
