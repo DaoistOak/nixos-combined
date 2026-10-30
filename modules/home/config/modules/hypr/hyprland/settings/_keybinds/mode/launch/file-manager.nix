@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 {
   wayland.windowManager.hyprland.extraConfig = ''
-    hl.define_submap("launch", "reset", function()
+    hl.define_submap("apps-file", "reset", function()
       hl.bind("RETURN", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh yazi"), { description = "Yazi (home)" })
       hl.bind("D", hl.dsp.exec_cmd("dolphin"), { description = "Dolphin" })
       hl.bind("Y", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh yazi"), { description = "Yazi (home)" })

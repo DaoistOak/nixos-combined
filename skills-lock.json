@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "sesh-cli": {
+      "source": "lukastk/sesh",
+      "sourceType": "github",
+      "skillPath": "skills/sesh-cli/SKILL.md",
+      "computedHash": "856efec5e785ad8ed1bde5dbf99c9d1b6cb50e1a40e2d11c7eefbb2d8cee9611"
+    }
+  }
+}

@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 {
   wayland.windowManager.hyprland.extraConfig = ''
-    hl.define_submap("launch", "reset", function()
+    hl.define_submap("apps-web", "reset", function()
       hl.bind("RETURN", hl.dsp.exec_cmd("zen"), { description = "Zen browser" })
       hl.bind("B", hl.dsp.exec_cmd("brave"), { description = "Brave browser" })
       hl.bind("Z", hl.dsp.exec_cmd("zen"), { description = "Zen browser" })

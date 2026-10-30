@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 {
   wayland.windowManager.hyprland.extraConfig = ''
-    hl.define_submap("launch", "reset", function()
+    hl.define_submap("apps-ai", "reset", function()
       hl.bind("G", hl.dsp.exec_cmd(scripts .. "/launch-ai.sh gemini"), { description = "Gemini (mode E, A)" })
       hl.bind("C", hl.dsp.exec_cmd(scripts .. "/launch-ai.sh chatgpt"), { description = "ChatGPT (mode E, A)" })
       hl.bind("P", hl.dsp.exec_cmd(scripts .. "/launch-ai.sh perplexity"), { description = "Perplexity (mode E, A)" })
