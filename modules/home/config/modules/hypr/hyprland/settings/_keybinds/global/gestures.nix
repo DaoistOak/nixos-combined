@@ -3,8 +3,9 @@
   wayland.windowManager.hyprland.extraConfig = ''
     -- Gestures configuration
     local workspaceSwipeFingers = 3
-    local gestureFingers = 4
+    local gestureFingers = 3
     hl.gesture({ fingers = workspaceSwipeFingers, direction = "vertical", action = "workspace" })
-    hl.gesture({ fingers = gestureFingers, direction = "horizontal", action = "scroll_move", scale = 1.2 })
+    -- horizontal swipe: drag the scrolling layout tape (no-op on other layouts)
+    hl.gesture({ fingers = gestureFingers, direction = "horizontal", action = "scroll_move", scale = 3.5 })
   '';
 }
