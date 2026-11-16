@@ -102,7 +102,8 @@ in
   systemd.user.services.makima = lib.mkIf enable {
     Unit = {
       Description = "Makima gamepad remapping daemon";
-      After = [ "default.target" ];
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
     };
     Service = {
       Type = "simple";

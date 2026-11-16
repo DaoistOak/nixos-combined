@@ -28,11 +28,18 @@
     auth [success=1 default=ignore] pam_fprintd.so
     auth [success=ok default=die] pam_unix.so try_first_pass
     account required pam_unix.so
-    password sufficient pam_unix.so nullok yescrypt
+    password sufficient pam_unix.so yescrypt
     session required pam_env.so conffile=/etc/pam/environment readenv=0
     session required pam_unix.so
     session required pam_limits.so conf=${pkgs.pam}/etc/security/limits.conf
   '';
+
+  # Require BOTH fingerprint and password for login (SDDM uses the `login`
+  # stack). Disable empty-password login as well.
+  security.pam.services.login.allowNullPassword = lib.mkForce false;
+  security.pam.services.login.rules.auth.fprintd.control = lib.mkForce "required";
+  security.pam.services.login.rules.auth.unix.control = lib.mkForce "required";
+  security.pam.services.login.rules.auth.deny.control = lib.mkForce "optional";
 
   services = {
     avahi = {

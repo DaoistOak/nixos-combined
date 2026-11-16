@@ -3,7 +3,8 @@
   wayland.windowManager.hyprland.extraConfig = ''
     -- 2. GLOBAL (SUPER)
     hl.bind(mod .. " + RETURN", hl.dsp.exec_cmd(scripts .. "/launch-terminal.sh tmux"), { description = "Terminal (default + tmux)" })
-    hl.bind(mod .. " + C", hl.dsp.window.close(), { description = "Close window" })
+    hl.bind(mod .. " + C", hl.dsp.window.close(), { description = "Close window (focused, graceful)" })
+    hl.bind(mod .. " + SHIFT + C", hl.dsp.exec_cmd(scripts .. "/hyprkill.sh"), { description = "Click a window to kill it (xkill-like, forceful)" })
     hl.bind(mod .. " + X", hl.dsp.exec_cmd("noctalia msg panel-toggle session"), { description = "Session menu" })
     hl.bind(mod .. " + K", hl.dsp.exec_cmd("noctalia msg panel-toggle kenn/keybind-cheatsheet:cheatsheet"), { description = "Toggle keybind cheatsheet" })
     hl.bind(mod .. " + SHIFT + T", hl.dsp.exec_cmd("qs ipc -c themeswitcher call themeswitcher toggle"), { description = "Cycle theme" })

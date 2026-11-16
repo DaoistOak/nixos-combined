@@ -8,7 +8,7 @@
       hl.bind("S", hl.dsp.exec_cmd("noctalia msg panel-toggle alexander/screen-toolkit:panel"), { description = "Screen tools panel (mode S)" })
       hl.bind("SHIFT + S", hl.dsp.exec_cmd("flameshot gui"), { description = "Flameshot screenshot (mode S)" })
       hl.bind("Q", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center"), { description = "Control center (mode S)" })
-      hl.bind("M", hl.dsp.exec_cmd("noctalia msg media toggle"), { description = "Media menu (mode S)" })
+      hl.bind("M", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center media"), { description = "Media control panel (mode S)" })
       hl.bind("W", hl.dsp.exec_cmd("noctalia msg panel-toggle wallpaper"), { description = "Wallpaper picker (mode S)" })
       hl.bind("R", hl.dsp.exec_cmd(scripts .. "/noctalia-restart.sh"), { description = "Restart noctalia (mode S)" })
       hl.bind("P", hl.dsp.exec_cmd("~/bin/colorpicker"), { description = "Color picker (mode S)" })

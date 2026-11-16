@@ -135,14 +135,16 @@
         apply_hyprland
         apply_noctalia
         "${config.xdg.configHome}/hypr/scripts/border-rotate.sh" off
+        systemctl --user stop makima.service || true
         touch "$STATE_FILE"
-        ${pkgs.libnotify}/bin/notify-send -i security-high "Performance mode" "Transparency, gaps and corners disabled"
+        ${pkgs.libnotify}/bin/notify-send -i security-high "Performance mode" "Transparency, gaps and corners disabled; makima off"
       else
         restore_hyprland
         restore_noctalia
         "${config.xdg.configHome}/hypr/scripts/border-rotate.sh" on
+        systemctl --user start makima.service || true
         rm -f "$STATE_FILE"
-        ${pkgs.libnotify}/bin/notify-send "Performance mode" "Desktop profile restored"
+        ${pkgs.libnotify}/bin/notify-send "Performance mode" "Desktop profile restored; makima on"
       fi
     '';
   };

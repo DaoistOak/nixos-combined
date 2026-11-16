@@ -21,6 +21,11 @@
           hl.dispatch(hl.dsp.exec_cmd("noctalia msg bar-hide Keymap"))
         end, { timeout = 2000, type = "oneshot" })
       end
+      local function remToggle(kind)
+        -- Floating/pseudo state is already retained by Hyprland per window;
+        -- this is a no-op placeholder so the "remembered" binds never hit a
+        -- nil global.
+      end
       hl.bind("F", hl.dsp.window.fullscreen(), { description = "Toggle fullscreen" })
       hl.bind("ALT + F", function()
         hl.dispatch(hl.dsp.window.float({ action = "toggle" }))
