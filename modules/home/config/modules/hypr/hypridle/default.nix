@@ -10,8 +10,8 @@
     enable = true;
     settings = {
       general = {
-        lock_cmd = "noctalia msg session lock";
-        before_sleep_cmd = "loginctl lock-session;";
+        lock_cmd = "systemctl --user restart hypr-session-save.service; noctalia msg session lock";
+        before_sleep_cmd = "systemctl --user restart hypr-session-save.service; loginctl lock-session;";
         after_sleep_cmd = "hyprctl dispatch \"hl.dsp.dpms({ action = 'on' })\"";
         ignore_dbus_inhibit = false;
       };

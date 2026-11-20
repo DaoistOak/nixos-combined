@@ -9,40 +9,62 @@
     executable = true;
     text = ''
       #!/usr/bin/env bash
+      set -o pipefail
+
       CACHE_DIR="$HOME/.cache/hypr"
       mkdir -p "$CACHE_DIR"
 
-      CLIENTS=$(hyprctl clients -j)
-      COUNT=$(echo "$CLIENTS" | jq length)
+      CLIENTS=$(hyprctl clients -j 2>/dev/null) || exit 1
+      [ -z "$CLIENTS" ] && exit 0
 
       IGNORE_CLASSES='^(kitty|org\.wezfurlong\.wezterm|Alacritty|foot|Ghostty|xterm|st-)$'
-      SHELL_TITLES='^(zsh|bash|sh|dash|fish|tmux|wezterm|nu|nushell|pwsh|powershell|ksh|elvish|xonsh)$'
 
-      echo "$CLIENTS" | ${pkgs.jq}/bin/jq --arg ignore "$IGNORE_CLASSES" --arg shellTitles "$SHELL_TITLES" '
-        [ .[]
-          | if (.class | test($ignore; "i")) then
-              (.title | sub("\\s+$"; "") | ascii_downcase) as $app
-              | if ($app | test($shellTitles)) or ($app | test("[^a-z0-9._-]")) then
-                  empty
-                else
-                  { class: .class, title: .title, workspace: .workspace.id, floating: .floating, tui: $app }
-                end
-            else
-              { class: .class, title: .title, workspace: .workspace.id, floating: .floating, tui: null }
-            end
-        ]' > "$CACHE_DIR/session.json"
-
-      if [ $? -eq 0 ] && [ -f "$CACHE_DIR/session.json" ]; then
-        ${pkgs.libnotify}/bin/notify-send -i dialog-save "Session saved" "$COUNT clients remembered"
+      TUI_MAP_FILE="$HOME/.config/hypr/session-tui-map.conf"
+      if [ -f "$TUI_MAP_FILE" ]; then
+        TUI_APPS=$(sed -e 's/#.*//' -e '/^[[:space:]]*$/d' "$TUI_MAP_FILE" | cut -d= -f1 | tr '\n' '|' | sed 's/|$//')
       else
-        ${pkgs.libnotify}/bin/notify-send -u critical -i dialog-error "Session save failed" "Could not write to $CACHE_DIR/session.json"
+        TUI_APPS=""
       fi
+
+      TMP_FILE="$CACHE_DIR/.session.json.tmp"
+      if ! printf '%s\n' "$CLIENTS" | ${pkgs.jq}/bin/jq --arg ignore "$IGNORE_CLASSES" --arg tuiApps "$TUI_APPS" '
+        [ .[]
+          | select((.class // "") != "")
+          | ((.title // "") | sub("\\s+$"; "") | ascii_downcase) as $rawTitle
+          | if (.class | test($ignore; "i")) then
+              (if $rawTitle == "" then
+                 empty
+               elif $tuiApps != "" and ($rawTitle | test(("^(" + $tuiApps + ")$"))) then
+                 { class: .class, title: (.title // ""), workspace: (.workspace.id // 0), floating: (.floating // false), tui: $rawTitle }
+               else
+                 empty
+               end)
+            else
+              { class: .class, title: (.title // ""), workspace: (.workspace.id // 0), floating: (.floating // false), tui: null }
+            end
+        ]' > "$TMP_FILE"; then
+        ${pkgs.libnotify}/bin/notify-send -u critical -i dialog-error "Session save failed" "jq processing failed"
+        rm -f "$TMP_FILE"
+        exit 1
+      fi
+
+      if [ ! -s "$TMP_FILE" ]; then
+        rm -f "$TMP_FILE"
+        exit 0
+      fi
+
+      mv -f "$TMP_FILE" "$CACHE_DIR/session.json"
+      SAVED=$(${pkgs.jq}/bin/jq 'length' "$CACHE_DIR/session.json")
+      ${pkgs.libnotify}/bin/notify-send -i dialog-save "Session saved" "$SAVED clients remembered"
     '';
   };
+
   xdg.configFile."hypr/scripts/session-restore.sh" = {
     executable = true;
     text = ''
       #!/usr/bin/env bash
+      set -o pipefail
+
       SESSION_FILE="$HOME/.cache/hypr/session.json"
       MAPPING_FILE="$HOME/.config/hypr/session-mapping.conf"
       TUI_MAP_FILE="$HOME/.config/hypr/session-tui-map.conf"
@@ -50,16 +72,16 @@
 
       [ ! -f "$SESSION_FILE" ] && exit 0
       [ ! -f "$MAPPING_FILE" ] && exit 0
-      [ "$(${pkgs.jq}/bin/jq length "$SESSION_FILE")" -eq 0 ] && exit 0
+
+      JQ="${pkgs.jq}/bin/jq"
+      [ "$("$JQ" 'length' "$SESSION_FILE" 2>/dev/null)" = "0" ] && exit 0
 
       ${pkgs.libnotify}/bin/notify-send -i display "Restoring session..."
 
-      JQ="${pkgs.jq}/bin/jq"
-
       declare -A APP_MAP
       while IFS='=' read -r cls cmd; do
-        cls="''${cls#"''${cls%%[![:space:]]*}"}"
-        cls="''${cls%"''${cls##*[![:space:]]}"}"
+        cls="''${cls#''${cls%%[![:space:]]*}}"
+        cls="''${cls%''${cls##*[![:space:]]}}"
         [[ "$cls" =~ ^#.*$ || -z "$cls" ]] && continue
         APP_MAP["$cls"]="$cmd"
       done < "$MAPPING_FILE"
@@ -67,8 +89,8 @@
       declare -A TUI_MAP
       if [[ -f "$TUI_MAP_FILE" ]]; then
         while IFS='=' read -r app cmd; do
-          app="''${app#"''${app%%[![:space:]]*}"}"
-          app="''${app%"''${app##*[![:space:]]}"}"
+          app="''${app#''${app%%[![:space:]]*}}"
+          app="''${app%''${app##*[![:space:]]}}"
           [[ "$app" =~ ^#.*$ || -z "$app" ]] && continue
           TUI_MAP["$app"]="$cmd"
         done < "$TUI_MAP_FILE"
@@ -79,52 +101,117 @@
 
       IGNORE_CLASSES='^(kitty|org\.wezfurlong\.wezterm|Alacritty|foot|Ghostty|xterm|st-)$'
 
-      CACHE_DIR="$HOME/.cache/hypr"
-      BEFORE_FILE="$CACHE_DIR/.session-before.json"
-      MAX_WAIT=20
+      mapfile -t ENTRIES < <("$JQ" -r --arg ignore "$IGNORE_CLASSES" '
+        .[] | select(.workspace > 0) |
+        if (.class | test($ignore; "i")) then
+          (if (.tui // null) != null and (.tui | tostring) != "" then "\(.class)\t\(.workspace)\t\(.floating)\t\(.tui)" else empty end)
+        else
+          "\(.class)\t\(.workspace)\t\(.floating)\t-"
+        end' "$SESSION_FILE")
 
-      while IFS=$'\t' read -r cls ws floating tui; do
+      CLASSES=()
+      WORKSPACES=()
+      FLOATINGS=()
+      CMDS=()
+      for entry in "''${ENTRIES[@]}"; do
+        IFS=$'\t' read -r cls ws floating tui <<< "$entry"
         if [[ -n "$tui" && "$tui" != "-" ]]; then
           cmd="''${TUI_MAP[$tui]:-$SCRIPTS/launch-terminal.sh $tui}"
         else
-          cmd="''${APP_MAP[$cls]}"
+          cmd="''${APP_MAP[$cls]:-}"
         fi
         if [ -z "$cmd" ]; then
           SKIPPED=$((SKIPPED + 1))
           continue
         fi
+        CLASSES+=("$cls")
+        WORKSPACES+=("$ws")
+        FLOATINGS+=("$floating")
+        CMDS+=("$cmd")
+      done
 
-        hyprctl clients -j | "$JQ" -c '[.[].address]' > "$BEFORE_FILE"
+      N=''${#CMDS[@]}
+      if [ "$N" -eq 0 ]; then
+        ${pkgs.libnotify}/bin/notify-send -i display "Session restored" "0 apps restored to their workspaces, $SKIPPED skipped"
+        exit 0
+      fi
 
-        eval "$cmd" &>/dev/null &
+      CACHE_DIR="$HOME/.cache/hypr"
+      mkdir -p "$CACHE_DIR"
+      BEFORE_FILE="$CACHE_DIR/.session-before.json"
+      BEFORE_JSON=$(hyprctl clients -j 2>/dev/null)
+      printf '%s' "$BEFORE_JSON" | "$JQ" -c '[.[].address]' > "$BEFORE_FILE" 2>/dev/null
 
+      LAUNCH=()
+      for ((i=0;i<N;i++)); do LAUNCH+=(1); done
+      USED=""
+      for ((i=0;i<N;i++)); do
+        cls="''${CLASSES[$i]}"
+        ws="''${WORKSPACES[$i]}"
+        floating="''${FLOATINGS[$i]}"
         addr=""
-        for i in $(seq 1 "$MAX_WAIT"); do
-          sleep 0.5
-          addr=$(hyprctl clients -j | "$JQ" -r \
-            --arg cls "$cls" \
-            --slurpfile prev "$BEFORE_FILE" \
-            '([ .[]
-               | select(.class == $cls and (.address as $a | $prev[0] | index($a) | not))
-             ] | sort_by(.focusHistoryID)) | if length > 0 then .[0].address // empty else "" end')
-          [ -n "$addr" ] && break
-        done
-
+        while IFS= read -r a; do
+          [ -z "$a" ] && continue
+          if [[ " $USED " != *" $a "* ]]; then addr="$a"; break; fi
+        done < <(printf '%s' "$BEFORE_JSON" | "$JQ" -r --arg cls "$cls" '.[] | select(.class == $cls) | .address')
         if [ -n "$addr" ]; then
           hyprctl dispatch "hl.dsp.window.move({ workspace = $ws, follow = false, window = 'address:$addr' })" &>/dev/null
-          sleep 0.2
           if [ "$floating" = "true" ]; then
             hyprctl dispatch "hl.dsp.window.float({ action = 'toggle', window = 'address:$addr' })" &>/dev/null
           fi
           RESTORED=$((RESTORED + 1))
-        else
-          SKIPPED=$((SKIPPED + 1))
+          USED="$USED $addr"
+          LAUNCH[$i]=0
         fi
-      done < <("$JQ" -r --arg ignore "$IGNORE_CLASSES" '.[] | select(.workspace > 0) | if (.class | test($ignore; "i")) then (if (.tui // null) != null then "\(.class)\t\(.workspace)\t\(.floating)\t\(.tui)" else empty end) else "\(.class)\t\(.workspace)\t\(.floating)\t-" end' "$SESSION_FILE")
+      done
 
-      ${pkgs.libnotify}/bin/notify-send -i display "Session restored" "''${RESTORED} apps restored to their workspaces, ''${SKIPPED} skipped"
+      PENDING=()
+      for ((i=0;i<N;i++)); do
+        if [ "''${LAUNCH[$i]}" = "1" ]; then
+          eval "''${CMDS[$i]}" &>/dev/null &
+          PENDING+=("$i")
+        fi
+      done
+
+      CLAIMED=""
+      MAX_WAIT=25
+      POLL_INTERVAL=0.2
+
+      for tick in $(seq 1 "$MAX_WAIT"); do
+        [ ''${#PENDING[@]} -eq 0 ] && break
+        CLIENTS_JSON=$(hyprctl clients -j 2>/dev/null)
+        NEW_PENDING=()
+        for i in "''${PENDING[@]}"; do
+          cls="''${CLASSES[$i]}"
+          ws="''${WORKSPACES[$i]}"
+          floating="''${FLOATINGS[$i]}"
+          addr=$(printf '%s' "$CLIENTS_JSON" | "$JQ" -r \
+            --arg cls "$cls" \
+            --arg claimed "$CLAIMED" \
+            --slurpfile prev "$BEFORE_FILE" \
+            '([ .[] | select(.class == $cls and (.address as $a | ($prev[0] // []) | index($a) | not) and ($claimed == "" or (($claimed | split(" ")) | index($a)) | not)) ] | sort_by(.focusHistoryID // 0)) | if length > 0 then .[0].address // empty else "" end')
+          if [ -n "$addr" ]; then
+            hyprctl dispatch "hl.dsp.window.move({ workspace = $ws, follow = false, window = 'address:$addr' })" &>/dev/null
+            if [ "$floating" = "true" ]; then
+              hyprctl dispatch "hl.dsp.window.float({ action = 'toggle', window = 'address:$addr' })" &>/dev/null
+            fi
+            RESTORED=$((RESTORED + 1))
+            CLAIMED="$CLAIMED $addr"
+          else
+            NEW_PENDING+=("$i")
+          fi
+        done
+        PENDING=("''${NEW_PENDING[@]}")
+        [ ''${#PENDING[@]} -eq 0 ] && break
+        sleep "$POLL_INTERVAL"
+      done
+
+      SKIPPED=$((SKIPPED + ''${#PENDING[@]}))
+
+      ${pkgs.libnotify}/bin/notify-send -i display "Session restored" "$RESTORED apps restored to their workspaces, $SKIPPED skipped"
     '';
   };
+
   xdg.configFile."hypr/session-mapping.conf" = {
     text = ''
       # Class=command (one per line)
@@ -151,6 +238,7 @@
       Steam=steam
     '';
   };
+
   xdg.configFile."hypr/session-tui-map.conf" = {
     text = ''
       # TUI apps: app=launch command. App is taken from the terminal window
@@ -159,9 +247,24 @@
       # re-attach to the same session. Pure tmux-only sessions are ignored.
       herdr=$HOME/.config/hypr/scripts/launch-terminal.sh tmux new-session -A -s herdr herdr
       nvim=$HOME/.config/hypr/scripts/launch-terminal.sh tmux new-session -A -s nvim nvim
-      btop=$HOME/.config/hypr/scripts/launch-terminal.sh btop
-      cava=$HOME/.config/hypr/scripts/launch-terminal.sh cava
+      btop=$HOME/.config/hypr/scripts/launch-terminal.sh tmux new-session -A -s btop btop
+      cava=$HOME/.config/hypr/scripts/launch-terminal.sh tmux new-session -A -s cava cava
       fastfetch=$HOME/.config/hypr/scripts/launch-terminal.sh fastfetch
     '';
+  };
+
+  systemd.user.services.hypr-session-save = {
+    Unit = {
+      Description = "Save Hyprland session before logout/sleep/lock";
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.coreutils}/bin/true";
+      ExecStop = "${config.home.homeDirectory}/.config/hypr/scripts/session-save.sh";
+      Environment = [ "PATH=/run/current-system/sw/bin:/run/wrappers/bin:${config.home.profileDirectory}/bin" ];
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
   };
 }

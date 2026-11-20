@@ -39,7 +39,7 @@
         rm -f $out/bin/lutris
         makeWrapper ${prev.lutris}/bin/lutris $out/bin/lutris \
           --prefix LD_LIBRARY_PATH : ${
-            final.lib.makeLibraryPath [
+            final.lib.makeLibraryPath ([
               final.vulkan-loader
               final.mesa
               final.libglvnd
@@ -77,7 +77,49 @@
               final.libsndfile
               final.openal
               final.cups
-            ]
+            ] ++ (with final.pkgsi686Linux; [
+              vulkan-loader
+              mesa
+              libglvnd
+              libx11
+              libxext
+              libxcursor
+              libxi
+              libxrandr
+              libxinerama
+              libxfixes
+              libxcb
+              libxrender
+              libxdamage
+              libxcomposite
+              libxtst
+              libxxf86vm
+              libxshmfence
+              libxkbcommon
+              libpulseaudio
+              alsa-lib
+              libunwind
+              freetype
+              fontconfig
+              libpng
+              libjpeg
+              libtiff
+              giflib
+              lcms2
+              libusb1
+              libv4l
+              gsm
+              libxml2
+              libtheora
+              libvorbis
+              libsndfile
+              openal
+              cups
+              libvdpau
+              speex
+              libgudev
+              xz
+            ]))
           }
       '';
     };
