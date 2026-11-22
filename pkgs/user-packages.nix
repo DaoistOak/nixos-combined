@@ -37,5 +37,5 @@ with pkgs;
     name = "phone-idle-inhibitor";
     text = builtins.readFile ../scripts/phone-idle-inhibitor;
   })
-  hyprland-qtutils
+  hyprland-guiutils
 ]

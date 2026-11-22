@@ -13,6 +13,16 @@
   programs = {
     gamemode = {
       enable = true;
+      settings = {
+        general = {
+          desiredgov = "performance";
+          inhibit_screensaver = 1;
+        };
+        custom = {
+          start = "/home/zeph/.config/hypr/scripts/performance-mode.sh start";
+          end = "/home/zeph/.config/hypr/scripts/performance-mode.sh end";
+        };
+      };
     };
     hyprland = {
       enable = true;

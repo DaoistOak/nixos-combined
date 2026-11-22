@@ -14,7 +14,7 @@
       hl.bind("P", hl.dsp.exec_cmd("~/bin/colorpicker"), { description = "Color picker (mode S)" })
       hl.bind("K", hl.dsp.exec_cmd("keyviz"), { description = "Keyviz keypress visualizer (mode S)" })
       hl.bind("C", hl.dsp.exec_cmd("noctalia msg panel-toggle yuuto/calculator:panel"), { description = "Calculator panel (mode S)" })
-      hl.bind("G", hl.dsp.exec_cmd(scripts .. "/performance-mode.sh"), { description = "Toggle performance mode (gaps/corners/transparency/border rotate)" })
+      hl.bind("G", hl.dsp.exec_cmd(scripts .. "/gamemode-toggle.sh"), { description = "Toggle GameMode (drives performance-mode hooks)" })
       hl.bind("SHIFT + V", hl.dsp.exec_cmd(scripts .. "/session-restore.sh"), { description = "Restore session (mode S)" })
       hl.bind("D", hl.dsp.submap("shell-widgets"), { description = "Widget toggles submenu" })
       hl.bind("escape", hl.dsp.submap("reset"), { description = "Exit shell mode" })

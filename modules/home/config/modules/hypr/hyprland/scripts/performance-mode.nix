@@ -8,22 +8,23 @@
     executable = true;
     text = ''
       #!/usr/bin/env bash
-      # Toggle performance mode (SUPER+S, G). A plain state flip — no noctalia
-      # panel dependency. When enabled: Hyprland runs with no gaps/animations
-      # and fully opaque square windows, and Noctalia stops drawing any
-      # transparency or rounded corners (screen corners off, concave edge
-      # corners off, radius 0, every background_opacity forced to 1.0). It also
-      # stops the cursor-tracking border rotation (border-rotate.sh off).
-      # Noctalia changes go through ~/.local/state/noctalia/settings.toml,
-      # which the shell watches for external edits and hot-applies.
-      # Disabling restores both profiles.
+      # Apply/restore the "performance mode" (gaps/corners/transparency/border
+      # rotate/makima) profile. Invoked by GameMode's custom start/end hooks
+      # (see pkgs/system-programs.nix -> programs.gamemode.settings.custom),
+      # not by a Hyprland keybind anymore. Args: start | end
       set -euo pipefail
+
+      # gamemoded forces a minimal PATH (pkexec only); restore a usable one.
+      export PATH="/run/current-system/sw/bin:/run/wrappers/bin:${pkgs.coreutils}/bin:${pkgs.bash}/bin:$PATH"
+
+      # Hyprland env may be missing when run from the gamemoded user service.
+      if [ -z "''${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+        _his="$(ls -1 /run/user/$(id -u)/hypr 2>/dev/null | head -n1)"
+        [ -n "$_his" ] && export HYPRLAND_INSTANCE_SIGNATURE="$_his"
+      fi
 
       NOCTALIA_SETTINGS="${config.xdg.stateHome}/noctalia/settings.toml"
       NOCTALIA_BAK="${config.xdg.cacheHome}/hypr/noctalia-settings.perf-bak"
-      STATE_FILE="${config.xdg.cacheHome}/hypr/performance-mode"
-
-      mkdir -p "$(dirname "$NOCTALIA_BAK")" "$(dirname "$STATE_FILE")"
 
       apply_hyprland() {
         hyprctl eval 'hl.config({
@@ -36,7 +37,6 @@
           },
           animations = { enabled = false },
         })'
-        # a plain option; force it off so every window is fully opaque.
         hyprctl eval 'hyprTrans.force(false)'
       }
 
@@ -51,7 +51,6 @@
           },
           animations = { enabled = true },
         })'
-        # Restore the transparency choice saved by SUPER+W,T.
         hyprctl eval 'hyprTrans.force(hyprTrans.get())'
       }
 
@@ -131,21 +130,26 @@
         rm -f "$NOCTALIA_BAK"
       }
 
-      if [ ! -f "$STATE_FILE" ]; then
-        apply_hyprland
-        apply_noctalia
-        "${config.xdg.configHome}/hypr/scripts/border-rotate.sh" off
-        systemctl --user stop makima.service || true
-        touch "$STATE_FILE"
-        ${pkgs.libnotify}/bin/notify-send -i security-high "Performance mode" "Transparency, gaps and corners disabled; makima off"
-      else
-        restore_hyprland
-        restore_noctalia
-        "${config.xdg.configHome}/hypr/scripts/border-rotate.sh" on
-        systemctl --user start makima.service || true
-        rm -f "$STATE_FILE"
-        ${pkgs.libnotify}/bin/notify-send "Performance mode" "Desktop profile restored; makima on"
-      fi
+      case "''${1:-}" in
+        start)
+          apply_hyprland
+          apply_noctalia
+          "${config.xdg.configHome}/hypr/scripts/border-rotate.sh" off
+          systemctl --user stop makima.service || true
+          ${pkgs.libnotify}/bin/notify-send -i security-high "Performance mode" "Transparency, gaps and corners disabled; makima off"
+          ;;
+        end)
+          restore_hyprland
+          restore_noctalia
+          "${config.xdg.configHome}/hypr/scripts/border-rotate.sh" on
+          systemctl --user start makima.service || true
+          ${pkgs.libnotify}/bin/notify-send "Performance mode" "Desktop profile restored; makima on"
+          ;;
+        *)
+          echo "usage: $0 {start|end}" >&2
+          exit 2
+          ;;
+      esac
     '';
   };
 }
