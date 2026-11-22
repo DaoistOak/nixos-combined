@@ -35,26 +35,5 @@ in
 
   console.font = "/run/current-system/sw/share/consolefonts/ter-u18n.psf.gz";
 
-  programs.xwayland.enable = true;
-  programs.xwayland.package = pkgs.xwayland;
-
-  programs.nix-ld = {
-    enable = true;
-    libraries =
-      with pkgs;
-      [
-        libtheora
-        speex
-        libgudev
-        libvdpau
-      ]
-      ++ (with pkgs.pkgsi686Linux; [
-        libtheora
-        speex
-        libgudev
-        libvdpau
-      ]);
-  };
-
   system.stateVersion = "26.05";
 }

@@ -77,7 +77,4 @@
     _JAVA_OPTIONS = "-Djava.util.prefs.userRoot=/home/zeph/.config/java";
     WGETRC = "/home/zeph/.config/wget/wgetrc";
   };
-  programs.zsh.enable = true;
-  programs.direnv.enableZshIntegration = true;
-
 }

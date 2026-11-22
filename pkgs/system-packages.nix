@@ -178,7 +178,6 @@ with pkgs;
   vulkan-validation-layers
 
   # --- System Libraries, Themes & Fonts ---
-  adi1090x-plymouth-themes
   adwaita-icon-theme
   alsa-utils
   bleachbit

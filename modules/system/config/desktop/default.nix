@@ -10,33 +10,14 @@
   services.xserver.enable = true;
 
   # Stock portal from binary cache; mask override to avoid forcing a local build.
-  programs.hyprland = {
-    enable = true;
-    withUWSM = true;
-    # stdenv override: the flake's pinned nixpkgs is glibc 2.42 but the system is
-    # glibc 2.44 with a mesa requiring GLIBC_2.43. Hyprland dlopens that GBM
-    # driver from /run/opengl-driver, so it must link the system glibc or it
-    # aborts at startup ("MESA-LOADER: version GLIBC_2.43 not found" ->
-    # "CBackend::create() failed!"). Deps (aquamarine/hyprutils/...) stay from
-    # hyprland's own overlay, so plugins keep matching store paths.
-    # MUST stay byte-identical to modules/home/.../hyprland/default.nix or the
-    # session package and the home-manager package diverge.
-    # hyprland input's own nixpkgs in flake.nix -- do NOT add a postPatch here,
-    # it would not reach the plugins' private Hyprland builds.
-    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland.override {
-      stdenv = pkgs.stdenv;
-    };
-    portalPackage =
-      let
-        stock = pkgs.xdg-desktop-portal-hyprland;
-      in
-      stock // { override = _: stock; };
-  };
-
   # Fix security wrapper for Hyprland: the wrapper script created by nix wraps
   # bin/Hyprland (a shell script), but the security wrapper requires an ELF.
   # Point it to the actual binary.
-  security.wrappers.Hyprland.source = lib.mkForce "${inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland.override { stdenv = pkgs.stdenv; }}/bin/.Hyprland-wrapped";
+  security.wrappers.Hyprland = {
+    owner = "root";
+    group = "root";
+    source = lib.mkForce "${inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland.override { stdenv = pkgs.stdenv; }}/bin/.Hyprland-wrapped";
+  };
 
   services.desktopManager.plasma6.enable = true;
 
