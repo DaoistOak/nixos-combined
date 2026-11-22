@@ -36,8 +36,48 @@
       paths = [ prev.lutris ];
       nativeBuildInputs = [ final.makeWrapper ];
       postBuild = ''
+        mkdir -p $out/share/lutris-rename-config-patch
+        cat > $out/share/lutris-rename-config-patch/sitecustomize.py <<'PYEOF'
+try:
+    import os as _os
+    import lutris.config as _lc
+    _GAME_CONFIG_DIR = _lc.settings.GAME_CONFIG_DIR
+
+    def rename_config(old_config_id, new_slug):
+        try:
+            old_slug, timestamp = old_config_id.rsplit("-", 1)
+        except ValueError:
+            return None
+        if old_slug == new_slug:
+            return None
+        new_config_id = "{}-{}".format(new_slug, timestamp)
+        src_path = "{}/{}.yml".format(_GAME_CONFIG_DIR, old_config_id)
+        dest_path = "{}/{}.yml".format(_GAME_CONFIG_DIR, new_config_id)
+        if not _os.path.exists(src_path):
+            if _os.path.exists(dest_path):
+                return new_config_id
+            return None
+        if _os.path.exists(dest_path):
+            try:
+                _os.remove(src_path)
+            except OSError:
+                pass
+            return new_config_id
+        _os.rename(src_path, dest_path)
+        return new_config_id
+
+    _lc.rename_config = rename_config
+    try:
+        import lutris.gui.config.game_common as _gc
+        _gc.rename_config = rename_config
+    except Exception:
+        pass
+except Exception:
+    pass
+PYEOF
         rm -f $out/bin/lutris
         makeWrapper ${prev.lutris}/bin/lutris $out/bin/lutris \
+          --prefix PYTHONPATH : $out/share/lutris-rename-config-patch \
           --prefix LD_LIBRARY_PATH : ${
             final.lib.makeLibraryPath ([
               final.vulkan-loader
