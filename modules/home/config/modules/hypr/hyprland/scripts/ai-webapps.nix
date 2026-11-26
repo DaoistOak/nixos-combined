@@ -42,14 +42,15 @@ in
       fi
 
       # No --user-data-dir: the app window joins the default Chromium profile,
-      # so it inherits the main browser's extensions (Stylus), their stored
-      # data and cookies. Chromium hands the request to the already-running
-      # browser process when one is up.
+      # so it inherits the main browser's cookies and extensions. Chromium hands
+      # the request to the already-running browser process when one is up.
       nohup chromium \
         --app="$url" \
         --class="$class" \
         --no-first-run \
-        --password-store=basic >/dev/null 2>&1 &
+        --password-store=basic \
+        --disable-features=CalculateNativeWinOcclusion \
+        --disable-gpu-vsync >/dev/null 2>&1 &
     '';
   };
 
@@ -104,7 +105,9 @@ in
         --app="http://127.0.0.1:4096" \
         --class="$class" \
         --no-first-run \
-        --password-store=basic >/dev/null 2>&1 &
+        --password-store=basic \
+        --disable-features=CalculateNativeWinOcclusion \
+        --disable-gpu-vsync >/dev/null 2>&1 &
 
       # Leave the opencode server running so the window stays connected.
       disown
@@ -152,7 +155,9 @@ in
         --app="$url" \
         --class="$class" \
         --no-first-run \
-        --password-store=basic >/dev/null 2>&1 &
+        --password-store=basic \
+        --disable-features=CalculateNativeWinOcclusion \
+        --disable-gpu-vsync >/dev/null 2>&1 &
 
       # Leave the hermes server running so the window stays connected.
       disown

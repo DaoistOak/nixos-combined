@@ -30,7 +30,7 @@ with pkgs;
   # no ExtensionInstallTypeBlocklist::command_line policy is set (it isn't).
   # `updt ext` bumps the upstream pins.
   (ungoogled-chromium.override {
-    commandLineArgs = "${chromiumExtensions.loadArg} --extension-mime-request-handling=always-prompt-for-install";
+    commandLineArgs = "${chromiumExtensions.loadArg} --extension-mime-request-handling=always-prompt-for-install --disable-features=CalculateNativeWinOcclusion --enable-gpu-rasterization --enable-zero-copy --disable-gpu-vsync --enable-features=WaylandWindowDecorations";
   })
   vesktop
 

@@ -17,7 +17,7 @@
       CLIENTS=$(hyprctl clients -j 2>/dev/null) || exit 1
       [ -z "$CLIENTS" ] && exit 0
 
-      IGNORE_CLASSES='^(kitty|org\.wezfurlong\.wezterm|Alacritty|foot|Ghostty|xterm|st-)$'
+      IGNORE_CLASSES='^(kitty|org\.wezfurlong\.wezterm|Alacritty|foot|Ghostty|xterm|st-|com\.mitchellh\.ghostty)$'
 
       TUI_MAP_FILE="$HOME/.config/hypr/session-tui-map.conf"
       if [ -f "$TUI_MAP_FILE" ]; then
@@ -99,7 +99,7 @@
       RESTORED=0
       SKIPPED=0
 
-      IGNORE_CLASSES='^(kitty|org\.wezfurlong\.wezterm|Alacritty|foot|Ghostty|xterm|st-)$'
+      IGNORE_CLASSES='^(kitty|org\.wezfurlong\.wezterm|Alacritty|foot|Ghostty|xterm|st-|com\.mitchellh\.ghostty)$'
 
       mapfile -t ENTRIES < <("$JQ" -r --arg ignore "$IGNORE_CLASSES" '
         .[] | select(.workspace > 0) |
@@ -189,7 +189,7 @@
             --arg cls "$cls" \
             --arg claimed "$CLAIMED" \
             --slurpfile prev "$BEFORE_FILE" \
-            '([ .[] | select(.class == $cls and (.address as $a | ($prev[0] // []) | index($a) | not) and ($claimed == "" or (($claimed | split(" ")) | index($a)) | not)) ] | sort_by(.focusHistoryID // 0)) | if length > 0 then .[0].address // empty else "" end')
+            '([ .[] | .address as $a | select(.class == $cls and (($prev[0] // []) | index($a) | not) and ($claimed == "" or (($claimed | split(" ")) | index($a)) | not)) ] | sort_by(.focusHistoryID // 0)) | if length > 0 then .[0].address // empty else "" end')
           if [ -n "$addr" ]; then
             hyprctl dispatch "hl.dsp.window.move({ workspace = $ws, follow = false, window = 'address:$addr' })" &>/dev/null
             if [ "$floating" = "true" ]; then

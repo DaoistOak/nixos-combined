@@ -170,6 +170,17 @@ in
             echo "removed stale nvim config file: $f"
           done < <(find "$dir" -type f -print0)
         done
+        # nvim's bytecode cache (vim.loader) keeps compiled chunks keyed by
+        # file path and only invalidates on mtime/size. After a home-manager
+        # switch or GC the nix store paths embedded in generated files such as
+        # lua/plugins/zz-nixpkgs.lua change while the source path's mtime may
+        # not, so stale bytecode referencing dead store paths survives and makes
+        # lazy.nvim report every nix-linked plugin as missing. Drop the cache
+        # so the next nvim start recompiles against the current generation.
+        if [[ -d "$HOME/.cache/nvim/luac" ]]; then
+          $DRY_RUN_CMD rm -rf "$HOME/.cache/nvim/luac"
+          echo "removed stale nvim luac cache"
+        fi
       '';
 
   stylix.targets.neovim.enable = false;

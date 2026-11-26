@@ -25,6 +25,8 @@ in
       name = "Catppuccin-Macchiato-Light-Cursors";
       size = 32;
     };
+    targets.wayprompt.enable = false;
+
     fonts = {
       monospace = {
         package = pkgs.jetbrains-mono;

@@ -10,7 +10,10 @@ with pkgs;
   copilot-language-server
   flameshot
   gpu-screen-recorder
-  inputs.hermes-agent.packages."x86_64-linux".default
+  # Temporarily disabled: hermes-agent's nix package applies a patchelf patch
+  # that no longer applies to patchelf 0.15.2, breaking all home builds.
+  # Re-enable once upstream fixes the packaging.
+  # inputs.hermes-agent.packages."x86_64-linux".default
   hypridle
   # hyprlandGuiutils  # disabled: hyprtoolkit build fails (needs hyprutils >=0.14.2, pinned is 0.14.0)
   # hyprlandGuiutils
